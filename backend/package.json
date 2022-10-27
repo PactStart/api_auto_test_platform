@@ -1,0 +1,25 @@
+{
+  "name": "aat_server",
+  "version": "1.0.0",
+  "description": "api auto test platform server",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Rex.Lei",
+  "license": "ISC",
+  "dependencies": {
+    "@escook/express-joi": "1.1.1",
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.19.2",
+    "cors": "^2.8.5",
+    "express": "^4.17.3",
+    "joi": "^17.4.0",
+    "jsonwebtoken": "^8.5.1",
+    "mysql": "^2.18.1",
+    "redis": "^4.3.1",
+    "request": "^2.88.2",
+    "swagger-jsdoc": "^6.2.5",
+    "swagger-ui-express": "^4.5.0"
+  }
+}
