@@ -14,23 +14,68 @@ function parseApi(groupName, apiDocObj) {
             let contentType = '';
             if(apiDescObj["consumes"]) {
                 contentType = apiDescObj["consumes"][0];
-            } else {
-                if(!contentType && requestMethod.toLocaleLowerCase() == 'post') {
-                    contentType = 'application/json';
-                }
             }
+            if(!contentType && requestMethod.toLocaleLowerCase() == 'post') {
+                contentType = 'application/json';
+            }
+            
             let moduleName = '默认模块';
             if(apiDescObj["tags"]) {
                 moduleName = apiDescObj["tags"][0];
             }
+
+            let headers = [];
+            let query = [];
+            let bodyParams = [];
+            if(apiDescObj['parameters']) {
+                headers = apiDescObj['parameters'].filter(item => item['in'] == 'header')
+                query = apiDescObj['parameters'].filter(item => item['in'] == 'query')
+                bodyParams = apiDescObj['parameters'].filter(item => item['in'] != 'body')
+            }
+            let body = {};
+            if(bodyParams && bodyParams.length) {
+                bodyParam = bodyParams[0];
+                if(bodyParam['schema'] && bodyParam['schema']['$ref']) {
+                    const ref = bodyParam['schema']['$ref']
+                    pathArr = ref.substring(2).split("/");
+                    let targetObj = apiDocObj;
+                    for (const path of pathArr) {
+                        if( targetObj[path]) {
+                            targetObj = targetObj[path];
+                        } else {
+                            break;
+                        }
+                    }
+                    body = targetObj;
+                }
+            }
+            let bodySchemaPathArr = ['requestBody','content','application/json','schema'];
+            let cursorObj = apiDescObj;
+            let index = 0;
+            for (;index < bodySchemaPathArr.length; index++) {
+                const name = bodySchemaPathArr[index];
+                if(cursorObj[name]) {
+                    cursorObj = cursorObj[name];
+                } else {
+                    break
+                }
+            }
+            if(index == bodySchemaPathArr.length) {
+                body = cursorObj;
+            }
+
             apiObj = {
                 groupName,
                 moduleName,
                 apiName,
                 apiUrl,
                 requestMethod,
-                contentType
+                contentType,
+                headers,
+                query,
+                body
             };
+            console.log(apiObj);
             apiArr.push(apiObj);
         }
     }

@@ -32,6 +32,8 @@ const AppCheck = require('../utils/AppCheck');
  *                required: true
  *    produces: 
  *      - application/json 
+ *    consumes: 
+ *      - application/json
  *    responses:
  *      200:
  *        description: OK
@@ -66,6 +68,8 @@ router.post('/add',expressJoi(AppCheck.appAddCheck),appController.addApp);
  *                description: 应用id
  *    produces: 
  *      - application/json 
+ *    consumes: 
+ *      - application/json
  *    responses:
  *      200:
  *        description: OK
@@ -104,6 +108,8 @@ router.post('/delete',expressJoi(AppCheck.appDeleteCheck),appController.deleteAp
  *                description: 应用名称
  *    produces: 
  *      - application/json 
+ *    consumes: 
+ *      - application/json
  *    responses:
  *      200:
  *        description: OK

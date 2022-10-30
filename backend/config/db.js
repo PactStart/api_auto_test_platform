@@ -16,7 +16,13 @@ const db = mysql.createPool({
             if(field.buffer() == null) {
                 return null;
             }
-           return field.buffer().compare(zeroBuffer,0,1) > 0;
+            try {
+                return field.buffer().compare(zeroBuffer,0,1) > 0;
+            } catch (error) {
+                console.log(field.name)
+                return true;
+            }
+           
         } else {
             return next();
         }

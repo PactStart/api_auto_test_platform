@@ -28,6 +28,8 @@ const UserCheck = require('../utils/UserCheck');
  *                required: true
  *    produces: 
  *      - application/json 
+ *    consumes: 
+ *      - application/json 
  *    responses:
  *      200:
  *        description: OK
@@ -59,7 +61,7 @@ router.post('/login', expressJoi(UserCheck.userLoginCheck), userController.login
 
  /**
  * @openapi
- * /api/v1/user/reset_pwd:
+ * /api/v1/user/resetPwd:
  *  post:
  *    tags:
  *      - 用户模块
@@ -70,24 +72,32 @@ router.post('/login', expressJoi(UserCheck.userLoginCheck), userController.login
  *        type: string
  *        description: jwt
  *        in: header
- *      - name: oldPassword
- *        type: string
- *        description: 旧密码
- *        in: body
- *        required: true
- *      - name: newPassword
- *        type: string
- *        description: 新密码
- *        in: body
- *        required: true
+ *      
+ *    requestBody:
+ *      description: 账号密码信息
+ *      content:
+ *        application/json:
+ *          schema:
+ *            type: object
+ *            properties: 
+ *              oldPassword:
+ *                type: string
+ *                description: 旧密码
+ *                required: true
+ *              newPassword:
+ *                type: string
+ *                description: 新密码
+ *                required: true
  *    produces: 
+ *      - application/json 
+ *    consumes: 
  *      - application/json 
  *    responses:
  *      200:
  *        description: OK
  * 
  */
-  router.post('/reset_pwd',expressJoi(UserCheck.userResetPwdCheck), userController.resetPwd);
+  router.post('/resetPwd',expressJoi(UserCheck.userResetPwdCheck), userController.resetPwd);
 
 
 /**
@@ -140,6 +150,8 @@ router.get('/userInfo',  userController.userInfo);
  *                required: true
  *    produces: 
  *      - application/json 
+ *    consumes: 
+ *      - application/json 
  *    responses:
  *      200:
  *        description: OK
@@ -171,6 +183,8 @@ router.post('/add',expressJoi(UserCheck.userAddCheck), userController.addUser);
  *                description: 用户id
  *                required: true
  *    produces: 
+ *      - application/json 
+ *    consumes: 
  *      - application/json 
  *    responses:
  *      200:
@@ -208,6 +222,10 @@ router.post('/delete',expressJoi(UserCheck.userDeleteCheck), userController.dele
  *              email:
  *                type: string
  *                description: 邮箱
+ *    produces: 
+ *      - application/json 
+ *    consumes: 
+ *      - application/json 
  *    responses:
  *      200:
  *        description: OK

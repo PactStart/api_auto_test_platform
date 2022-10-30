@@ -22,7 +22,7 @@ const ApiTestCaseCheck = require('../utils/ApiTestCaseCheck');
  *    requestBody:
  *      description: 测试用例信息
  *      content:
- *        apilication/json:
+ *        application/json:
  *          schema:
  *            type: object
  *            properties: 
@@ -60,7 +60,9 @@ const ApiTestCaseCheck = require('../utils/ApiTestCaseCheck');
  *                required: true
  *                description: 断言
  *    produces: 
- *      - apilication/json 
+ *      - application/json
+ *    consumes: 
+ *      - application/json
  *    responses:
  *      200:
  *        description: OK
@@ -85,7 +87,7 @@ router.post('/add',expressJoi(ApiTestCaseCheck.apiTestCaseAddCheck),apiTestCaseC
  *    requestBody:
  *      description: 用例id
  *      content:
- *        apilication/json:
+ *        application/json:
  *          schema:
  *            type: object
  *            properties: 
@@ -94,7 +96,9 @@ router.post('/add',expressJoi(ApiTestCaseCheck.apiTestCaseAddCheck),apiTestCaseC
  *                required: true
  *                description: 用例id
  *    produces: 
- *      - apilication/json 
+ *      - application/json 
+ *    consumes: 
+ *      - application/json
  *    responses:
  *      200:
  *        description: OK
@@ -119,7 +123,7 @@ router.post('/delete',expressJoi(ApiTestCaseCheck.apiTestCaseDeleteCheck),apiTes
  *    requestBody:
  *      description: 用例信息
  *      content:
- *        apilication/json:
+ *        application/json:
  *          schema:
  *            type: object
  *            properties: 
@@ -153,7 +157,9 @@ router.post('/delete',expressJoi(ApiTestCaseCheck.apiTestCaseDeleteCheck),apiTes
  *                required: true
  *                description: 断言
  *    produces: 
- *      - apilication/json 
+ *      - application/json 
+ *    consumes: 
+ *      - application/json
  *    responses:
  *      200:
  *        description: OK
@@ -202,12 +208,126 @@ router.post('/update',expressJoi(ApiTestCaseCheck.apiTestCaseUpdateCheck),apiTes
  *        required: true
  *        in: query
  *    produces: 
- *      - apilication/json 
+ *      - application/json 
  *    responses:
  *      200:
  *        description: OK
  * 
  */
 router.get('/query',expressJoi(ApiTestCaseCheck.apiTestCaseQueryCheck),apiTestCaseController.queryApiTestCase);
+
+
+/**
+ * @openapi
+ * /api/v1/testCase/createDefault:
+ *  post:
+ *    tags:
+ *      - 测试用例模块
+ *    summary: 为api创建默认的测试用例
+ *    description: 为api创建默认的测试用例
+ *    parameters:
+ *      - name: Authorization
+ *        type: string
+ *        description: jwt
+ *        in: header
+ *        required: true
+ *    requestBody:
+ *      description: API id
+ *      content:
+ *        application/json:
+ *          schema:
+ *            type: object
+ *            properties: 
+ *              id:
+ *                type: integer
+ *                required: true
+ *                description: API id
+ *    produces: 
+ *      - application/json 
+ *    consumes: 
+ *      - application/json
+ *    responses:
+ *      200:
+ *        description: OK
+ * 
+ */
+ router.post('/delete',expressJoi(ApiTestCaseCheck.apiTestCaseCreateDefaultCheck),apiTestCaseController.createDefault);
+
+ /**
+ * @openapi
+ * /api/v1/testCase/createDefaultForAll:
+ *  post:
+ *    tags:
+ *      - 测试用例模块
+ *    summary: 为应用的所有api创建默认的测试用例
+ *    description: 为应用的所有api创建默认的测试用例
+ *    parameters:
+ *      - name: Authorization
+ *        type: string
+ *        description: jwt
+ *        in: header
+ *        required: true
+ *    requestBody:
+ *      description: 用例id
+ *      content:
+ *        application/json:
+ *          schema:
+ *            type: object
+ *            properties: 
+ *              appId:
+ *                type: integer
+ *                required: true
+ *                description: 应用id
+ *    produces: 
+ *      - application/json 
+ *    consumes: 
+ *      - application/json
+ *    responses:
+ *      200:
+ *        description: OK
+ * 
+ */
+router.post('/createDefaultForAll',expressJoi(ApiTestCaseCheck.apiTestCaseCreateDefaultForAllCheck),apiTestCaseController.createDefaultForAll);
+
+
+/**
+ * @openapi
+ * /api/v1/testCase/bactchSetPreCase:
+ *  post:
+ *    tags:
+ *      - 测试用例模块
+ *    summary: 为应用的所有api设置默认前置用例
+ *    description: 为应用的所有api设置默认前置用例
+ *    parameters:
+ *      - name: Authorization
+ *        type: string
+ *        description: jwt
+ *        in: header
+ *        required: true
+ *    requestBody:
+ *      description: 用例id
+ *      content:
+ *        application/json:
+ *          schema:
+ *            type: object
+ *            properties: 
+ *              appId:
+ *                type: integer
+ *                required: true
+ *                description: 应用id
+ *              preCaseId:
+ *                type: integer
+ *                required: true
+ *                description: 用例id
+ *    produces: 
+ *      - application/json 
+ *    consumes: 
+ *      - application/json
+ *    responses:
+ *      200:
+ *        description: OK
+ * 
+ */
+ router.post('/bactchSetPreCase',expressJoi(ApiTestCaseCheck.apiTestCaseCreateDefaultForAllCheck),apiTestCaseController.batchSetPreCase);
 
 module.exports = router;

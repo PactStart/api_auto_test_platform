@@ -3,6 +3,8 @@ const request = require('request');
 const {parseToken} = require('../utils/TokenParser');
 const {generateWhereSql} = require('../utils/CommonUtil');
 const {parseApi} = require('../utils/SwaggerParser');
+var defaults = require('json-schema-defaults');
+
 
 exports.addApi = (req,res) => {
     let {appId,groupName,moduleName,apiName,url,requestMethod,contentType} = req.body;
@@ -155,13 +157,13 @@ exports.importSwaggerApi = (req,res) => {
         
         const currentUser = parseToken(req);
         const now = Date.now();
-        let insertSql = 'insert api(app_id,group_name,module_name,api_name,url,request_method,content_type,create_at,create_by,update_at) values \r\n';
+        let insertSql = 'insert api(app_id,group_name,module_name,api_name,url,request_method,content_type,query,body,headers,create_at,create_by,update_at) values \r\n';
 
         const moduleNameSet = new Set();
         for (let index = 0; index < apiArr.length; index++) {
             const api = apiArr[index];
             moduleNameSet.add(api['moduleName']);
-            insertSql = insertSql + `(${appId},'${api.groupName}','${api.moduleName}','${api.apiName}','${api.apiUrl}','${api.requestMethod}','${api.contentType}',${now},'${currentUser.nickname}',${now}),\r\n`;
+            insertSql = insertSql + `(${appId},'${api.groupName}','${api.moduleName}','${api.apiName}','${api.apiUrl}','${api.requestMethod}','${api.contentType}','${JSON.stringify(api.query)}','${JSON.stringify(api.body)}','${JSON.stringify(api.headers)}',${now},'${currentUser.nickname}',${now}),\r\n`;
         }
         insertSql = insertSql.substring(0,insertSql.lastIndexOf(','));
         insertSql = insertSql + `on duplicate key update 
@@ -170,6 +172,9 @@ exports.importSwaggerApi = (req,res) => {
         api_name=values(api_name),
         request_method=values(request_method),
         content_type=values(content_type),
+        query = values(query),
+        body = values(body),
+        headers = values(headers),
         update_at=values(update_at),
         update_by='${currentUser.nickname}'`;
         db.query(insertSql,(err,results) => {

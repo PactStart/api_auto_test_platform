@@ -23,7 +23,7 @@ const ApiCheck = require('../utils/ApiCheck');
  *    requestBody:
  *      description: API信息
  *      content:
- *        apilication/json:
+ *        application/json:
  *          schema:
  *            type: object
  *            properties: 
@@ -56,7 +56,9 @@ const ApiCheck = require('../utils/ApiCheck');
  *                required: true
  *                description: 请求格式，x-www-form-url-encoded | application/json | none
  *    produces: 
- *      - apilication/json 
+ *      - application/json 
+ *    consumes: 
+ *      - application/json
  *    responses:
  *      200:
  *        description: OK
@@ -81,7 +83,7 @@ router.post('/add',expressJoi(ApiCheck.apiAddCheck),apiController.addApi);
  *    requestBody:
  *      description: API信息
  *      content:
- *        apilication/json:
+ *        application/json:
  *          schema:
  *            type: object
  *            properties: 
@@ -90,7 +92,9 @@ router.post('/add',expressJoi(ApiCheck.apiAddCheck),apiController.addApi);
  *                required: true
  *                description: APIid
  *    produces: 
- *      - apilication/json 
+ *      - application/json
+ *    consumes: 
+ *      - application/json
  *    responses:
  *      200:
  *        description: OK
@@ -115,7 +119,7 @@ router.post('/delete',expressJoi(ApiCheck.apiDeleteCheck),apiController.deleteAp
  *    requestBody:
  *      description: API信息
  *      content:
- *        apilication/json:
+ *        application/json:
  *          schema:
  *            type: object
  *            properties: 
@@ -148,7 +152,9 @@ router.post('/delete',expressJoi(ApiCheck.apiDeleteCheck),apiController.deleteAp
  *                required: true
  *                description: 请求格式，x-www-form-url-encoded | application/json | none
  *    produces: 
- *      - apilication/json 
+ *      - application/json
+ *    consumes: 
+ *      - application/json
  *    responses:
  *      200:
  *        description: OK
@@ -193,7 +199,7 @@ router.post('/update',expressJoi(ApiCheck.apiUpdateCheck),apiController.updateAp
  *        required: true
  *        in: query
  *    produces: 
- *      - apilication/json 
+ *      - application/json 
  *    responses:
  *      200:
  *        description: OK
@@ -218,7 +224,7 @@ router.get('/query',expressJoi(ApiCheck.apiQueryCheck),apiController.queryApi);
  *    requestBody:
  *      description: swagger api url
  *      content:
- *        apilication/json:
+ *        application/json:
  *          schema:
  *            type: object
  *            properties: 
@@ -231,7 +237,9 @@ router.get('/query',expressJoi(ApiCheck.apiQueryCheck),apiController.queryApi);
  *                required: true
  *                description: api文档地址
  *    produces: 
- *      - apilication/json 
+ *      - application/json 
+ *    consumes: 
+ *      - application/json
  *    responses:
  *      200:
  *        description: OK

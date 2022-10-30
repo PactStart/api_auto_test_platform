@@ -54,6 +54,8 @@ const permissionCheck = require('../utils/PermissionCheck');
  * 
  *    produces: 
  *      - application/json 
+ *    consumes: 
+ *      - application/json 
  *    responses:
  *      200:
  *        description: OK
@@ -87,6 +89,8 @@ router.post('/add',expressJoi(permissionCheck.permissionAddCheck),permissionCont
  *                required: true
  *                description: 权限id
  *    produces: 
+ *      - application/json 
+ *    consumes: 
  *      - application/json 
  *    responses:
  *      200:
@@ -137,6 +141,8 @@ router.post('/delete',expressJoi(permissionCheck.permissionDeleteCheck),permissi
  *                required: true
  *                description: 权限描述
  *    produces: 
+ *      - application/json 
+ *    consumes: 
  *      - application/json 
  *    responses:
  *      200:
@@ -220,6 +226,8 @@ router.get('/query',expressJoi(permissionCheck.permissionQueryCheck),permissionC
  *                required: true
  *                description: swagger api地址
  *    produces: 
+ *      - application/json 
+ *    consumes: 
  *      - application/json 
  *    responses:
  *      200:

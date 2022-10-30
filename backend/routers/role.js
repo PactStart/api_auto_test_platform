@@ -107,6 +107,8 @@ router.post('/delete',expressJoi(RoleCheck.roleDeleteCheck),roleController.delet
  *                description: 角色描述
  *    produces: 
  *      - application/json 
+ *    consumes: 
+ *      - application/json 
  *    responses:
  *      200:
  *        description: OK
@@ -182,6 +184,8 @@ router.get('/query',expressJoi(RoleCheck.roleQueryCheck),roleController.queryRol
  *                description: 权限id数组
  *    produces: 
  *      - application/json 
+ *    consumes: 
+ *      - application/json 
  *    responses:
  *      200:
  *        description: OK
@@ -220,6 +224,8 @@ router.post('/assignPermissions',expressJoi(RoleCheck.rolePermissionsCheck),role
  *                description: 权限id数组
  *    produces: 
  *      - application/json 
+ *    consumes: 
+ *      - application/json 
  *    responses:
  *      200:
  *        description: OK
@@ -257,6 +263,8 @@ router.post('/assignPermissions',expressJoi(RoleCheck.rolePermissionsCheck),role
  *                required: true
  *                description: 权限id数组
  *    produces: 
+ *      - application/json 
+ *    consumes: 
  *      - application/json 
  *    responses:
  *      200:

@@ -78,5 +78,28 @@ function convertKeyToUnderline (data) {
 	}
 	return newObj
   }
+
+  function recursionFindAll(map,array) {
+	let result = [];
+	if(array == null || array.length == 0) {
+		return result
+	}
+	for (let index = 0; index < array.length; index++) {
+		const element = array[index];
+		if(map.has(element)) {
+			result.push(element)
+		}
+	}
+	let subResult = recursionFindAll(map,result);
+	result = result.push(subResult);
+	return result;
+  }
+
+  function recursionFindAllNonredundant(map,array) {
+	let result = recursionFindAll(map,array);
+	return Array.from(new Set(arr))
+  }
+
+
   
-module.exports = {camelCaseToUnderline,underlineToCamelCase,generateWhereSql,convertKeyToCamelCase,convertKeyToUnderline};
+module.exports = {camelCaseToUnderline,underlineToCamelCase,generateWhereSql,convertKeyToCamelCase,convertKeyToUnderline,recursionFindAllNonredundant};

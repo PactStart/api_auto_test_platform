@@ -23,7 +23,7 @@ const AppConfigCheck = require('../utils/AppConfigCheck');
  *    requestBody:
  *      description: 应用配置信息
  *      content:
- *        appConfiglication/json:
+ *        application/json:
  *          schema:
  *            type: object
  *            properties: 
@@ -40,7 +40,9 @@ const AppConfigCheck = require('../utils/AppConfigCheck');
  *                required: true
  *                description: 配置值
  *    produces: 
- *      - appConfiglication/json 
+ *      - application/json 
+ *    consumes: 
+ *      - application/json 
  *    responses:
  *      200:
  *        description: OK
@@ -65,7 +67,7 @@ router.post('/add',expressJoi(AppConfigCheck.appConfigAddCheck),appConfigControl
  *    requestBody:
  *      description: 应用配置信息
  *      content:
- *        appConfiglication/json:
+ *        application/json:
  *          schema:
  *            type: object
  *            properties: 
@@ -74,7 +76,9 @@ router.post('/add',expressJoi(AppConfigCheck.appConfigAddCheck),appConfigControl
  *                required: true
  *                description: 应用配置id
  *    produces: 
- *      - appConfiglication/json 
+ *      - application/json 
+ *    consumes: 
+ *      - application/json 
  *    responses:
  *      200:
  *        description: OK
@@ -99,7 +103,7 @@ router.post('/delete',expressJoi(AppConfigCheck.appConfigAddCheck),appConfigCont
  *    requestBody:
  *      description: 应用配置信息
  *      content:
- *        appConfiglication/json:
+ *        application/json:
  *          schema:
  *            type: object
  *            properties: 
@@ -116,7 +120,9 @@ router.post('/delete',expressJoi(AppConfigCheck.appConfigAddCheck),appConfigCont
  *                required: true
  *                description: 配置值
  *    produces: 
- *      - appConfiglication/json 
+ *      - application/json 
+ *    consumes: 
+ *      - application/json
  *    responses:
  *      200:
  *        description: OK
@@ -157,7 +163,7 @@ router.post('/update',expressJoi(AppConfigCheck.appConfigUpdateCheck),appConfigC
  *        required: true
  *        in: query
  *    produces: 
- *      - appConfiglication/json 
+ *      - application/json 
  *    responses:
  *      200:
  *        description: OK

@@ -15,6 +15,16 @@ async function hSet(key, hashKey, hashValue) {
     await client.hSet(key,hashKey, hashValue);
 }
 
+async function hDel(key, hashKey) {
+    await client.connect();
+    await client.hDel(key,hashKey);
+}
+
+async function hGet(key, hashKey) {
+    await client.connect();
+    await client.hGet(key,hashKey);
+}
+
 async function hExists(key,field) {
     await client.connect();
     return await client.hExists(key,field);
@@ -41,4 +51,4 @@ async function deleteKey(key) {
     return await client.del(key);
 }
 
-module.exports = {client,hSet,hExists,sAdd,sIsMember,sMembers};
+module.exports = {client,hSet,hDel,hGet,hExists,sAdd,sIsMember,sMembers};

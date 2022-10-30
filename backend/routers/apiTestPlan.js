@@ -22,7 +22,7 @@ const ApiTestPlanCheck = require('../utils/ApiTestPlanCheck');
  *    requestBody:
  *      description: 测试计划
  *      content:
- *        apilication/json:
+ *        application/json:
  *          schema:
  *            type: object
  *            properties: 
@@ -49,7 +49,9 @@ const ApiTestPlanCheck = require('../utils/ApiTestPlanCheck');
  *                required: true
  *                description: 计划名称
  *    produces: 
- *      - apilication/json 
+ *      - application/json 
+ *    consumes: 
+ *      - application/json
  *    responses:
  *      200:
  *        description: OK
@@ -74,7 +76,7 @@ router.post('/add',expressJoi(ApiTestPlanCheck.apiTestPlanAddCheck),apiTestPlanC
  *    requestBody:
  *      description: 计划id
  *      content:
- *        apilication/json:
+ *        application/json:
  *          schema:
  *            type: object
  *            properties: 
@@ -83,7 +85,9 @@ router.post('/add',expressJoi(ApiTestPlanCheck.apiTestPlanAddCheck),apiTestPlanC
  *                required: true
  *                description: 计划id
  *    produces: 
- *      - apilication/json 
+ *      - application/json
+ *    consumes: 
+ *      - application/json
  *    responses:
  *      200:
  *        description: OK
@@ -124,7 +128,7 @@ router.post('/delete',expressJoi(ApiTestPlanCheck.apiTestPlanDeleteCheck),apiTes
  *        required: true
  *        in: query
  *    produces: 
- *      - apilication/json 
+ *      - application/json 
  *    responses:
  *      200:
  *        description: OK
@@ -169,7 +173,9 @@ router.get('/query',expressJoi(ApiTestPlanCheck.apiTestPlanQueryCheck),apiTestPl
  *        required: true
  *        in: query
  *    produces: 
- *      - apilication/json 
+ *      - application/json 
+ *    consumes: 
+ *      - application/json
  *    responses:
  *      200:
  *        description: OK

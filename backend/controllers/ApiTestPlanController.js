@@ -1,6 +1,6 @@
 const db = require("../config/db");
 const {parseToken} = require('../utils/TokenParser');
-const {generateWhereSql,convertKeyToCamelCase} = require('../utils/CommonUtil');
+const {generateWhereSql,convertKeyToCamelCase,recursionFindAllNonredundant} = require('../utils/CommonUtil');
 
 exports.addApiTestPlan = (req,res) => {
     let {appId, chooseAllCase, caseIds, baseUrl, name} = req.body;
@@ -52,75 +52,118 @@ exports.addApiTestPlan = (req,res) => {
                 msg: err.message
             })
         }
-        console.log(caseRows);
-        db.getConnection((err,connection) => {
+        const preCaseIdMappingSql = 'select id, pre_case_id from api_test_plan where app_id = ? where pre_case_id != 0'
+        db.query(preCaseIdMappingSql,appId, (err,results) => {
             if(err) {
                 return res.send({
                     code: 1,
                     msg: err.message
                 })
             }
-            connection.beginTransaction(function(err) {
+            const idMapping = new Map();
+            for (let index = 0; index < results.length; index++) {
+                const row = array[index];
+                idMapping.put(row.id,row.pre_case_id)
+            }
+            effectiveCaseIds = [];
+            for (let index = 0; index < caseRows.length; index++) {
+                effectiveCaseIds.push(caseRows[index].id)
+            }
+            extraCaseIds = recursionFindAllNonredundant(idMapping,effectiveCaseIds);
+            //交集
+            var tmpCaseIdArr = extraCaseIds.filter(function(v){
+                return effectiveCaseIds.indexOf(v)!==-1;
+            })
+            //差集
+            extraCaseIds = extraCaseIds.filter(function (v) {
+                return tmpCaseIdArr .indexOf(v)===-1
+            })
+            if(extraCaseIds && !extraCaseIds.length) {
+                selectExtraSql = `select 
+                tc.id as case_id,
+                tc.name as case_name,
+                group_name,
+                module_name,
+                api_name,
+                url,
+                request_method,
+                content_type,
+                headers,
+                pre_case_id,
+                pre_fields,
+                request_body,
+                assert
+                from api_test_case tc 
+                join api 
+                on tc.api_id = api.id 
+                where tc.app_id = ? tc.id in (${extraCaseIds.join(',')})`;
+                db.query(selectExtraSql,appId,(err,extracaseRows) => {
+                    if(err) {
+                        return res.send({
+                            code: 1,
+                            msg: err.message
+                        })
+                    }
+                });
+                caseRows = caseRows.push(extracaseRows);
+            }
+            db.getConnection((err,connection) => {
                 if(err) {
                     return res.send({
                         code: 1,
                         msg: err.message
                     })
                 }
-                const insertPlanSql = "insert api_test_plan(app_id,name,base_url,case_num,create_at,create_by) values (?,?,?,?,?,?)";
-                const currentUser = parseToken(req);
-                const now = Date.now();
-                connection.query(insertPlanSql,[appId,name,baseUrl,caseRows.length,now,currentUser.nickname],(err,results) => {
+                connection.beginTransaction(function(err) {
                     if(err) {
-                        console.log(err)
                         return res.send({
                             code: 1,
                             msg: err.message
                         })
                     }
-                    const planId = results.insertId;
-    
-                    let insertRunLogSql = ` insert api_test_case_run_log(
-                        app_id,
-                        plan_id,
-                        case_id,
-                        case_name,
-                        group_name,
-                        module_name,
-                        api_name,
-                        url,
-                        request_method,
-                        content_type,
-                        headers,
-                        pre_case_id,
-                        pre_fields,
-                        request_body,
-                        assert,
-                        create_at,
-                        create_by) values 
-                    `;
-                    for (let index = 0; index < caseRows.length; index++) {
-                        const caseRow = caseRows[index];
-                        insertRunLogSql = insertRunLogSql + `
-                        (${appId},${planId},${caseRow.case_id},'${caseRow.case_name}','${caseRow.group_name}','${caseRow.module_name}','${caseRow.api_name}','${caseRow.url}','${caseRow.request_method}',
-                            '${caseRow.content_type}','${caseRow.headers}',${caseRow.pre_case_id},'${caseRow.pre_fields}','${caseRow.request_body}','${caseRow.assert}',${now},'${currentUser.nickname}'),`;
-                    }
-                    insertRunLogSql = insertRunLogSql.substring(0,insertRunLogSql.length-1);
-
-                    console.log(insertRunLogSql);
-
-                    db.query(insertRunLogSql,(err,results) => {
-                        if (err) {
-                            return connection.rollback(function() {
-                                // throw err;
-                                res.send({
-                                    code: 1,
-                                    msg: err.message
-                                })
-                            });
+                    const insertPlanSql = "insert api_test_plan(app_id,name,base_url,case_num,create_at,create_by) values (?,?,?,?,?,?)";
+                    const currentUser = parseToken(req);
+                    const now = Date.now();
+                    connection.query(insertPlanSql,[appId,name,baseUrl,caseRows.length,now,currentUser.nickname],(err,results) => {
+                        if(err) {
+                            console.log(err)
+                            return res.send({
+                                code: 1,
+                                msg: err.message
+                            })
                         }
-                        //提交事务
-                        connection.commit(function(err) {
+                        const planId = results.insertId;
+        
+                        let insertRunLogSql = ` insert api_test_case_run_log(
+                            app_id,
+                            plan_id,
+                            case_id,
+                            case_name,
+                            group_name,
+                            module_name,
+                            api_name,
+                            url,
+                            request_method,
+                            content_type,
+                            headers,
+                            pre_case_id,
+                            pre_fields,
+                            request_body,
+                            assert,
+                            create_at,
+                            create_by) values 
+                        `;
+                        for (let index = 0; index < caseRows.length; index++) {
+                            const caseRow = caseRows[index];
+                            insertRunLogSql = insertRunLogSql + `
+                            (${appId},${planId},${caseRow.case_id},'${caseRow.case_name}','${caseRow.group_name}','${caseRow.module_name}','${caseRow.api_name}','${caseRow.url}','${caseRow.request_method}',
+                                '${caseRow.content_type}','${caseRow.headers}',${caseRow.pre_case_id},'${caseRow.pre_fields}','${caseRow.request_body}','${caseRow.assert}',${now},'${currentUser.nickname}'),`;
+                        }
+                        insertRunLogSql = insertRunLogSql.substring(0,insertRunLogSql.length-1);
+    
+                        console.log(insertRunLogSql);
+    
+                        db.query(insertRunLogSql,(err,results) => {
                             if (err) {
                                 return connection.rollback(function() {
                                     // throw err;
@@ -130,15 +173,46 @@ exports.addApiTestPlan = (req,res) => {
                                     })
                                 });
                             }
-                            res.send({
-                                code: 0,
-                                msg: 'success'
+                            const updateCaseIdSql = `
+                            update api_test_case_run_log t1 
+                            join api_test_case_run_log t2 on t1.pre_case_id = t2.case_id 
+                            set t1.pre_case_id = t2.id where t1.pre_case_id = t2.case_id WHERE t1.plan_id = ? and t2.plan_id = ?
+                            `;
+    
+                            db.query(updateCaseIdSql,[planId,planId],(err,results) => {
+                                if (err) {
+                                    return connection.rollback(function() {
+                                        // throw err;
+                                        res.send({
+                                            code: 1,
+                                            msg: err.message
+                                        })
+                                    });
+                                }
+                                //提交事务
+                                connection.commit(function(err) {
+                                    if (err) {
+                                        return connection.rollback(function() {
+                                            // throw err;
+                                            res.send({
+                                                code: 1,
+                                                msg: err.message
+                                            })
+                                        });
+                                    }
+                                    res.send({
+                                        code: 0,
+                                        msg: 'success'
+                                    })
+                                });
                             })
-                        });
+                            
+                        })
                     })
                 })
             })
-        })
+        }) 
+        
     })
 }
 

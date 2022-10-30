@@ -2,11 +2,13 @@ const db = require("../config/db");
 const request = require('request');
 const {parseToken} = require('../utils/TokenParser');
 const {generateWhereSql,convertKeyToCamelCase} = require('../utils/CommonUtil');
-const {parseApi,parseApiTree} = require('../utils/SwaggerParser');
+const {parseApiTree} = require('../utils/SwaggerParser');
+const {refreshPermCache,removePermCache} = require('../service/PermissionService');
 
 exports.addPermission = (req,res) => {
-    let {parentId,type,anon,name,description,internal} = req.body;
+    let {parentId,type,anon,login,name,description,internal} = req.body;
     anon = !!anon;
+    login = !!login;
     internal = !!internal;
     if(!parentId) {
         parentId = 0;
@@ -14,8 +16,8 @@ exports.addPermission = (req,res) => {
 
     const currentUser = parseToken(req);
     const now = Date.now();
-    const insertSql = 'insert sys_permission(parent_id,type,anon,name,description,internal,create_at,create_by,update_at) values(?,?,?,?,?,?,?,?,?)';
-    db.query(insertSql,[parentId,type,anon,name,description,internal,now,currentUser.nickname,now,''],(err,results) => {
+    const insertSql = 'insert sys_permission(parent_id,type,anon,login,name,description,internal,create_at,create_by,update_at) values(?,?,?,?,?,?,?,?,?)';
+    db.query(insertSql,[parentId,type,anon,login,name,description,internal,now,currentUser.nickname,now,''],(err,results) => {
         if(err) {
             return res.send({
                 code: 1,
@@ -56,6 +58,7 @@ exports.deletePermission = (req,res) => {
                         msg: err.message
                     })
                 }
+                removePermCache(id);
                 res.send({
                     code: 0,
                     msg: "success"
@@ -70,8 +73,9 @@ exports.deletePermission = (req,res) => {
 }
 
 exports.updatePermission = (req,res) => {
-    let {id,parentId,anon,type,name,description,internal} = req.body;
+    let {id,parentId,anon,login,type,name,description,internal} = req.body;
     anon = !!anon;
+    login = !!login;
     internal = !!internal;
     if(!parentId) {
         parentId = 0;
@@ -94,15 +98,16 @@ exports.updatePermission = (req,res) => {
             }
             const currentUser = parseToken(req);
             const now = Date.now();
-            const updateSql = 'update sys_permission set parent_id = ?, type = ?, anon = ?, name = ?, description = ?, internal = ? , update_at= ?, update_by = ? where id = ?';
+            const updateSql = 'update sys_permission set parent_id = ?, type = ?, anon = ?, login = ?, name = ?, description = ?, internal = ? , update_at= ?, update_by = ? where id = ?';
 
-            db.query(updateSql,[parentId, type, anon, name, description, internal, now, currentUser.nickname, id],(err,results) => {
+            db.query(updateSql,[parentId, type, anon, login, name, description, internal, now, currentUser.nickname, id],(err,results) => {
                 if(err) {
                     return res.send({
                         code: 1,
                         msg: err.message
                     })
                 }
+                refreshPermCache(id);
                 res.send({
                     code: 0,
                     msg: 'success'
@@ -122,7 +127,7 @@ exports.queryPermission = (req,res) => {
     let { page, size } = req.query;
     page = (page - 1) * size;
 
-    let {whereSql,values} = generateWhereSql(req.query,['name','anon','type','internal','keyword'],['name']);
+    let {whereSql,values} = generateWhereSql(req.query,['name','anon','login','type','internal','keyword'],['name']);
 
     //查询权限列表sql
     const pageSql = 'select * from sys_permission '+ whereSql +' order by id limit ?,?';

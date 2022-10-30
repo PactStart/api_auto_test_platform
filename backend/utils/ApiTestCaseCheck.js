@@ -52,3 +52,22 @@ exports.apiTestCaseQueryCheck = {
         size
     }
 }
+
+exports.apiTestCaseCreateDefaultCheck = {
+    body: {
+        id
+    }
+}
+
+exports.apiTestCaseCreateDefaultForAllCheck = {
+    body: {
+       appId
+    }
+}
+
+exports.apiTestCaseBatchSetPreCaseCheck = {
+    body: {
+       appId,
+       preCaseId
+    }
+}

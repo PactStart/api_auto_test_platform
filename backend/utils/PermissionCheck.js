@@ -4,6 +4,7 @@ const id = joi.number().integer().required();
 const parentId = joi.number().integer();
 const type = joi.string().required();
 const anon = joi.bool();
+const login = joi.bool();
 const name = joi.string().required();
 const description = joi.string().required();
 const internel = joi.bool();
@@ -15,6 +16,7 @@ exports.permissionAddCheck = {
         parentId,
         type,
         anon,
+        login,
         name,
         description,
         internel
@@ -27,6 +29,7 @@ exports.permissionUpdateCheck = {
         parentId,
         type,
         anon,
+        login,
         name,
         description,
         internel
@@ -42,6 +45,7 @@ exports.permissionDeleteCheck = {
 exports.permissionQueryCheck = {
     query: {
         anon,
+        login,
         type:joi.string(),
         internel,
         name: joi.string(),

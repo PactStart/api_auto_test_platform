@@ -1,5 +1,6 @@
 const express = require('express');
 const app = express();
+const {loadPermCache,getPermCache} = require('./service/PermissionService')
 
 /**
  * 解析post请求的body数据
@@ -31,8 +32,20 @@ const {sIsMember} = require('./config/redis');
 const {parseToken} = require('./utils/TokenParser');
 app.use((req,res,next)=> {
   const url = req.url;
-  if(url.endsWith('/user/login') || url.startsWith('/swagger')) {
+  const perm = getPermCache(url);
+  if(perm.anon) {
     next();
+  } else if(perm.login) {
+    const currentUser =  parseToken(req);
+    if(!currentUser) {
+      const token = req.headers.authorization;
+      res.send({
+        code: -1,
+        msg: token ? '登录已过期，请重新登录' : '未登录'
+      })
+    } else {
+      next();
+    }
   } else {
     const currentUser =  parseToken(req);
     if(!currentUser) {
@@ -188,4 +201,5 @@ app.use("/swagger.json", (req,res) => {
 
 app.listen(3000,()=>{
     console.log('api auto-testing platform server start on http://127.0.0.1:3000');
+    loadPermCache();
 })
