@@ -186,8 +186,8 @@ getBodyExample = api => {
     let bodyExample = {};
     if(api.request_method == 'post' && api.content_type == 'application/json' && api.body) {
         const schema = JSON.parse(api.body);
-        console.log(schema)
         bodyExample = defaults(schema);
+        console.log(bodyExample)
 
     } else if(api.request_method == 'get') {
         queryParamArr = JSON.parse(api.query);

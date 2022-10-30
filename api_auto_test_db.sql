@@ -11,7 +11,7 @@
  Target Server Version : 50734
  File Encoding         : 65001
 
- Date: 27/10/2022 17:59:07
+ Date: 30/10/2022 17:44:59
 */
 
 SET NAMES utf8mb4;
@@ -29,14 +29,17 @@ CREATE TABLE `api` (
   `api_name` varchar(50) COLLATE utf8mb4_bin NOT NULL COMMENT 'api描述',
   `url` varchar(100) COLLATE utf8mb4_bin NOT NULL COMMENT '接口地址',
   `request_method` varchar(6) COLLATE utf8mb4_bin NOT NULL COMMENT '请求方式',
-  `content_type` varchar(20) COLLATE utf8mb4_bin NOT NULL DEFAULT '' COMMENT '数据提交方式，针对post的表单提交或者json''提交',
+  `content_type` varchar(20) COLLATE utf8mb4_bin NOT NULL DEFAULT '' COMMENT '数据提交方式：application/json | multipart/form-data | application/x-www-form-urlencoded | ''''',
+  `query` varchar(1024) COLLATE utf8mb4_bin NOT NULL DEFAULT '' COMMENT 'query参数定义',
+  `body` varchar(2048) COLLATE utf8mb4_bin NOT NULL DEFAULT '' COMMENT 'body参数定义，json schema',
+  `headers` varchar(1024) COLLATE utf8mb4_bin NOT NULL DEFAULT '' COMMENT 'header参数定义',
   `case_num` int(11) NOT NULL DEFAULT '0' COMMENT '用例数量',
   `create_at` bigint(20) NOT NULL COMMENT '创建时间',
   `create_by` varchar(50) COLLATE utf8mb4_bin NOT NULL COMMENT '创建人',
   `update_at` bigint(20) NOT NULL COMMENT '修改时间',
   `update_by` varchar(50) COLLATE utf8mb4_bin NOT NULL DEFAULT '' COMMENT '修改人',
   `del` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`id`) USING BTREE,
   UNIQUE KEY `uk_appid_url` (`app_id`,`url`) COMMENT '应用url唯一索引'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin COMMENT='API接口';
 
@@ -49,19 +52,19 @@ CREATE TABLE `api_test_case` (
   `app_id` int(20) NOT NULL COMMENT '应用id',
   `api_id` int(11) NOT NULL COMMENT 'API id',
   `name` varchar(50) COLLATE utf8mb4_bin NOT NULL COMMENT '用例名称',
-  `run` bit(1) NOT NULL COMMENT '是否运行',
+  `run` tinyint(1) NOT NULL COMMENT '是否运行',
   `headers` varchar(255) COLLATE utf8mb4_bin NOT NULL DEFAULT '{}' COMMENT '请求头',
   `pre_case_id` int(20) NOT NULL DEFAULT '0' COMMENT '前置用例id',
-  `pre_fields` varchar(255) COLLATE utf8mb4_bin NOT NULL DEFAULT '[]' COMMENT '前置字段，用于当前case的header和body的动态参数替换，例子：[{"field":"$.data.token","applyTo":"header"}]\n',
+  `pre_fields` varchar(255) COLLATE utf8mb4_bin NOT NULL DEFAULT '[]' COMMENT '前置字段，用于当前case的header和body的动态参数替换',
   `request_body` varchar(255) COLLATE utf8mb4_bin NOT NULL DEFAULT '{}' COMMENT '请求内容',
   `assert` varchar(255) COLLATE utf8mb4_bin NOT NULL DEFAULT '[]' COMMENT '断言，例子：[{"field":"$.code","predicate":"=","expect":"0","msg":"code不为0"}]\n',
   `create_at` bigint(20) NOT NULL COMMENT '创建时间',
   `create_by` varchar(50) COLLATE utf8mb4_bin NOT NULL COMMENT '创建人',
   `update_at` bigint(20) NOT NULL COMMENT '修改时间',
-  `update_by` varchar(50) COLLATE utf8mb4_bin NOT NULL COMMENT '修改人',
-  `del` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `update_by` varchar(50) COLLATE utf8mb4_bin NOT NULL DEFAULT '' COMMENT '修改人',
+  `del` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否删除',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin COMMENT='api测试用例';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
 -- ----------------------------
 -- Table structure for api_test_case_run_log
@@ -84,7 +87,7 @@ CREATE TABLE `api_test_case_run_log` (
   `pre_fields` varchar(255) COLLATE utf8mb4_bin NOT NULL DEFAULT '[]' COMMENT '前置字段，用于当前case的header和body的动态参数替换，例子：[{"field":"$.data.token","applyTo":"header"}]\n',
   `request_body` varchar(255) COLLATE utf8mb4_bin NOT NULL DEFAULT '{}' COMMENT '请求内容',
   `assert` varchar(255) COLLATE utf8mb4_bin NOT NULL DEFAULT '[]' COMMENT '断言，例子：[{"field":"$.code","predicate":"=","expect":"0","msg":"code不为0"}]\n',
-  `pass` bit(1) DEFAULT NULL COMMENT '是否通过',
+  `pass` tinyint(1) DEFAULT NULL COMMENT '是否通过',
   `msg` varchar(128) COLLATE utf8mb4_bin DEFAULT NULL COMMENT '断言结果',
   `response` text COLLATE utf8mb4_bin COMMENT '实际响应',
   `create_at` bigint(20) NOT NULL COMMENT '创建时间',
@@ -92,7 +95,7 @@ CREATE TABLE `api_test_case_run_log` (
   `start_at` bigint(20) DEFAULT NULL COMMENT '开始时间',
   `end_at` bigint(20) DEFAULT NULL COMMENT '结束时间',
   `cost` int(11) DEFAULT NULL COMMENT '耗时',
-  `del` bit(1) NOT NULL DEFAULT b'0' COMMENT '删除标记',
+  `del` tinyint(1) NOT NULL DEFAULT '0' COMMENT '删除标记',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin COMMENT='api测试用例执行日志';
 
@@ -112,9 +115,10 @@ CREATE TABLE `api_test_plan` (
   `start_at` bigint(20) DEFAULT NULL COMMENT '开始时间',
   `end_at` bigint(20) DEFAULT NULL COMMENT '结束时间',
   `cost` int(11) DEFAULT NULL COMMENT '耗时',
-  `mail_report` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否邮件发送测试报告',
+  `run` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否已完成运行',
+  `mail_report` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否邮件发送测试报告',
   `mail_receivers` varchar(200) COLLATE utf8mb4_bin NOT NULL DEFAULT '' COMMENT '测试报告邮件接收人',
-  `del` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `del` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否删除',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin COMMENT='api测试计划';
 
@@ -129,7 +133,7 @@ CREATE TABLE `app` (
   `create_by` varchar(50) COLLATE utf8mb4_bin NOT NULL COMMENT '创建人',
   `update_at` bigint(20) NOT NULL COMMENT '修改时间',
   `update_by` varchar(50) COLLATE utf8mb4_bin NOT NULL COMMENT '修改人',
-  `del` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `del` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否删除',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin COMMENT='应用';
 
@@ -147,7 +151,7 @@ CREATE TABLE `app_config` (
   `create_by` varchar(50) COLLATE utf8mb4_bin NOT NULL COMMENT '创建人',
   `update_at` bigint(20) NOT NULL COMMENT '修改时间',
   `update_by` varchar(50) COLLATE utf8mb4_bin NOT NULL DEFAULT '' COMMENT '修改人',
-  `del` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `del` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否删除',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_appid_configkey` (`app_id`,`config_key`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin COMMENT='应用配置';
@@ -160,15 +164,16 @@ CREATE TABLE `sys_permission` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `parent_id` int(11) NOT NULL DEFAULT '0' COMMENT '上级权限',
   `type` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '类型:API,Page,Button',
-  `anon` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否支持匿名访问',
+  `anon` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否支持匿名访问',
+  `login` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否登录就能访问',
   `name` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '权限名称',
   `description` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '权限描述',
-  `internal` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否内置权限，内置权限不允许修改和删除',
+  `internal` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否内置权限，内置权限不允许修改和删除',
   `create_at` bigint(20) NOT NULL COMMENT '创建时间',
   `create_by` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '创建人',
   `update_at` bigint(20) NOT NULL COMMENT '更新时间',
   `update_by` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '更新人',
-  `del` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `del` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE KEY `uk_name` (`name`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='角色表';
@@ -185,7 +190,7 @@ CREATE TABLE `sys_role` (
   `create_by` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '创建人',
   `update_at` bigint(20) NOT NULL COMMENT '更新时间',
   `update_by` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '更新人',
-  `del` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `del` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE KEY `uk_name` (`name`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='角色表';
@@ -202,7 +207,7 @@ CREATE TABLE `sys_role_permission` (
   `create_by` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '创建人',
   `update_at` bigint(20) NOT NULL COMMENT '更新时间',
   `update_by` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '更新人',
-  `del` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `del` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE KEY `uk_roleid_permid` (`role_id`,`permission_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='角色权限表';
@@ -227,7 +232,7 @@ CREATE TABLE `sys_user` (
   `create_by` varchar(50) NOT NULL COMMENT '创建人',
   `update_at` bigint(20) NOT NULL COMMENT '更新时间',
   `update_by` varchar(50) NOT NULL COMMENT '更新人',
-  `del` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `del` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE KEY `uk_username` (`username`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='管理员表';
@@ -244,9 +249,7 @@ CREATE TABLE `sys_user_role` (
   `create_by` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '创建人',
   `update_at` bigint(20) NOT NULL COMMENT '更新时间',
   `update_by` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '更新人',
-  `del` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `del` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE KEY `uk_uid_rid` (`user_id`,`role_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='角色表';
-
-SET FOREIGN_KEY_CHECKS = 1;

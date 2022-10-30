@@ -75,7 +75,6 @@ function parseApi(groupName, apiDocObj) {
                 query,
                 body
             };
-            console.log(apiObj);
             apiArr.push(apiObj);
         }
     }

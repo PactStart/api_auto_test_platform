@@ -9,46 +9,47 @@ client.on('connect', function() {
 });
 client.on('error', (err) => console.log('Redis Client Error', err));
 
+async function connect() {
+    await client.connect();
+}
 
 async function hSet(key, hashKey, hashValue) {
-    await client.connect();
     await client.hSet(key,hashKey, hashValue);
 }
 
+async function hSetMulti(key,map)  {
+    for(let entry in map.entries()) {
+        await client.hSet(key,entry[0], entry[1]);
+    }
+}
+
 async function hDel(key, hashKey) {
-    await client.connect();
     await client.hDel(key,hashKey);
 }
 
 async function hGet(key, hashKey) {
-    await client.connect();
     await client.hGet(key,hashKey);
 }
 
 async function hExists(key,field) {
-    await client.connect();
     return await client.hExists(key,field);
 }
 
 async function sAdd(key,members) {
-    await client.connect();
     await client.sAdd(key,members);
 }
 
 async function sIsMember(key,member) {
-    await client.connect();
     const value = await client.sIsMember(key,member);
     return value;
 }
 
 async function sMembers(key) {
-    await client.connect();
     return await client.sMembers(key);
 }
 
 async function deleteKey(key) {
-    await client.connect();
     return await client.del(key);
 }
 
-module.exports = {client,hSet,hDel,hGet,hExists,sAdd,sIsMember,sMembers};
+module.exports = {connect,hSet,hSetMulti,hDel,hGet,hExists,sAdd,sIsMember,sMembers};

@@ -3,7 +3,7 @@ const request = require('request');
 const {parseToken} = require('../utils/TokenParser');
 const {generateWhereSql,convertKeyToCamelCase} = require('../utils/CommonUtil');
 const {parseApiTree} = require('../utils/SwaggerParser');
-const {refreshPermCache,removePermCache} = require('../service/PermissionService');
+const {updateApiPermCache,removeApiPermCache} = require('../service/PermissionService');
 
 exports.addPermission = (req,res) => {
     let {parentId,type,anon,login,name,description,internal} = req.body;
@@ -58,7 +58,7 @@ exports.deletePermission = (req,res) => {
                         msg: err.message
                     })
                 }
-                removePermCache(id);
+                removeApiPermCache(id);
                 res.send({
                     code: 0,
                     msg: "success"
@@ -107,7 +107,7 @@ exports.updatePermission = (req,res) => {
                         msg: err.message
                     })
                 }
-                refreshPermCache(id);
+                updateApiPermCache(id);
                 res.send({
                     code: 0,
                     msg: 'success'
