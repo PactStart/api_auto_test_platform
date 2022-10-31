@@ -53,7 +53,8 @@ exports.getGoodsDetail = (req, res) => {
 
 exports.secKill = (req, res) => {
   let { id } = req.body;
-  const promise = sleep(1000);
+  ms = parseInt(Math.random() * 500);
+  const promise = sleep(ms);
   promise.then((ms) => {
     res.send({
       code: 0,
