@@ -63,6 +63,5 @@ class MysqlDb:
 
 if __name__ == '__main__':
     mydb = MysqlDb()
-    #r = mydb.query("select * from `case`")
-    r = mydb.execute("insert into `case` (`app`) values('xd')")
-    print(r)
+    rows = mydb.query("select * from `api_test_case_run_log`")
+    print(rows)

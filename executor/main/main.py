@@ -7,5 +7,5 @@
 from case.test_plan_executor import TestPlanExecutor
 if __name__ == '__main__':
     executor = TestPlanExecutor()
-    planId = 1;
+    planId = 4;
     executor.run(planId);

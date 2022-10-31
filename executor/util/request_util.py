@@ -45,15 +45,10 @@ class RequestUtil:
 
 
 if __name__ == '__main__':
-    # url = "https://api.xdclass.net/pub/api/v1/web/all_category"
-    # r = RequestUtil()
-    # result = r.request(url, 'get')
-    # print(result)
-
-    url = "https://api.xdclass.net/pub/api/v1/web/web_login"
+    url = "http://localhost:3000/api/v1/user/login"
     r = RequestUtil()
-    data = {"phone": "13113777555", "pwd": "1234567890"}
-    headers = {"Content-Type": "application/x-www-form-urlencoded"}
+    data = {"username": "admin", "password": "123456"}
+    headers = {"Content-Type": "application/json"}
     result = r.request(url, 'post', param=data, headers=headers)
     print(result)
 
