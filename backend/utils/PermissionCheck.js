@@ -1,4 +1,4 @@
-const joi = require('joi');
+const joi = require("joi");
 
 const id = joi.number().integer().required();
 const parentId = joi.number().integer();
@@ -12,50 +12,50 @@ const page = joi.number().integer().min(1).required();
 const size = joi.number().integer().min(1).max(100).required();
 
 exports.permissionAddCheck = {
-    body: {
-        parentId,
-        type,
-        anon,
-        login,
-        name,
-        description,
-        internel
-    }
-}
+  body: {
+    parentId,
+    type,
+    anon,
+    login,
+    name,
+    description,
+    internel,
+  },
+};
 
 exports.permissionUpdateCheck = {
-    body: {
-        id,
-        parentId,
-        type,
-        anon,
-        login,
-        name,
-        description,
-        internel
-    }
-}
+  body: {
+    id,
+    parentId,
+    type,
+    anon,
+    login,
+    name,
+    description,
+    internel,
+  },
+};
 
 exports.permissionDeleteCheck = {
-    body: {
-        id
-    }
-}
+  body: {
+    id,
+  },
+};
 
 exports.permissionQueryCheck = {
-    query: {
-        anon,
-        login,
-        type:joi.string(),
-        internel,
-        name: joi.string(),
-        page,
-        size
-    }
-}
+  query: {
+    anon,
+    login,
+    type: joi.string(),
+    internel,
+    name: joi.string(),
+    page,
+    size,
+  },
+};
 
 exports.apiPermsImportCheck = {
-    body: {
-        url:joi.string().required()
-    }
-}
+  body: {
+    url: joi.string().required(),
+  },
+};

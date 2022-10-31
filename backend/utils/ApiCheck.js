@@ -1,4 +1,4 @@
-const joi = require('joi');
+const joi = require("joi");
 
 const id = joi.number().integer().required();
 
@@ -14,35 +14,34 @@ const page = joi.number().integer().min(1).required();
 const size = joi.number().integer().min(1).max(100).required();
 
 exports.apiAddCheck = {
-    body: {
-      appId,
-      groupName,
-      moduleName,
-      apiName,
-      url,
-      requestMethod,
-      contentType
-    }
-}
+  body: {
+    appId,
+    groupName,
+    moduleName,
+    apiName,
+    url,
+    requestMethod,
+    contentType,
+  },
+};
 
 exports.apiUpdateCheck = {
-    body: {
-      id,
-      groupName,
-      moduleName,
-      apiName,
-      url,
-      requestMethod,
-      contentType
-    }
-}
+  body: {
+    id,
+    groupName,
+    moduleName,
+    apiName,
+    url,
+    requestMethod,
+    contentType,
+  },
+};
 
 exports.apiDeleteCheck = {
-    body: {
-      id
-    }
-}
-
+  body: {
+    id,
+  },
+};
 
 exports.apiQueryCheck = {
   query: {
@@ -50,14 +49,13 @@ exports.apiQueryCheck = {
     moduleName: joi.string(),
     apiName: joi.string(),
     page,
-    size
-  }
-}
-
+    size,
+  },
+};
 
 exports.apiImportCheck = {
-    body: {
-      appId,
-      url
-    }
-  }
+  body: {
+    appId,
+    url,
+  },
+};

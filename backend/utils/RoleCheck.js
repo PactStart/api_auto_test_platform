@@ -1,4 +1,4 @@
-const joi = require('joi');
+const joi = require("joi");
 
 const id = joi.number().integer().required();
 const name = joi.string().required();
@@ -9,54 +9,53 @@ const roleId = joi.number().integer().required();
 const permissionIds = joi.array().items(joi.number()).required();
 const userIds = joi.array().items(joi.number()).required();
 
-
 exports.roleAddCheck = {
-    body: {
-        name,
-        description,
-    }
-}
+  body: {
+    name,
+    description,
+  },
+};
 
 exports.roleUpdateCheck = {
-    body: {
-        id,
-        name,
-        description
-    }
-}
+  body: {
+    id,
+    name,
+    description,
+  },
+};
 
 exports.roleDeleteCheck = {
-    body: {
-        id
-    }
-}
+  body: {
+    id,
+  },
+};
 
 exports.roleQueryCheck = {
-    query: {
-        name : joi.string(),
-        page,
-        size
-    }
-}
+  query: {
+    name: joi.string(),
+    page,
+    size,
+  },
+};
 
 exports.rolePermissionsCheck = {
-    body: {
-        roleId,
-        permissionIds
-    }
-}
+  body: {
+    roleId,
+    permissionIds,
+  },
+};
 
 exports.roleIdCheck = {
-    query: {
-        roleId,
-        page,
-        size
-    }
-}
+  query: {
+    roleId,
+    page,
+    size,
+  },
+};
 
 exports.roleUsersCheck = {
-    body: {
-        roleId,
-        userIds
-    }
-}
+  body: {
+    roleId,
+    userIds,
+  },
+};

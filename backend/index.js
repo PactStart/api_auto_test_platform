@@ -31,7 +31,7 @@ app.use("/", defaultRouter);
  */
 app.use((req, res, next) => {
   const url = req.url;
-  const permPromise = hGet(API_PERM_KEY,url);
+  const permPromise = hGet(API_PERM_KEY, url);
   permPromise.then((value) => {
     if (!value) {
       console.error("接口权限未定义:" + url);
@@ -206,5 +206,5 @@ app.listen(3000, () => {
   const promise = connect();
   promise.then(() => {
     cacheApiPerm();
-  })
+  });
 });

@@ -1,4 +1,4 @@
-const joi = require('joi');
+const joi = require("joi");
 
 const id = joi.number().integer().required();
 
@@ -16,58 +16,58 @@ const page = joi.number().integer().min(1).required();
 const size = joi.number().integer().min(1).max(100).required();
 
 exports.apiTestCaseAddCheck = {
-    body: {
-        appId,
-        apiId,
-        name,
-        run,
-        headers,
-        preCaseId,
-        preFields,
-        requestBody,
-        assert
-    }
-}
+  body: {
+    appId,
+    apiId,
+    name,
+    run,
+    headers,
+    preCaseId,
+    preFields,
+    requestBody,
+    assert,
+  },
+};
 
 exports.apiTestCaseDeleteCheck = {
-    body: {
-        id,
-        name,
-        run,
-        headers,
-        preCaseId,
-        preFields,
-        requestBody,
-        assert
-    }
-}
+  body: {
+    id,
+    name,
+    run,
+    headers,
+    preCaseId,
+    preFields,
+    requestBody,
+    assert,
+  },
+};
 
 exports.apiTestCaseQueryCheck = {
-    query: {
-        appId: joi.number().integer(),
-        apiId: joi.number().integer(),
-        name: joi.string(),
-        run,
-        page,
-        size
-    }
-}
+  query: {
+    appId: joi.number().integer(),
+    apiId: joi.number().integer(),
+    name: joi.string(),
+    run,
+    page,
+    size,
+  },
+};
 
 exports.apiTestCaseCreateDefaultCheck = {
-    body: {
-        id
-    }
-}
+  body: {
+    id,
+  },
+};
 
 exports.apiTestCaseCreateDefaultForAllCheck = {
-    body: {
-       appId
-    }
-}
+  body: {
+    appId,
+  },
+};
 
 exports.apiTestCaseBatchSetPreCaseCheck = {
-    body: {
-       appId,
-       preCaseId
-    }
-}
+  body: {
+    appId,
+    preCaseId,
+  },
+};

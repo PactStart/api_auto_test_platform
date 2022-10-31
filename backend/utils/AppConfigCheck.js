@@ -1,4 +1,4 @@
-const joi = require('joi');
+const joi = require("joi");
 
 const id = joi.number().integer().required();
 const appId = joi.number().integer().required();
@@ -9,34 +9,33 @@ const page = joi.number().integer().min(1).required();
 const size = joi.number().integer().min(1).max(100).required();
 
 exports.appConfigAddCheck = {
-    body: {
-        appId,
-        configKey,
-        configValue,
-        description
-    }
-}
+  body: {
+    appId,
+    configKey,
+    configValue,
+    description,
+  },
+};
 
 exports.appConfigUpdateCheck = {
-    body: {
-        appId,
-        configKey,
-        configValue
-    }
-}
+  body: {
+    appId,
+    configKey,
+    configValue,
+  },
+};
 
 exports.appConfigDeleteCheck = {
-    body: {
-        id
-    }
-}
-
+  body: {
+    id,
+  },
+};
 
 exports.appConfigQueryCheck = {
   query: {
     appId: joi.number().integer(),
     configKey: joi.string(),
     page,
-    size
-  }
-}
+    size,
+  },
+};

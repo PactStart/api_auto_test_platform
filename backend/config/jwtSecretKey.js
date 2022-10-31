@@ -1,5 +1,3 @@
 module.exports = {
-    jwtSecretKey: 'tuoluo666',
-  };
-  
-  
+  jwtSecretKey: "tuoluo666",
+};
