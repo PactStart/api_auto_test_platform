@@ -27,6 +27,45 @@ defaultRouter.get("/", (req, res) => {
 app.use("/", defaultRouter);
 
 /**
+ * 配置接口文档
+ */
+const swaggerJsdoc = require("swagger-jsdoc");
+const swaggerui = require("swagger-ui-express");
+const path = require("path");
+
+const options = {
+  definition: {
+    openapi: "3.0.3",
+    info: {
+      title: "自动化测试平台-服务端",
+      version: "1.0.0",
+      description: `
+         这是一个用Node开发的API接口测试用例管理平台，你可以很方便的通过swagger接口文档地址批量导入应用的api接口，然后为这些借口创建测试用例，另外我们还提供了python脚本用来执行这些测试用例和生成测试报告。
+         祝您玩的开心。
+       `,
+      contact: {
+        name: "Rex.Lei",
+        url: "https://github.com/PactStart?tab=repositories",
+        email: "1203208955@qq.com",
+      },
+    },
+    host: `localhost:3000`,
+    basePath: "/",
+    produces: ["application/json"],
+    schemes: ["http", "https"],
+  },
+  apis: [path.join(__dirname, "/routers/*.js")],
+};
+
+// 定义swagger 访问的路由
+const swaggerSpec = swaggerJsdoc(options);
+app.use("/swagger", swaggerui.serve, swaggerui.setup(swaggerSpec));
+app.use("/swagger.json", (req, res) => {
+  res.setHeader("Content-Type", "application/json");
+  res.send(swaggerSpec);
+});
+
+/**
  * 登录&权限检查中间件
  */
 app.use((req, res, next) => {
@@ -130,43 +169,10 @@ const apiTestPlanRouter = require("./routers/apiTestPlan");
 app.use("/api/v1/testPlan", apiTestPlanRouter);
 
 /**
- * 配置接口文档
+ * 性能测试Demo接口
  */
-const swaggerJsdoc = require("swagger-jsdoc");
-const swaggerui = require("swagger-ui-express");
-const path = require("path");
-
-const options = {
-  definition: {
-    openapi: "3.0.3",
-    info: {
-      title: "自动化测试平台-服务端",
-      version: "1.0.0",
-      description: `
-        这是一个用Node开发的API接口测试用例管理平台，你可以很方便的通过swagger接口文档地址批量导入应用的api接口，然后为这些借口创建测试用例，另外我们还提供了python脚本用来执行这些测试用例和生成测试报告。
-        祝您玩的开心。
-      `,
-      contact: {
-        name: "Rex.Lei",
-        url: "https://github.com/PactStart?tab=repositories",
-        email: "1203208955@qq.com",
-      },
-    },
-    host: `localhost:3000`,
-    basePath: "/",
-    produces: ["application/json"],
-    schemes: ["http", "https"],
-  },
-  apis: [path.join(__dirname, "/routers/*.js")],
-};
-
-// 定义swagger 访问的路由
-const swaggerSpec = swaggerJsdoc(options);
-app.use("/swagger", swaggerui.serve, swaggerui.setup(swaggerSpec));
-app.use("/swagger.json", (req, res) => {
-  res.setHeader("Content-Type", "application/json");
-  res.send(swaggerSpec);
-});
+const performanceTestRouter = require("./routers/performanceTest");
+app.use("/api/v1/pt/goods", performanceTestRouter);
 
 /**
  * 错误中间件
