@@ -1,8 +1,5 @@
-node_modules/
-.idea
-venv/
-
 .DS_Store
+node_modules
 /dist
 
 
