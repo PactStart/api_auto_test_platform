@@ -1,9 +1,10 @@
 <template>
 <div>
-    <router-view></router-view>
+    授权管理
 </div>
 </template>
-<script setup>
+<script>
+
 </script>
 <style lang='less' scoped>
 

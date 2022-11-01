@@ -78,6 +78,8 @@
 			"",
 			"</div>",
 			"</template>",
+            "<script setup>",
+            "</script>",
 			"<style lang='less' scoped>",
 			"",
 			"</style>"
@@ -160,5 +162,78 @@
         n stable  
     4、检查最新的node版本
         node -v
+
+```
+11、安装axios
+```
+    cnpm install axios --save
+
+    //util/request.js
+
+    import router from "@/router/index";
+    import axios from "axios";
+    /**
+    * 创建axios实例
+    */
+    const ENV = process.env.NODE_ENV;
+    const host = ENV === "development" ? "http://127.0.0.1:3000" : "";
+    const service = axios.create({
+        baseURL: host,
+        timeout: "3000",
+    });
+
+    /**
+    * 请求拦截
+    */
+    service.interceptors.request.use((config) => {
+        if (config.url.indexOf("login") < 0) {
+            config.headers.authorization = localStorage.getItem("token");
+        }
+        return config;
+    });
+
+    /**
+    * 响应拦截
+    */
+    service.interceptors.response.use((res) => {
+        const { code, data, msg } = res.data;
+        if (code === 0) {
+            return data;
+        } else {
+            message.error(msg);
+            if (code === -1) {
+            router.push("/login");
+            }
+        }
+    });
+
+    /**
+    * 封装请求函数
+    */
+    const request = (options) => {
+        if (options.method === "get") {
+            options.params = options.data;
+        }
+        return service(options);
+    };
+
+    export default request;
+
+    //api/index.js
+    import request from "../utils/request";
+    /**
+    * 登录接口
+    */
+    export const getLogin = (data) => {
+        return request({ method: "post", url: "/api/v1/user/login", data });
+    };
+
+    /**
+    * 获取用户信息接口
+    */
+    export const getUserInfo = () => {
+        return request({ method: "get", url: "/api/v1/user/userInfo" });
+    };
+
 
 ```
