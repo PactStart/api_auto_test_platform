@@ -3,11 +3,11 @@ const joi = require("joi");
 const id = joi.number().integer().required();
 const parentId = joi.number().integer();
 const type = joi.string().required();
-const anon = joi.bool();
-const login = joi.bool();
+const anon = joi.number().integer().min(0).max(1);
+const login = joi.number().integer().min(0).max(1);
 const name = joi.string().required();
 const description = joi.string().required();
-const internel = joi.bool();
+const internel = joi.number().integer().min(0).max(1);
 const page = joi.number().integer().min(1).required();
 const size = joi.number().integer().min(1).max(100).required();
 
@@ -46,9 +46,9 @@ exports.permissionQueryCheck = {
   query: {
     anon,
     login,
-    type: joi.string(),
+    type: joi.string().allow(null, ''),
     internel,
-    name: joi.string(),
+    name: joi.string().allow(null, ''),
     page,
     size,
   },

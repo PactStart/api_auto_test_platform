@@ -124,7 +124,7 @@ exports.logout = (req, res) => {
   deleteKey(`perm:data:${currentUser.id}`);
 };
 
-exports.resetPwd = (req, res) => {
+exports.updatePwd = (req, res) => {
   const currentUser = parseToken(req);
   let { oldPassword, newPassword } = req.body;
   const selectSql = "select * from sys_user where id = ?";
@@ -138,7 +138,7 @@ exports.resetPwd = (req, res) => {
     if (!results || !results.length) {
       return res.send({
         code: 1,
-        msg: "当前用户已",
+        msg: "当前用户已被删除",
       });
     }
     const compareState = bcrypt.compareSync(oldPassword, results[0].password);
@@ -153,7 +153,7 @@ exports.resetPwd = (req, res) => {
       "update sys_user set password = ?, update_at = ?, update_by = ? where id = ?";
     db.query(
       updateSql,
-      [passwordB, currentUser.id, Date.now(), currentUser.nickname],
+      [passwordB, Date.now(), currentUser.nickname, currentUser.id],
       (err, results) => {
         if (err) {
           return res.send({
@@ -168,6 +168,36 @@ exports.resetPwd = (req, res) => {
       }
     );
   });
+};
+
+exports.resetPwd = (req, res) => {
+  const currentUser = parseToken(req);
+  if (!currentUser.superAdmin) {
+    return res.send({
+      code: 1,
+      msg: "只有超级管理员才能重置他人密码",
+    });
+  }
+  let { id, password } = req.body;
+  const passwordB = bcrypt.hashSync(password, 10);
+  const updateSql =
+    "update sys_user set password = ?, update_at = ?, update_by = ? where id = ?";
+  db.query(
+    updateSql,
+    [passwordB, Date.now(), currentUser.nickname, id],
+    (err, results) => {
+      if (err) {
+        return res.send({
+          code: 1,
+          msg: err.message,
+        });
+      }
+      res.send({
+        code: 0,
+        msg: "success",
+      });
+    }
+  );
 };
 
 exports.addUser = (req, res) => {
@@ -213,8 +243,8 @@ exports.addUser = (req, res) => {
 
 exports.deleteUser = (req, res) => {
   let { id } = req.body;
-  const deleteSql = "update sys_user set del = 1 where id = 0";
-  db.query(deleteSql, (err, results) => {
+  const deleteSql = "update sys_user set del = 1 where id = ?";
+  db.query(deleteSql, id, (err, results) => {
     if (err) {
       return res.send({
         code: 1,
@@ -231,7 +261,7 @@ exports.deleteUser = (req, res) => {
 exports.updateUser = (req, res) => {
   let { id, phone, email } = req.body;
   const currentUser = parseToken(req);
-  if (currentUser.id === id || currentUser.super_admin) {
+  if (currentUser.id === id || currentUser.superAdmin) {
     const updateSql =
       "update sys_user set phone = ?,email = ?,update_at = ? ,update_by = ? where id = ?";
     db.query(
@@ -264,7 +294,7 @@ exports.queryUser = (req, res) => {
   page = (page - 1) * size;
 
   //查询用户列表sql
-  let pageSql = "select * from sys_user where del=0 order by id limit ?,?";
+  let pageSql = "select * from sys_user where del = 0 order by id limit ?,?";
   //查询用户总数的sql
   let totalSql = "select count(*) as total from sys_user where del = 0";
   let params = [];

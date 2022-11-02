@@ -184,26 +184,26 @@ app.use((err, req, res, next) => {
   if (err instanceof joi.ValidationError) {
     return res.send({
       code: 1,
-      message: err.message,
+      msg: err.message,
     });
   }
   if (err instanceof jwt.TokenExpiredError) {
     return res.send({
       code: -1,
-      message: "登录已过期，请重新登录",
+      msg: "登录已过期，请重新登录",
     });
   }
   if (err.name === "UnauthorizedError") {
     return res.send({
       code: 1,
-      message: "身份认证失败",
+      msg: "身份认证失败",
     });
   }
   console.log(err);
   //其他的错误
   res.send({
     code: 1,
-    message: err.message,
+    msg: err.message,
   });
 });
 

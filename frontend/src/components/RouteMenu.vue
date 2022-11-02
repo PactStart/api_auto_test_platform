@@ -25,7 +25,6 @@
         props: ['route'],
         setup() {
             const go = function(route) {
-                console.log(route);
                 router.push(route.path);
             };
             return {

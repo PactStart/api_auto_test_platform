@@ -13,7 +13,7 @@ const id = joi.number().integer().required();
 const nickname = joi.string().required();
 const email = joi.string().email();
 const phone = joi.string().pattern(new RegExp("^[0-9]{11}$"));
-const keyword = joi.string();
+const keyword = joi.string().allow(null, '')
 const page = joi.number().integer().min(1).required();
 const size = joi.number().integer().min(1).max(100).required();
 exports.userLoginCheck = {
@@ -23,10 +23,17 @@ exports.userLoginCheck = {
   },
 };
 
-exports.userResetPwdCheck = {
+exports.userUpdatePwdCheck = {
   body: {
     oldPassword: password,
     newPassword: password,
+  },
+};
+
+exports.userResetPwdCheck = {
+  body: {
+    id,
+    password
   },
 };
 

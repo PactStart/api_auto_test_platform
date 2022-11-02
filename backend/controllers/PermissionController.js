@@ -23,7 +23,7 @@ exports.addPermission = (req, res) => {
   const currentUser = parseToken(req);
   const now = Date.now();
   const insertSql =
-    "insert sys_permission(parent_id,type,anon,login,name,description,internal,create_at,create_by,update_at) values(?,?,?,?,?,?,?,?,?)";
+    "insert sys_permission(parent_id,type,anon,login,name,description,internal,create_at,create_by,update_at) values(?,?,?,?,?,?,?,?,?,?)";
   db.query(
     insertSql,
     [
@@ -37,7 +37,6 @@ exports.addPermission = (req, res) => {
       now,
       currentUser.nickname,
       now,
-      "",
     ],
     (err, results) => {
       if (err) {
@@ -170,13 +169,14 @@ exports.queryPermission = (req, res) => {
 
   let { whereSql, values } = generateWhereSql(
     req.query,
-    ["name", "anon", "login", "type", "internal", "keyword"],
+    ["name", "anon", "login", "type", "internal"],
     ["name"]
   );
 
   //查询权限列表sql
   const pageSql =
     "select * from sys_permission " + whereSql + " order by id limit ?,?";
+    console.log(pageSql)
 
   //查询权限总数的sql
   const totalSql = "select count(*) as total from sys_permission " + whereSql;

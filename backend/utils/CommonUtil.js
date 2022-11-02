@@ -26,9 +26,9 @@ function generateWhereSql(obj, fields, likeFields) {
     const key = fields[index];
     if (Object.hasOwnProperty.call(obj, key)) {
       const value = obj[key];
-      if (value != null) {
+      if (value != null && value != '') {
         if (likeFields.indexOf(key) != -1) {
-          whereSql = whereSql + ` ${camelCaseToUnderline(key)} = ? and `;
+          whereSql = whereSql + ` ${camelCaseToUnderline(key)} like ? and `;
           values.push("%" + value) + "%";
         } else {
           whereSql = whereSql + ` ${camelCaseToUnderline(key)} = ? and `;

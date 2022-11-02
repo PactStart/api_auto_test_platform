@@ -23,7 +23,7 @@ const routes = [
         name: 'app',
         meta: {
           isAuth: true,
-          title: "测试管理",
+          title: "应用管理",
           open: true,
         },
         children: [
@@ -45,10 +45,21 @@ const routes = [
               title: "API管理",
             },
           },
+        ],
+      },
+      {
+        path: "/test",
+        name: 'test',
+        meta: {
+          isAuth: true,
+          title: "测试管理",
+          open: true,
+        },
+        children: [
           {
-            path: "/app/testCase",
+            path: "/test/testCase",
             name: 'testCase',
-            component: () => import("../views/app/testCase/TestCase.vue"),
+            component: () => import("../views/test/testCase/TestCase.vue"),
             meta: {
               isAuth: true,
               title: "测试用例",
@@ -57,13 +68,13 @@ const routes = [
           {
             path: "/app/testPlan",
             name:'testPlan',
-            component: () => import("../views/app/testPlan/TestPlan.vue"),
+            component: () => import("../views/test/testPlan/TestPlan.vue"),
             meta: {
               isAuth: true,
               title: "测试计划",
             },
           },
-        ],
+        ]
       },
       {
         path: "/sys",

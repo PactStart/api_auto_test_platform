@@ -235,7 +235,7 @@ router.post('/assignPermissions',expressJoi(RoleCheck.rolePermissionsCheck),role
 
 /**
  * @openapi
- * /api/v1/role/removePermissions:
+ * /api/v1/role/unbindPermissions:
  *  post:
  *    tags:
  *      - 角色模块
@@ -345,8 +345,8 @@ router.post('/assignUsers',expressJoi(RoleCheck.roleUsersCheck),roleController.a
  *  post:
  *    tags:
  *      - 角色模块
- *    summary: 角色解绑用户
- *    description: 角色解绑用户
+ *    summary: 角色绑定用户
+ *    description: 角色绑定用户
  *    parameters:
  *      - name: Authorization
  *        type: string

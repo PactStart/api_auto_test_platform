@@ -2,7 +2,7 @@ const joi = require("joi");
 
 const id = joi.number().integer().required();
 const name = joi.string().required();
-const description = joi.string().required();
+const description = joi.string().allow(null, '')
 const page = joi.number().integer().min(1).required();
 const size = joi.number().integer().min(1).max(100).required();
 const roleId = joi.number().integer().required();
@@ -32,7 +32,7 @@ exports.roleDeleteCheck = {
 
 exports.roleQueryCheck = {
   query: {
-    name: joi.string(),
+    name: joi.string().allow(null, ''),
     page,
     size,
   },

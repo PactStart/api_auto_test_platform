@@ -65,8 +65,8 @@ router.post('/login', expressJoi(UserCheck.userLoginCheck), userController.login
  *  post:
  *    tags:
  *      - 用户模块
- *    summary: 重置密码
- *    description: 重置密码
+ *    summary: 修改密码
+ *    description: 修改密码
  *    parameters:
  *      - name: Authorization
  *        type: string
@@ -97,7 +97,48 @@ router.post('/login', expressJoi(UserCheck.userLoginCheck), userController.login
  *        description: OK
  * 
  */
-  router.post('/resetPwd',expressJoi(UserCheck.userResetPwdCheck), userController.resetPwd);
+  router.post('/updatePwd',expressJoi(UserCheck.userUpdatePwdCheck), userController.updatePwd);
+
+
+  /**
+ * @openapi
+ * /api/v1/user/resetPwd:
+ *  post:
+ *    tags:
+ *      - 用户模块
+ *    summary: 重置密码
+ *    description: 重置密码
+ *    parameters:
+ *      - name: Authorization
+ *        type: string
+ *        description: jwt
+ *        in: header
+ *      
+ *    requestBody:
+ *      description: 账号密码信息
+ *      content:
+ *        application/json:
+ *          schema:
+ *            type: object
+ *            properties: 
+ *              id:
+ *                type: integer
+ *                description: 用户id
+ *                required: true
+ *              password:
+ *                type: string
+ *                description: 新密码
+ *                required: true
+ *    produces: 
+ *      - application/json 
+ *    consumes: 
+ *      - application/json 
+ *    responses:
+ *      200:
+ *        description: OK
+ * 
+ */
+   router.post('/resetPwd',expressJoi(UserCheck.userResetPwdCheck), userController.resetPwd);
 
 
 /**

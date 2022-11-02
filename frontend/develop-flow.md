@@ -237,3 +237,34 @@
 
 
 ```
+
+
+
+
+
+
+
+QA:
+1、ref函数和reactive函数的区别？
+```
+    1)处理数据类型不同： ref 可以处理基本类型和对象（数组）类型数据，reactive 只能处理对象（数组）类型数据
+    2)实现原理不同：ref 处理基本类型数据通过 Object.defineProperty() 实现(RefImpl)，reactive 通过 Proxy 实现
+    3)操作不同：ref 操作数据需要加 .value
+```
+2、toRef函数和toRefs函数的作用？
+```
+    1)toRef: 创建一个 ref 对象，其 value 值指向另一个对象中指定的属性,将某个响应式对象的某一个属性提供给外部使用
+        const name = toRef(person, "name");
+
+    2)toRefs: 批量创建多个 ref 对象，其 value 值指向另一个对象中指定的属性,将某个响应式对象的全部属性提供给外部使用
+        setup() {
+            let person = reactive({
+                name: "张三",
+                age: 19,
+            });
+            return {
+                ...toRefs(person),
+            };
+        },
+
+```
