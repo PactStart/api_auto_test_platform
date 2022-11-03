@@ -5,8 +5,8 @@
                 <a @click="onAddClick">添加</a>
             </template>
             <div class="search-wrapper">
-                <label>选择应用：</label><AppSelectVue  v-model:appId="appId" style="width: 200px;" @update:appId="appId = $event"/>
-                <a-input-search v-model:value="keyword" style="width: 350px; margin-left: 20px;" placeholder="模糊搜索配置名"
+                <label>选择应用：</label><AppSelectVue  v-model:appId="queryForm.appId" style="width: 200px;" @update:appId="queryForm.appId = $event"/>
+                <a-input-search v-model:value="queryForm.name" style="width: 350px; margin-left: 20px;" placeholder="模糊搜索配置名"
                     enter-button="查询" @search="handleQueryAppConfig" />
             </div>
             <a-table :dataSource="dataSource" :columns="columns" :pagination="pagination" @change="handleTableChange">
@@ -112,8 +112,10 @@ const pagination = ref({
     pageSize: 10,
     total: 0
 });
-const appId = ref(null);
-const keyword = ref(null);
+const queryForm = ref({
+    appId: null,
+    name: null,
+})
 const showAppConfigAddDrawer = ref(false);
 const showAppConfigEditDrawer = ref(false);
 const appConfig = ref({});
@@ -125,8 +127,7 @@ const handleQueryAppConfig = () => {
     queryAppConfig({
         page: pagination.value.current,
         size: pagination.value.pageSize,
-        name: keyword.value,
-        appId: appId.value
+        ...queryForm
     }).then(res => {
         if (!res.code) {
             dataSource.value = res.data.list;

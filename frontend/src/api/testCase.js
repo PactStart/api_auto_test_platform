@@ -28,3 +28,19 @@ import request from "../utils/request";
   return request({ method: "post", url: "/api/v1/testCase/delete", data });
 };
 
+
+/**
+ * 批量为应用接口创建默认用例
+ */
+ export const createDefaultForAll = (data) => {
+  return request({ method: "post", url: "/api/v1/testCase/createDefaultForAll", data });
+};
+
+
+
+/**
+ * 批量设置前置用例
+ */
+ export const bactchSetPreCase = (data) => {
+  return request({ method: "post", url: "/api/v1/testCase/createDefaultForAll", data });
+};

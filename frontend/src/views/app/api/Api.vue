@@ -18,17 +18,21 @@
                 <a-input-search v-model:value="keyword" style="width: 350px; margin-left: 20px;" placeholder="模糊搜索API名称"
                     enter-button="查询" @search="handleQueryApi" />
             </div>
-            <a-table :dataSource="dataSource" :columns="columns" :pagination="pagination" @change="handleTableChange" :row-class-name="(_record, index) => (index % 2 === 1 ? 'table-striped' : null)" size="small"
->
+            <a-table :dataSource="dataSource" :columns="columns" :pagination="pagination" @change="handleTableChange"
+                :row-class-name="(_record, index) => (index % 2 === 1 ? 'table-striped' : null)" size="small">
                 <template #bodyCell="{ column, record }">
                     <template v-if="column.key === 'query'">
                         <span>
-                            <a @click="onViewJsonClick(record.query)"><eye-outlined /></a>
+                            <a @click="onViewJsonClick(record.query)">
+                                <eye-outlined />
+                            </a>
                         </span>
                     </template>
                     <template v-if="column.key === 'body'">
                         <span>
-                            <a @click="onViewJsonClick(record.body)"><eye-outlined /></a>
+                            <a @click="onViewJsonClick(record.body)">
+                                <eye-outlined />
+                            </a>
                         </span>
                     </template>
                     <template v-if="column.key === 'headers'">
@@ -60,14 +64,19 @@
         </a-card>
     </div>
     <a-drawer title="添加API" :width="700" :visible="showApiAddDrawer" :body-style="{ paddingBottom: '80px' }"
-        :footer-style="{ textAlign: 'right' }" @close="onClose('add')">
+        :footer-style="{ textAlign: 'right' }" @close="onClose('api_add')">
         <ApiAdd :onSubmit="handleAddApi" />
     </a-drawer>
     <a-drawer title="编辑API" :width="700" :visible="showApiEditDrawer" :body-style="{ paddingBottom: '80px' }"
-        :footer-style="{ textAlign: 'right' }" @close="onClose('edit')">
+        :footer-style="{ textAlign: 'right' }" @close="onClose('api_edit')">
         <ApiEdit :api="api" :onSubmit="handleUpdateApi" />
     </a-drawer>
-    <a-modal v-model:visible="showApiImportModal" title="请求体" @ok="handleImport" ok-text="提交"
+    <a-drawer title="添加测试用例" :width="700" :visible="showTestCaseAddDrawer" :body-style="{ paddingBottom: '80px' }"
+        :footer-style="{ textAlign: 'right' }" @close="onClose('test_case_add')">
+        <TestCaseAdd :apiId="apiId" :onSubmit="handleAddTestCase"/>
+    </a-drawer>
+
+    <a-modal v-model:visible="showApiImportModal" title="导入API" @ok="handleImport" ok-text="提交"
         :confirmLoading="importLoading" cancel-text="取消">
         <a-form :model="importForm" :label-col="{ span: 4 }" :wrapper-col="{ span: 20 }" autocomplete="off">
             <a-form-item label="分组" name="groupName">
@@ -81,11 +90,11 @@
                 <a-input v-model:value="importForm.url" placeholder="请输入swagger api文档地址" />
             </a-form-item>
         </a-form>
-    
     </a-modal>
     <a-modal v-model:visible="showViewJsonModal" title="请求体" @ok="showViewJsonModal = !showViewJsonModal" ok-text="关闭">
-        <JsonViewer :value="apiBody" copyable boxed sort theme="jv-light"/>
+        <JsonViewer :value="apiBody" copyable boxed sort theme="jv-light" />
     </a-modal>
+
 </template>
 <script setup>
 import { addApi, queryApi, updateApi, deleteApi, importApi, queryGroupAndModule } from '@/api/api';
@@ -97,6 +106,8 @@ import ApiEdit from './components/ApiEdit.vue';
 import { formatTimestamp } from '@/utils/time'
 import AppSelectVue from '@/components/AppSelect.vue';
 import { EyeOutlined } from '@ant-design/icons-vue';
+import TestCaseAdd from '@/views/test/testCase/components/TestCaseAdd.vue';
+import { addTestCase } from '@/api/testCase';
 
 const dataSource = ref([]);
 const columns = reactive([
@@ -195,14 +206,14 @@ const importForm = reactive({
 const api = ref({});
 watch(appId, (newValue, oldValue) => {
     console.log('appId changed', newValue, oldValue);
-    if(newValue == null) {
+    if (newValue == null) {
         groupNameList.value = [];
         moduleNameList.value = [];
     }
     if (oldValue == undefined && newValue == null) {
         return;
     }
-    if(appId.value === null || appId.value === undefined) {
+    if (appId.value === null || appId.value === undefined) {
         return;
     }
     queryGroupAndModule({
@@ -220,8 +231,8 @@ const filterOption = (input, option) => {
 const getFieldNames = (jsonStr) => {
     const jsonObjArr = JSON.parse(jsonStr);
     let fieldNames = [];
-    if(jsonObjArr instanceof Array) {
-        for(const jsonObj of jsonObjArr ) {
+    if (jsonObjArr instanceof Array) {
+        for (const jsonObj of jsonObjArr) {
             fieldNames.push(jsonObj['name']);
         }
     }
@@ -301,10 +312,12 @@ const onDelClick = (id) => {
     });
 };
 const onClose = (type) => {
-    if (type === 'add') {
+    if (type === 'api_add') {
         showApiAddDrawer.value = false;
-    } else {
+    } else if (type === 'api_edit') {
         showApiEditDrawer.value = false;
+    } else if (type === 'test_case_add') {
+        showTestCaseAddDrawer.value = false;
     }
 }
 const onImportClick = () => {
@@ -327,15 +340,29 @@ const handleImport = () => {
         importLoading.value = false;
     })
 };
-const onAddCaseClick = (api) => {
 
+const showTestCaseAddDrawer = ref(false);
+const apiId = ref(null);
+const onAddCaseClick = (api) => {
+    apiId.value = api.id;
+    showTestCaseAddDrawer.value = true;
+}
+
+const handleAddTestCase = (api) => {
+    addTestCase(api).then(res => {
+        if(!res.code) {
+            message.success('添加成功');
+            showTestCaseAddDrawer.value = false;
+        }
+    })
 }
 </script>
 <style lang='less' scoped>
 .search-wrapper {
     margin-bottom: 20px;
 }
+
 .ant-table-striped :deep(.table-striped) td {
-  background-color: #fafafa;
+    background-color: #fafafa;
 }
 </style>

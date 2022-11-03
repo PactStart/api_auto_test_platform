@@ -2,12 +2,16 @@
     <div>
         <a-card title="用例管理">
             <template #extra>
-                <a @click="onAddClick">添加</a>
+                <a @click="onAddClick">生成默认用例</a>
+                <a-divider type="vertical" />
+                <a @click="onAddClick">设置前置用例</a>
+
             </template>
             <div class="search-wrapper">
-                <label>选择应用：</label>
-                <AppSelectVue v-model:appId="appId" style="width: 200px;" @update:appId="appId = $event" />
-                <a-input-search v-model:value="keyword" style="width: 350px; margin-left: 20px;" placeholder="模糊搜索用例名称"
+                <label>选择应用：</label><AppSelectVue v-model:appId="queryForm.appId" style="width: 200px;" @update:appId="appId = $event" />
+                <label> API ID: </label><a-input-number v-model:value="queryForm.apiId" :min="1" placeholder="请输入API id"
+                    style="width: 200px;" />
+                <a-input-search v-model:value="queryForm.name" style="width: 350px; margin-left: 20px;" placeholder="模糊搜索用例名称"
                     enter-button="查询" @search="handleQueryTestCase" />
             </div>
             <a-table :dataSource="dataSource" :columns="columns" :pagination="pagination" @change="handleTableChange" size="small">
@@ -62,36 +66,33 @@
                             <a-divider type="vertical" />
                             <a style="color: red;" @click="onDelClick(record.id)">删除</a>
                             <a-divider type="vertical" />
-                            <a style="color: green;" @click="onRunClick(record)">执行</a>
+                            <a  @click="onCopyClick(record)">克隆</a>
+                            <a-divider type="vertical" />
+                            <a style="color: green;" @click="onRunClick(record)">运行</a>
                         </span>
                     </template>
                 </template>
             </a-table>
         </a-card>
     </div>
-    <a-drawer title="添加测试用例" :width="700" :visible="showTestCaseAddDrawer" :body-style="{ paddingBottom: '80px' }"
-        :footer-style="{ textAlign: 'right' }" @close="onClose('add')">
-        <TestCaseAdd :onSubmit="handleAddTestCase" />
-    </a-drawer>
     <a-drawer title="编辑测试用例" :width="700" :visible="showTestCaseEditDrawer" :body-style="{ paddingBottom: '80px' }"
         :footer-style="{ textAlign: 'right' }" @close="onClose('edit')">
-        <TestCaseEdit :api="api" :onSubmit="handleUpdateTestCase" />
+        <TestCaseEdit :testCase="testCase" :onSubmit="handleUpdateTestCase" />
     </a-drawer>
     <a-modal v-model:visible="showViewJsonModal" :title="title" @ok="showViewJsonModal = !showViewJsonModal" ok-text="关闭">
-        <JsonViewer :value="apiBody" copyable boxed sort theme="jv-light"/>
+        <JsonViewer :value="jsonObj" copyable boxed sort theme="jv-light"/>
     </a-modal>
 
 </template>
 <script setup>
-import { addTestCase, queryTestCase, updateTestCase, deleteTestCase } from '@/api/testCase';
+import { addTestCase, queryTestCase, updateTestCase, deleteTestCase, createDefaultForAll,bactchSetPreCase } from '@/api/testCase';
 import { message, Modal } from 'ant-design-vue';
 import { ref, onMounted, createVNode, reactive,h } from 'vue';
 import { ExclamationCircleOutlined } from '@ant-design/icons-vue';
-import TestCaseAdd from './components/TestCaseAdd.vue';
-import TestCaseEdit from './components/TestCaseEdit.vue';
 import { formatTimestamp } from '@/utils/time'
 import AppSelectVue from '@/components/AppSelect.vue';
 import { EyeOutlined,CheckOutlined,CloseOutlined } from '@ant-design/icons-vue';
+import TestCaseEdit from './components/TestCaseEdit.vue';
 
 const dataSource = ref([]);
 const columns = reactive([
@@ -160,16 +161,18 @@ const pagination = ref({
     pageSize: 10,
     total: 0
 });
-const appId = ref(null);
-const keyword = ref(null);
-const showTestCaseAddDrawer = ref(false);
+const queryForm = ref({
+    appId: null,
+    apiId: null,
+    name: null,
+})
 const showTestCaseEditDrawer = ref(false);
-const api = ref({});
+const testCase = ref(null);
 const title = ref('');
-const apiBody = ref({});
+const jsonObj = ref({});
 const showViewJsonModal = ref(false);
 const onViewJsonClick = (json,text) => {
-    apiBody.value = JSON.parse(json);
+    jsonObj.value = JSON.parse(json);
     showViewJsonModal.value = true;
     title.value = text;
 };
@@ -180,8 +183,7 @@ const handleQueryTestCase = () => {
     queryTestCase({
         page: pagination.value.current,
         size: pagination.value.pageSize,
-        name: keyword.value,
-        appId: appId.value
+        ...queryForm.value
     }).then(res => {
         if (!res.code) {
             dataSource.value = res.data.list;
@@ -189,17 +191,8 @@ const handleQueryTestCase = () => {
         }
     });
 }
-const handleAddTestCase = (api) => {
-    addTestCase(api).then(res => {
-        if (!res.code) {
-            message.success('添加成功');
-            handleQueryTestCase();
-            showTestCaseAddDrawer.value = false;
-        }
-    });
-}
-const handleUpdateTestCase = (api) => {
-    updateTestCase(api).then(res => {
+const handleUpdateTestCase = (testCaseForm) => {
+    updateTestCase(testCaseForm).then(res => {
         if (!res.code) {
             message.success('修改成功');
             handleQueryTestCase();
@@ -213,11 +206,11 @@ const handleTableChange = (page, filters, sorter) => {
     handleQueryTestCase();
 }
 const onAddClick = () => {
-    showTestCaseAddDrawer.value = true;
+    // showTestCaseAddDrawer.value = true;
 };
 const onEditClick = (record) => {
     showTestCaseEditDrawer.value = true;
-    api.value = record;
+    testCase.value = record;
 };
 const onDelClick = (id) => {
     Modal.confirm({
@@ -246,6 +239,9 @@ const onClose = (type) => {
     }
 };
 const onRunClick = (record) => {
+
+}
+const onCopyClick = (record) => {
 
 }
 </script>

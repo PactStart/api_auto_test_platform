@@ -1,6 +1,6 @@
 <template>
     <div>
-        <a-form :model="appConfigForm" name="basic" :label-col="{ span: 4 }" :wrapper-col="{ span: 20 }"
+        <a-form :model="appConfigForm"  :label-col="{ span: 4 }" :wrapper-col="{ span: 20 }"
             autocomplete="off" @finish="onSubmit" @finishFailed="onFinishFailed">
 
             <a-form-item label="选择应用" name="appId" :rules="[{ required: true, message: 'Please choose app!' }]">

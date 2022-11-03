@@ -41,3 +41,11 @@ import request from "../utils/request";
  export const queryGroupAndModule = (data) => {
   return request({ method: "get", url: "/api/v1/api/queryGroupAndModule", data });
 };
+
+
+/**
+ * 根据id获取API
+ */
+ export const getById = (data) => {
+  return request({ method: "get", url: "/api/v1/api/getById", data });
+};
