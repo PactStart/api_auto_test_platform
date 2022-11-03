@@ -78,3 +78,9 @@ exports.apiGroupAndModuleQueryCheck = {
     moduleName: joi.string(),
   },
 };
+
+exports.apiGetCheck = {
+  query: {
+    id
+  }
+}

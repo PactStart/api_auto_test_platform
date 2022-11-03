@@ -4,6 +4,8 @@ const { cacheApiPerm, API_PERM_KEY } = require("./service/PermissionService");
 const { sIsMember, hGet, connect } = require("./config/redis");
 const { parseToken } = require("./utils/TokenParser");
 
+const joi = require("joi");
+const jwt = require("jsonwebtoken");
 /**
  * 解析post请求的body数据
  */
@@ -69,19 +71,28 @@ app.use("/swagger.json", (req, res) => {
  * 登录&权限检查中间件
  */
 app.use((req, res, next) => {
-  const url = req.url;
-  const permPromise = hGet(API_PERM_KEY, url);
+  const path = req.path;
+  const permPromise = hGet(API_PERM_KEY, path);
   permPromise.then((value) => {
     if (!value) {
-      console.error("接口权限未定义:" + url);
+      console.error("接口权限未定义:" + path);
       return next();
     }
     perm = JSON.parse(value);
-    console.log(perm);
     if (perm.anon) {
       next();
     } else if (perm.login) {
-      const currentUser = parseToken(req);
+      let currentUser = null;
+      try {
+        currentUser = parseToken(req);
+      } catch (err) {
+        if (err instanceof jwt.TokenExpiredError) {
+          return res.send({
+            code: -1,
+            msg: "登录已过期，请重新登录",
+          });
+        }
+      }
       if (!currentUser) {
         const token = req.headers.authorization;
         res.send({
@@ -92,7 +103,17 @@ app.use((req, res, next) => {
         next();
       }
     } else {
-      const currentUser = parseToken(req);
+      let currentUser = null;
+      try {
+        currentUser = parseToken(req);
+      } catch (err) {
+        if (err instanceof jwt.TokenExpiredError) {
+          return res.send({
+            code: -1,
+            msg: "登录已过期，请重新登录",
+          });
+        }
+      }
       if (!currentUser) {
         const token = req.headers.authorization;
         res.send({
@@ -177,8 +198,6 @@ app.use("/api/v1/pt/goods", performanceTestRouter);
 /**
  * 错误中间件
  */
-const joi = require("joi");
-const jwt = require("jsonwebtoken");
 app.use((err, req, res, next) => {
   //joi表单的用户信息校验失败
   if (err instanceof joi.ValidationError) {
@@ -191,12 +210,6 @@ app.use((err, req, res, next) => {
     return res.send({
       code: -1,
       msg: "登录已过期，请重新登录",
-    });
-  }
-  if (err.name === "UnauthorizedError") {
-    return res.send({
-      code: 1,
-      msg: "身份认证失败",
     });
   }
   console.log(err);

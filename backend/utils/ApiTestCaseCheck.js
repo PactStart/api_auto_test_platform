@@ -42,6 +42,21 @@ exports.apiTestCaseDeleteCheck = {
   },
 };
 
+exports.apiTestCaseUpdateCheck = {
+  body: {
+    id,
+    appId,
+    apiId,
+    name,
+    run,
+    headers,
+    preCaseId,
+    preFields,
+    requestBody,
+    assert,
+  },
+};
+
 exports.apiTestCaseQueryCheck = {
   query: {
     appId: joi.number().integer(),

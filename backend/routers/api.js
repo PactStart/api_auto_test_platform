@@ -28,13 +28,14 @@ const ApiCheck = require('../utils/ApiCheck');
  *            type: object
  *            properties: 
  *              appId:
- *                type: string
+ *                type: integer
  *                required: true
  *                description: 应用id
  *              groupName:
  *                type: string
  *                required: true
  *                description: 分组名称
+ *                default: 默认分组
  *              moduleName:
  *                type: string
  *                required: true
@@ -51,18 +52,22 @@ const ApiCheck = require('../utils/ApiCheck');
  *                type: string
  *                required: true
  *                description: 请求方式，get|post
+ *                default: post
  *              contentType:
  *                type: string
  *                required: true
  *                description: 请求格式，x-www-form-url-encoded | application/json | none
+ *                default: application/json
  *              query:
  *                type: string
  *                required: true
  *                description: 查询字符串参数，json格式
+ *                default: {}
  *              body:
  *                type: string
  *                required: true
  *                description: 请求体json schema
+ *                default: {}
  *              headers:
  *                type: string
  *                required: true
@@ -143,6 +148,7 @@ router.post('/delete',expressJoi(ApiCheck.apiDeleteCheck),apiController.deleteAp
  *                type: string
  *                required: true
  *                description: 分组名称
+ *                default: 默认分组
  *              moduleName:
  *                type: string
  *                required: true
@@ -159,18 +165,22 @@ router.post('/delete',expressJoi(ApiCheck.apiDeleteCheck),apiController.deleteAp
  *                type: string
  *                required: true
  *                description: 请求方式，get|post
+ *                default: post
  *              contentType:
  *                type: string
  *                required: true
  *                description: 请求格式，x-www-form-url-encoded | application/json | none
+ *                default: application/json
  *              query:
  *                type: string
  *                required: true
  *                description: 查询字符串参数，json格式
+ *                default: {}
  *              body:
  *                type: string
  *                required: true
  *                description: 请求体json schema
+ *                default: {}
  *              headers:
  *                type: string
  *                required: true
@@ -311,5 +321,32 @@ router.post('/import',expressJoi(ApiCheck.apiImportCheck),apiController.importSw
  */
  router.get('/queryGroupAndModule',expressJoi(ApiCheck.apiGroupAndModuleQueryCheck),apiController.queryGroupAndModule);
 
+/**
+ * @openapi
+ * /api/v1/api/queryGroupAndModule:
+ *  get:
+ *    tags:
+ *      - API模块
+ *    summary: 查询API
+ *    description: 查询API
+ *    parameters:
+ *      - name: Authorization
+ *        type: string
+ *        description: jwt
+ *        in: header
+ *        required: true
+ *      - name: id
+ *        type: integer
+ *        required: true
+ *        description: API id
+ *        in: query
+ *    produces: 
+ *      - application/json 
+ *    responses:
+ *      200:
+ *        description: OK
+ * 
+ */
+ router.get('/getById',expressJoi(ApiCheck.apiGetCheck),apiController.getById);
 
 module.exports = router;

@@ -22,7 +22,7 @@ async function hDel(key, hashKey) {
 }
 
 async function hGet(key, hashKey) {
-  await client.hGet(key, hashKey);
+  return await client.hGet(key, hashKey);
 }
 
 async function hExists(key, field) {

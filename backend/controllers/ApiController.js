@@ -269,3 +269,25 @@ exports.queryGroupAndModule = (req, res) => {
     });
   });
 };
+
+exports.getById = (req, res) => {
+  let { id } = req.query;
+  const sql = "select * from api where id = ?";
+  db.query(sql, id, (err, results) => {
+    if (err) {
+      res.send({
+        code: 1,
+        msg: err.message,
+      });
+    }
+    let api = null;
+    if (results && results.length) {
+      api = convertKeyToCamelCase(results[0]);
+    }
+    res.send({
+      code: 0,
+      msg: "success",
+      data: api,
+    });
+  });
+};
