@@ -46,7 +46,7 @@ exports.apiTestCaseQueryCheck = {
   query: {
     appId: joi.number().integer(),
     apiId: joi.number().integer(),
-    name: joi.string(),
+    name: joi.string().allow(null,''),
     run,
     page,
     size,

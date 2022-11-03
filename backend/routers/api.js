@@ -274,5 +274,42 @@ router.get('/query',expressJoi(ApiCheck.apiQueryCheck),apiController.queryApi);
  */
 router.post('/import',expressJoi(ApiCheck.apiImportCheck),apiController.importSwaggerApi);
 
+/**
+ * @openapi
+ * /api/v1/api/queryGroupAndModule:
+ *  get:
+ *    tags:
+ *      - API模块
+ *    summary: 查询API
+ *    description: 查询API
+ *    parameters:
+ *      - name: Authorization
+ *        type: string
+ *        description: jwt
+ *        in: header
+ *        required: true
+ *      - name: appId
+ *        type: string
+ *        required: true
+ *        description: api名称
+ *        in: query
+ *      - name: groupName
+ *        type: string
+ *        description: 分组名称
+ *        in: query
+ *      - name: moduleName
+ *        type: string
+ *        description: 模块名称
+ *        in: query
+ *      
+ *    produces: 
+ *      - application/json 
+ *    responses:
+ *      200:
+ *        description: OK
+ * 
+ */
+ router.get('/queryGroupAndModule',expressJoi(ApiCheck.apiGroupAndModuleQueryCheck),apiController.queryGroupAndModule);
+
 
 module.exports = router;

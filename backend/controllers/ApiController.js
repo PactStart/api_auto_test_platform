@@ -229,3 +229,43 @@ exports.importSwaggerApi = (req, res) => {
     });
   });
 };
+
+exports.queryGroupAndModule = (req, res) => {
+  let { appId } = req.query;
+  const selectGroupSql =
+    "select distinct(group_name) as groupName from api where app_id = ? and del = 0";
+  db.query(selectGroupSql, appId, (err, result1) => {
+    if (err) {
+      return res.send({
+        code: 1,
+        msg: err.message,
+      });
+    }
+    const selectModuleSql =
+      "select distinct(module_name) as moduleName from api where app_id = ? and del = 0";
+    db.query(selectModuleSql, appId, (err, result2) => {
+      if (err) {
+        return res.send({
+          code: 1,
+          msg: err.message,
+        });
+      }
+      console.log(result1, result2);
+      let groupNameList = !result1.length
+        ? []
+        : result1.map((row) => row.groupName);
+      let moduleNameList = !result2.length
+        ? []
+        : result2.map((row) => row.moduleName);
+      console.log(groupNameList, moduleNameList);
+      res.send({
+        code: 0,
+        msg: "success",
+        data: {
+          groupNameList,
+          moduleNameList,
+        },
+      });
+    });
+  });
+};

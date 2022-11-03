@@ -70,3 +70,11 @@ exports.apiImportCheck = {
     groupName: joi.string(),
   },
 };
+
+exports.apiGroupAndModuleQueryCheck = {
+  query: {
+    appId,
+    groupName: joi.string(),
+    moduleName: joi.string(),
+  },
+};

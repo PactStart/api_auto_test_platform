@@ -209,13 +209,14 @@ exports.queryApiTestCase = (req, res) => {
   let { whereSql, values } = generateWhereSql(
     req.query,
     ["appId", "apiId", "run", "name"],
-    []
+    ['name']
   );
 
   //查询api测试用例列表sql
   const pageSql =
     "select * from api_test_case " + whereSql + " order by id limit ?,?";
 
+  console.log(pageSql,values);
   //查询api测试用例总数的sql
   const totalSql = "select count(*) as total from api_test_case" + whereSql;
 
