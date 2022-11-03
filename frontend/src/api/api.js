@@ -34,3 +34,10 @@ import request from "../utils/request";
  export const importApi = (data) => {
     return request({ method: "post", url: "/api/v1/api/import", data });
   };
+
+/**
+ * 查询应用API的分组和模块
+ */
+ export const queryGroupAndModule = (data) => {
+  return request({ method: "get", url: "/api/v1/api/queryGroupAndModule", data });
+};

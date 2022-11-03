@@ -9,11 +9,33 @@
             <div class="search-wrapper">
                 <label>选择应用：</label>
                 <AppSelectVue v-model:appId="appId" style="width: 200px;" @update:appId="appId = $event" />
+                <label> 分组：</label>
+                <a-auto-complete v-model:value="queryForm.groupName" :options="groupNameList" style="width: 150px"
+                    placeholder="请输入API分组" :filter-option="filterOption" />
+                <label> 模块：</label>
+                <a-auto-complete v-model:value="queryForm.moduleName" :options="moduleNameList" style="width: 150px"
+                    placeholder="请输入API模块" :filter-option="filterOption" />
                 <a-input-search v-model:value="keyword" style="width: 350px; margin-left: 20px;" placeholder="模糊搜索API名称"
                     enter-button="查询" @search="handleQueryApi" />
             </div>
-            <a-table :dataSource="dataSource" :columns="columns" :pagination="pagination" @change="handleTableChange">
+            <a-table :dataSource="dataSource" :columns="columns" :pagination="pagination" @change="handleTableChange" :row-class-name="(_record, index) => (index % 2 === 1 ? 'table-striped' : null)" size="small"
+>
                 <template #bodyCell="{ column, record }">
+                    <template v-if="column.key === 'query'">
+                        <span>
+                            <a @click="onViewJsonClick(record.query)"><eye-outlined /></a>
+                        </span>
+                    </template>
+                    <template v-if="column.key === 'body'">
+                        <span>
+                            <a @click="onViewJsonClick(record.body)"><eye-outlined /></a>
+                        </span>
+                    </template>
+                    <template v-if="column.key === 'headers'">
+                        <span>
+                            {{ getFieldNames(record.headers) }}
+                        </span>
+                    </template>
                     <template v-if="column.key === 'createAt'">
                         <span>
                             {{ formatTimestamp(record.createAt) }}
@@ -29,6 +51,8 @@
                             <a @click="onEditClick(record)">编辑</a>
                             <a-divider type="vertical" />
                             <a style="color: red;" @click="onDelClick(record.id)">删除</a>
+                            <a-divider type="vertical" />
+                            <a @click="onAddCaseClick(record)">添加用例</a>
                         </span>
                     </template>
                 </template>
@@ -43,7 +67,7 @@
         :footer-style="{ textAlign: 'right' }" @close="onClose('edit')">
         <ApiEdit :api="api" :onSubmit="handleUpdateApi" />
     </a-drawer>
-    <a-modal v-model:visible="showApiImportModal" title="导入API" @ok="handleImport" ok-text="提交"
+    <a-modal v-model:visible="showApiImportModal" title="请求体" @ok="handleImport" ok-text="提交"
         :confirmLoading="importLoading" cancel-text="取消">
         <a-form :model="importForm" :label-col="{ span: 4 }" :wrapper-col="{ span: 20 }" autocomplete="off">
             <a-form-item label="分组" name="groupName">
@@ -57,18 +81,23 @@
                 <a-input v-model:value="importForm.url" placeholder="请输入swagger api文档地址" />
             </a-form-item>
         </a-form>
+    
+    </a-modal>
+    <a-modal v-model:visible="showViewJsonModal" title="请求体" @ok="showViewJsonModal = !showViewJsonModal" ok-text="关闭">
+        <JsonViewer :value="apiBody" copyable boxed sort theme="jv-light"/>
     </a-modal>
 </template>
 <script setup>
-import { addApi, queryApi, updateApi, deleteApi, importApi } from '@/api/api';
+import { addApi, queryApi, updateApi, deleteApi, importApi, queryGroupAndModule } from '@/api/api';
 import { message, Modal } from 'ant-design-vue';
-import { ref, onMounted, createVNode, reactive,h } from 'vue';
+import { ref, onMounted, createVNode, reactive, h, watch } from 'vue';
 import { ExclamationCircleOutlined } from '@ant-design/icons-vue';
 import ApiAdd from './components/ApiAdd.vue';
 import ApiEdit from './components/ApiEdit.vue';
-import ApiImport from './components/ApiEdit.vue';
 import { formatTimestamp } from '@/utils/time'
 import AppSelectVue from '@/components/AppSelect.vue';
+import { EyeOutlined } from '@ant-design/icons-vue';
+
 const dataSource = ref([]);
 const columns = reactive([
     {
@@ -112,6 +141,21 @@ const columns = reactive([
         key: 'contentType',
     },
     {
+        title: '查询参数',
+        dataIndex: 'query',
+        key: 'query',
+    },
+    {
+        title: '请求体',
+        dataIndex: 'body',
+        key: 'body',
+    },
+    {
+        title: '请求头',
+        dataIndex: 'headers',
+        key: 'headers',
+    },
+    {
         title: '用例数',
         dataIndex: 'caseNum',
         key: 'caseNum',
@@ -132,6 +176,12 @@ const pagination = ref({
     total: 0
 });
 const appId = ref(null);
+const groupNameList = ref([]);
+const moduleNameList = ref([]);
+const queryForm = ref({
+    groupName: null,
+    moduleName: null
+});
 const keyword = ref(null);
 const showApiAddDrawer = ref(false);
 const showApiEditDrawer = ref(false);
@@ -143,16 +193,57 @@ const importForm = reactive({
     url: null
 });
 const api = ref({});
-
+watch(appId, (newValue, oldValue) => {
+    console.log('appId changed', newValue, oldValue);
+    if(newValue == null) {
+        groupNameList.value = [];
+        moduleNameList.value = [];
+    }
+    if (oldValue == undefined && newValue == null) {
+        return;
+    }
+    if(appId.value === null || appId.value === undefined) {
+        return;
+    }
+    queryGroupAndModule({
+        appId: appId.value
+    }).then(res => {
+        if (!res.code) {
+            groupNameList.value = res.data.groupNameList.map(item => ({ value: item }));
+            moduleNameList.value = res.data.moduleNameList.map(item => ({ value: item }));
+        }
+    })
+}, { immediate: true, deep: true });
+const filterOption = (input, option) => {
+    return option.value.toUpperCase().indexOf(input.toUpperCase()) >= 0;
+};
+const getFieldNames = (jsonStr) => {
+    const jsonObjArr = JSON.parse(jsonStr);
+    let fieldNames = [];
+    if(jsonObjArr instanceof Array) {
+        for(const jsonObj of jsonObjArr ) {
+            fieldNames.push(jsonObj['name']);
+        }
+    }
+    return fieldNames.length ? fieldNames.join(' | ') : '';
+}
+const apiBody = ref({});
+const showViewJsonModal = ref(false);
+const onViewJsonClick = (json) => {
+    apiBody.value = JSON.parse(json);
+    showViewJsonModal.value = true;
+};
 onMounted(() => {
     handleQueryApi();
 });
+
 const handleQueryApi = () => {
     queryApi({
         page: pagination.value.current,
         size: pagination.value.pageSize,
         name: keyword.value,
-        appId: appId.value
+        appId: appId.value,
+        ...queryForm.value
     }).then(res => {
         if (!res.code) {
             dataSource.value = res.data.list;
@@ -235,10 +326,16 @@ const handleImport = () => {
         }
         importLoading.value = false;
     })
+};
+const onAddCaseClick = (api) => {
+
 }
 </script>
 <style lang='less' scoped>
 .search-wrapper {
     margin-bottom: 20px;
+}
+.ant-table-striped :deep(.table-striped) td {
+  background-color: #fafafa;
 }
 </style>

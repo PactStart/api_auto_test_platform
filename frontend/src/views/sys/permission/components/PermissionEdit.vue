@@ -71,8 +71,6 @@ export default {
             permissionForm.anon = permission.anon+'';
             permissionForm.login = permission.login+'';
         });
-        watchEffect(() => {
-        })
         const onFinishFailed = errorInfo => {
             console.log('Failed:', errorInfo);
         };
