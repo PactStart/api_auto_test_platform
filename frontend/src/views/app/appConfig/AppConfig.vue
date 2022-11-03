@@ -1,12 +1,13 @@
 <template>
     <div>
-        <a-card title="应用管理">
+        <a-card title="应用配置管理">
             <template #extra>
                 <a @click="onAddClick">添加</a>
             </template>
             <div class="search-wrapper">
-                <a-input-search v-model:value="keyword" style="width: 350px" placeholder="模糊搜索应用" enter-button="查询"
-                @search="handleQueryApp" />
+                <label>选择应用：</label><AppSelectVue  v-model:appId="appId" style="width: 200px;" @update:appId="appId = $event"/>
+                <a-input-search v-model:value="keyword" style="width: 350px; margin-left: 20px;" placeholder="模糊搜索配置名"
+                    enter-button="查询" @search="handleQueryAppConfig" />
             </div>
             <a-table :dataSource="dataSource" :columns="columns" :pagination="pagination" @change="handleTableChange">
                 <template #bodyCell="{ column, record }">
@@ -31,23 +32,24 @@
             </a-table>
         </a-card>
     </div>
-    <a-drawer title="添加应用" :width="500" :visible="showAppAddDrawer" :body-style="{ paddingBottom: '80px' }"
+    <a-drawer title="添加配置" :width="500" :visible="showAppConfigAddDrawer" :body-style="{ paddingBottom: '80px' }"
         :footer-style="{ textAlign: 'right' }" @close="onClose('add')">
-        <AppAdd :onSubmit="handleAddApp" />
+        <AppConfigAdd :onSubmit="handleAddAppConfig" />
     </a-drawer>
-    <a-drawer title="编辑应用" :width="500" :visible="showAppEditDrawer" :body-style="{ paddingBottom: '80px' }"
+    <a-drawer title="编辑配置" :width="500" :visible="showAppConfigEditDrawer" :body-style="{ paddingBottom: '80px' }"
         :footer-style="{ textAlign: 'right' }" @close="onClose('edit')">
-        <AppEdit :app="app" :onSubmit="handleUpdateApp" />
+        <AppConfigEdit :appConfig="appConfig" :onSubmit="handleUpdateAppConfig" />
     </a-drawer>
 </template>
 <script setup>
-import { addApp, queryApp, updateApp, deleteApp } from '@/api/app';
+import { addAppConfig, queryAppConfig, updateAppConfig, deleteAppConfig } from '@/api/appConfig';
 import { message, Modal } from 'ant-design-vue';
 import { ref, onMounted, createVNode, reactive } from 'vue';
 import { ExclamationCircleOutlined } from '@ant-design/icons-vue';
-import AppAdd from './components/AppAdd.vue';
-import AppEdit from './components/AppEdit.vue';
+import AppConfigAdd from './components/AppConfigAdd.vue';
+import AppConfigEdit from './components/AppConfigEdit.vue';
 import { formatTimestamp } from '@/utils/time'
+import AppSelectVue from '@/components/AppSelect.vue';
 const dataSource = ref([]);
 const columns = reactive([
     {
@@ -56,9 +58,24 @@ const columns = reactive([
         key: 'id',
     },
     {
-        title: '应用名',
-        dataIndex: 'name',
-        key: 'appname',
+        title: '应用ID',
+        dataIndex: 'appId',
+        key: 'appId',
+    },
+    {
+        title: '配置描述',
+        dataIndex: 'description',
+        key: 'description',
+    },
+    {
+        title: '配置名',
+        dataIndex: 'configKey',
+        key: 'configValue',
+    },
+    {
+        title: '配置值',
+        dataIndex: 'configValue',
+        key: 'configValue',
     },
     {
         title: '创建时间',
@@ -95,66 +112,68 @@ const pagination = ref({
     pageSize: 10,
     total: 0
 });
-const keyword = ref('');
-const showAppAddDrawer = ref(false);
-const showAppEditDrawer = ref(false);
-const app = ref({});
+const appId = ref(null);
+const keyword = ref(null);
+const showAppConfigAddDrawer = ref(false);
+const showAppConfigEditDrawer = ref(false);
+const appConfig = ref({});
 
 onMounted(() => {
-    handleQueryApp();
+    handleQueryAppConfig();
 });
-const handleQueryApp = () => {
-    queryApp({
+const handleQueryAppConfig = () => {
+    queryAppConfig({
         page: pagination.value.current,
         size: pagination.value.pageSize,
-        name: keyword.value
+        name: keyword.value,
+        appId: appId.value
     }).then(res => {
-        if(!res.code) {
+        if (!res.code) {
             dataSource.value = res.data.list;
             pagination.value.total = res.data.total;
         }
     });
 }
-const handleAddApp = (app) => {
-    addApp(app).then(res => {
+const handleAddAppConfig = (appConfig) => {
+    addAppConfig(appConfig).then(res => {
         if (!res.code) {
             message.success('添加成功');
-            handleQueryApp();
-            showAppAddDrawer.value = false;
+            handleQueryAppConfig();
+            showAppConfigAddDrawer.value = false;
         }
     });
 }
-const handleUpdateApp = (app) => {
-    updateApp(app).then(res => {
+const handleUpdateAppConfig = (appConfig) => {
+    updateAppConfig(appConfig).then(res => {
         if (!res.code) {
             message.success('修改成功');
-            handleQueryApp();
-            showAppEditDrawer.value = false;
+            handleQueryAppConfig();
+            showAppConfigEditDrawer.value = false;
         }
     });
 }
 const handleTableChange = (page, filters, sorter) => {
     pagination.value.current = page.current;
     pagination.value.pageSize = page.pageSize;
-    handleQueryApp();
+    handleQueryAppConfig();
 }
 const onAddClick = () => {
-    showAppAddDrawer.value = true;
+    showAppConfigAddDrawer.value = true;
 };
 const onEditClick = (record) => {
-    showAppEditDrawer.value = true;
-    app.value = record;
+    showAppConfigEditDrawer.value = true;
+    appConfig.value = record;
 };
 const onDelClick = (id) => {
     Modal.confirm({
-        title: '确定删除该应用吗?',
+        title: '确定删除该配置吗?',
         icon: createVNode(ExclamationCircleOutlined),
         content: '删除后不可恢复，请谨慎操作',
         onOk() {
             return new Promise((resolve, reject) => {
-                deleteApp({ id }).then(() => {
+                deleteAppConfig({ id }).then(() => {
                     if (!res.code) {
-                        handleQueryApp();
+                        handleQueryAppConfig();
                         resolve();
                     }
                 })
@@ -166,14 +185,14 @@ const onDelClick = (id) => {
 };
 const onClose = (type) => {
     if (type === 'add') {
-        showAppAddDrawer.value = false;
+        showAppConfigAddDrawer.value = false;
     } else {
-        showAppEditDrawer.value = false;
+        showAppConfigEditDrawer.value = false;
     }
 }
 </script>
 <style lang='less' scoped>
-    .search-wrapper {
-        margin-bottom: 20px;
-    }
+.search-wrapper {
+    margin-bottom: 20px;
+}
 </style>

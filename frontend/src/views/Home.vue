@@ -19,7 +19,7 @@
                 <router-view></router-view>
             </a-layout-content>
             <a-layout-footer style="text-align: center; height: 80px;">
-                API自动化测试平台 v1.0.0，github地址：<a href="https://github.com/PactStart/api_auto_test_platform" target="_blank">https://github.com/PactStart/api_auto_test_platform</a>
+                API自动化测试平台 <a href="http://localhost:3000/swagger" target="_blank" >v1.0.0</a>，github地址：<a href="https://github.com/PactStart/api_auto_test_platform" target="_blank">https://github.com/PactStart/api_auto_test_platform</a>
             </a-layout-footer>
         </a-layout>
     </a-layout>

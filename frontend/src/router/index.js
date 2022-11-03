@@ -33,7 +33,16 @@ const routes = [
             component: () => import("../views/app/app/App.vue"),
             meta: {
               isAuth: true,
-              title: "应用管理",
+              title: "应用列表",
+            },
+          },
+          {
+            path: "/app/appConfig",
+            name: 'appConfig',
+            component: () => import("../views/app/appConfig/AppConfig.vue"),
+            meta: {
+              isAuth: true,
+              title: "应用配置",
             },
           },
           {
@@ -42,9 +51,9 @@ const routes = [
             component: () => import("../views/app/api/Api.vue"),
             meta: {
               isAuth: true,
-              title: "API管理",
+              title: "API 管理",
             },
-          },
+          }
         ],
       },
       {

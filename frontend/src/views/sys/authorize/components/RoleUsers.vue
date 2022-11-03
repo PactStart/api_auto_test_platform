@@ -1,6 +1,6 @@
 <template>
     <div>
-        <a-card title="" size="small">
+        <a-card title="" size="small" bordered="false">
             <template #extra>
                 <a-button type="primary">添加关联</a-button>
                 <a-button type="dashed" danger style="margin-left: 10px;">取消关联</a-button>
