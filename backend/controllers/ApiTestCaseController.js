@@ -1,6 +1,6 @@
 const db = require("../config/db");
 const { parseToken } = require("../utils/TokenParser");
-var defaults = require("json-schema-defaults");
+const defaults = require("json-schema-defaults");
 
 const {
   generateWhereSql,

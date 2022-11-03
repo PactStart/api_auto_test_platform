@@ -88,10 +88,10 @@ exports.deleteAppConfig = (req, res) => {
 };
 
 exports.updateAppConfig = (req, res) => {
-  let { appId, configKey, configValue } = req.body;
+  let { appId, configKey, configValue, description } = req.body;
   const updateSql =
-    "update app_config set config_value = ? where app_id = ? and config_key = ?";
-  db.query(updateSql, [configValue, appId, configKey], (err, results) => {
+    "update app_config set config_value = ?,description = ? where app_id = ? and config_key = ?";
+  db.query(updateSql, [configValue, description, appId, configKey], (err, results) => {
     if (err) {
       return res.send({
         code: 0,

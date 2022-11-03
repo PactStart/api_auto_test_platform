@@ -26,7 +26,7 @@ exports.appDeleteCheck = {
 
 exports.appQueryCheck = {
   query: {
-    name: joi.string(),
+    name: joi.string().allow(null, ''),
     page,
     size,
   },

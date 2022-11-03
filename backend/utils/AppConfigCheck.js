@@ -22,6 +22,7 @@ exports.appConfigUpdateCheck = {
     appId,
     configKey,
     configValue,
+    description
   },
 };
 

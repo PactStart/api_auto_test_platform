@@ -1,9 +1,10 @@
 const db = require("../config/db");
 const { parseToken } = require("../utils/TokenParser");
-const { generateWhereSql } = require("../utils/CommonUtil");
+const {
+  generateWhereSql,
+  convertKeyToCamelCase,
+} = require("../utils/CommonUtil");
 const { requestSwaggerApi } = require("../utils/RequestUtil");
-
-var defaults = require("json-schema-defaults");
 
 exports.addApi = (req, res) => {
   let {
@@ -14,11 +15,14 @@ exports.addApi = (req, res) => {
     url,
     requestMethod,
     contentType,
+    query,
+    body,
+    headers,
   } = req.body;
 
   const currentUser = parseToken(req);
   const now = Date.now();
-  const insertSql = `insert api(app_id,group_name,module_name,api_name,url,request_method,content_type,create_at,create_by,update_at,update_by) values(?,?,?,?,?,?,?,?,?,?,?) 
+  const insertSql = `insert api(app_id,group_name,module_name,api_name,url,request_method,content_type,query,body,headers,create_at,create_by,update_at,update_by) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?) 
     on duplicate key update del = 0,update_at = values(update_at),update_by = values(update_by)`;
   db.query(
     insertSql,
@@ -30,6 +34,9 @@ exports.addApi = (req, res) => {
       url,
       requestMethod,
       contentType,
+      query,
+      body,
+      headers,
       now,
       currentUser.nickname,
       now,
@@ -68,27 +75,44 @@ exports.deleteApi = (req, res) => {
 };
 
 exports.updateApi = (req, res) => {
-  let { id, groupName, moduleName, apiName, url, requestMethod, contentType } =
-    req.body;
+  let {
+    id,
+    appId,
+    groupName,
+    moduleName,
+    apiName,
+    url,
+    requestMethod,
+    contentType,
+    query,
+    body,
+    headers,
+  } = req.body;
 
   const currentUser = parseToken(req);
   const now = Date.now();
-  ("update api set app_id = ?,group_name = ?, module_name = ? , api_name = ?, request_method = ?, content_type = ?, update_at = ?, update_by = ? where id = ?");
+  const updateSql =
+    "update api set app_id = ?,group_name = ?, module_name = ? , api_name = ?, request_method = ?, content_type = ?, query = ? , body = ? , headers = ? , update_at = ?, update_by = ? where id = ?";
   db.query(
-    insertSql,
+    updateSql,
     [
+      appId,
       groupName,
       moduleName,
       apiName,
       url,
       requestMethod,
       contentType,
+      query,
+      body,
+      headers,
       now,
       currentUser.nickname,
+      id,
     ],
     (err, results) => {
       if (err) {
-        res.send({
+        return res.send({
           code: 1,
           msg: err.message,
         });
@@ -107,8 +131,8 @@ exports.queryApi = (req, res) => {
 
   let { whereSql, values } = generateWhereSql(
     req.query,
-    ["groupName", "moduleName", "apiName"],
-    []
+    ["appId", "groupName", "moduleName", "apiName"],
+    ["apiName"]
   );
 
   //查询api列表sql
@@ -134,7 +158,7 @@ exports.queryApi = (req, res) => {
       res.send({
         code: 0,
         data: {
-          list: result1,
+          list: convertKeyToCamelCase(result1),
           total: result2[0].total,
         },
       });
@@ -143,9 +167,13 @@ exports.queryApi = (req, res) => {
 };
 
 exports.importSwaggerApi = (req, res) => {
-  let { appId, url } = req.body;
+  let { groupName, appId, url } = req.body;
   let apiArr = [];
-  const promise = requestSwaggerApi(url, "默认分组", apiArr);
+  const promise = requestSwaggerApi(
+    url,
+    !!groupName ? groupName : "默认分组",
+    apiArr
+  );
   promise.then((groupNum) => {
     console.log(apiArr.length);
     const currentUser = parseToken(req);

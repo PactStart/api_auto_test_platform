@@ -9,6 +9,9 @@ const apiName = joi.string().required();
 const url = joi.string().required();
 const requestMethod = joi.string().required();
 const contentType = joi.string().required();
+const query = joi.string().required();
+const body = joi.string().required();
+const headers = joi.string().required();
 
 const page = joi.number().integer().min(1).required();
 const size = joi.number().integer().min(1).max(100).required();
@@ -22,6 +25,9 @@ exports.apiAddCheck = {
     url,
     requestMethod,
     contentType,
+    query,
+    body,
+    headers,
   },
 };
 
@@ -34,6 +40,9 @@ exports.apiUpdateCheck = {
     url,
     requestMethod,
     contentType,
+    query,
+    body,
+    Headers,
   },
 };
 
@@ -45,6 +54,7 @@ exports.apiDeleteCheck = {
 
 exports.apiQueryCheck = {
   query: {
+    appId: joi.number().integer(),
     groupName: joi.string(),
     moduleName: joi.string(),
     apiName: joi.string(),
@@ -57,5 +67,6 @@ exports.apiImportCheck = {
   body: {
     appId,
     url,
+    groupName: joi.string(),
   },
 };

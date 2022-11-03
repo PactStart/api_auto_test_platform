@@ -55,6 +55,18 @@ const ApiCheck = require('../utils/ApiCheck');
  *                type: string
  *                required: true
  *                description: 请求格式，x-www-form-url-encoded | application/json | none
+ *              query:
+ *                type: string
+ *                required: true
+ *                description: 查询字符串参数，json格式
+ *              body:
+ *                type: string
+ *                required: true
+ *                description: 请求体json schema
+ *              headers:
+ *                type: string
+ *                required: true
+ *                description: 请求头
  *    produces: 
  *      - application/json 
  *    consumes: 
@@ -151,6 +163,18 @@ router.post('/delete',expressJoi(ApiCheck.apiDeleteCheck),apiController.deleteAp
  *                type: string
  *                required: true
  *                description: 请求格式，x-www-form-url-encoded | application/json | none
+ *              query:
+ *                type: string
+ *                required: true
+ *                description: 查询字符串参数，json格式
+ *              body:
+ *                type: string
+ *                required: true
+ *                description: 请求体json schema
+ *              headers:
+ *                type: string
+ *                required: true
+ *                description: 请求头
  *    produces: 
  *      - application/json
  *    consumes: 
@@ -228,7 +252,10 @@ router.get('/query',expressJoi(ApiCheck.apiQueryCheck),apiController.queryApi);
  *          schema:
  *            type: object
  *            properties: 
- *              app_id:
+ *              groupName:
+ *                type: string
+ *                description: 分组名称
+ *              appId:
  *                type: integer
  *                required: true
  *                description: 应用id
