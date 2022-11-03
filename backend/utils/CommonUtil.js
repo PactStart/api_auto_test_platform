@@ -29,7 +29,7 @@ function generateWhereSql(obj, fields, likeFields) {
       if (value != null && value != '') {
         if (likeFields.indexOf(key) != -1) {
           whereSql = whereSql + ` ${camelCaseToUnderline(key)} like ? and `;
-          values.push("%" + value) + "%";
+          values.push("%" + value + "%");
         } else {
           whereSql = whereSql + ` ${camelCaseToUnderline(key)} = ? and `;
           values.push(value);
