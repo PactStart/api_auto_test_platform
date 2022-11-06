@@ -96,26 +96,25 @@ exports.addApiTestCase = (req, res) => {
 
 exports.deleteApiTestCase = (req, res) => {
   let { id } = req.body;
-  const currentUser = parseToken(req);
-  db.getConnection((err, connection) => {
+  const selectSql = "select * from api_test_case where id = ?";
+  db.query(selectSql, id, (err, testCase) => {
     if (err) {
       return res.send({
         code: 1,
         msg: err.message,
       });
     }
-    const selectSql = "select * from api_test_case where id = ?";
-    connection.query(selectSql, id, (err, testCase) => {
+    if (!testCase || testCase.del) {
+      return res.send({
+        code: 1,
+        msg: "您要删除的用例不存在",
+      });
+    }
+    db.getConnection((err, connection) => {
       if (err) {
         return res.send({
           code: 1,
           msg: err.message,
-        });
-      }
-      if (testCase || testCase.del) {
-        return res.send({
-          code: 1,
-          msg: "您要删除的用例不存在",
         });
       }
       connection.beginTransaction(function (err) {
@@ -125,6 +124,7 @@ exports.deleteApiTestCase = (req, res) => {
             msg: err.message,
           });
         }
+        const currentUser = parseToken(req);
         const now = Date.now();
         const deleteSql =
           "update api_test_case set del = 1, update_at = ?, update_by = ? where id = ?";
@@ -139,23 +139,31 @@ exports.deleteApiTestCase = (req, res) => {
               });
             }
             const updateSql =
-              "update api set case_num = case_num -1 , update_at = ?, update_by = ? where id = ?";
-            connection.query(
-              updateSql,
-              [now, currentUser.nickname, testCase.id],
-              (err, results) => {
+              "update api set case_num = case_num -1  where id = ?";
+            connection.query(updateSql, id, (err, results) => {
+              if (err) {
+                return res.send({
+                  code: 1,
+                  msg: err.message,
+                });
+              }
+              //提交事务
+              connection.commit(function (err) {
                 if (err) {
-                  return res.send({
-                    code: 1,
-                    msg: err.message,
+                  return connection.rollback(function () {
+                    // throw err;
+                    res.send({
+                      code: 1,
+                      msg: err.message,
+                    });
                   });
                 }
                 res.send({
                   code: 0,
                   msg: "success",
                 });
-              }
-            );
+              });
+            });
           }
         );
       });
@@ -168,7 +176,8 @@ exports.updateApiTestCase = (req, res) => {
     req.body;
   const currentUser = parseToken(req);
   const now = Date.now();
-  const updateSql = "update api_test_case set name = ?,run = ?, headers = ? , pre_case_id = ?, pre_fields = ?, request_body = ?, assert = ?, update_at = ?, update_by = ? where id = ?";
+  const updateSql =
+    "update api_test_case set name = ?,run = ?, headers = ? , pre_case_id = ?, pre_fields = ?, request_body = ?, assert = ?, update_at = ?, update_by = ? where id = ?";
   db.query(
     updateSql,
     [
@@ -204,7 +213,7 @@ exports.queryApiTestCase = (req, res) => {
 
   let { whereSql, values } = generateWhereSql(
     req.query,
-    ["appId", "apiId", "run", "name"],
+    ["appId", "apiId", "run", "name", "preCaseId"],
     ["name"]
   );
 
@@ -212,7 +221,6 @@ exports.queryApiTestCase = (req, res) => {
   const pageSql =
     "select * from api_test_case " + whereSql + " order by id desc limit ?,?";
 
-  console.log(pageSql, values);
   //查询api测试用例总数的sql
   const totalSql = "select count(*) as total from api_test_case" + whereSql;
 
@@ -456,19 +464,48 @@ exports.createDefaultForAll = (req, res) => {
 };
 
 exports.batchSetPreCase = (req, res) => {
-  let { appId, preCaseId } = req.body;
-  const updateSql =
-    "update api_test_case set pre_case_id  = ? where app_id = ? and id != ? and del = 0 ";
-  db.query(updateSql, [appId, preCaseId, preCaseId], (err, results) => {
+  let { appId, preCaseId, preFields } = req.body;
+  const selectSql = "select * from api_test_case where id = ? and del = 0";
+  db.query(selectSql, preCaseId, (err, results) => {
     if (err) {
-      res.send({
+      return res.send({
         code: 1,
         msg: err.message,
       });
     }
-    res.send({
-      code: 0,
-      msg: "success",
-    });
+    let preCase = null;
+    if (results && results.length) {
+      preCase = results[0];
+    }
+    if (!preCase) {
+      return res.send({
+        code: 1,
+        msg: "前置用例不存在",
+      });
+    }
+    if (preCase.app_id != appId) {
+      return res.send({
+        code: 1,
+        msg: "用例不属于该应用，不能设置为前置用例",
+      });
+    }
+    const updateSql =
+      "update api_test_case set pre_case_id  = ?, pre_fields = ? where app_id = ? and id != ? and del = 0 ";
+    db.query(
+      updateSql,
+      [preCaseId, preFields, appId, preCaseId],
+      (err, results) => {
+        if (err) {
+          res.send({
+            code: 1,
+            msg: err.message,
+          });
+        }
+        res.send({
+          code: 0,
+          msg: "success",
+        });
+      }
+    );
   });
 };

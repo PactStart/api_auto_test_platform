@@ -47,9 +47,16 @@ exports.rolePermissionsCheck = {
 
 exports.roleIdCheck = {
   query: {
+    exclude: joi.bool(),
     roleId,
     page,
     size,
+  },
+};
+
+exports.listPermissionTreeCheck = {
+  query: {
+    roleId,
   },
 };
 

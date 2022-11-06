@@ -27,3 +27,11 @@ import request from "../utils/request";
  export const deletePermission = (data) => {
   return request({ method: "post", url: "/api/v1/permission/delete", data });
 };
+
+/**
+ * 导入API权限
+ */
+ export const importApiPerms = (data) => {
+  return request({ method: "post", url: "/api/v1/permission/importApiPerms", data });
+};
+

@@ -25,7 +25,7 @@
 <script>
 import { defineComponent, reactive } from 'vue';
 import { login } from '../api/user'
-import { router } from '../router/index';
+import router from '../router/index';
 import { message } from 'ant-design-vue';
 
 export default defineComponent({

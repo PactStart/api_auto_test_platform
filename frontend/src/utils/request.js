@@ -1,4 +1,4 @@
-import { router } from "@/router/index";
+import router from "@/router/index";
 import axios from "axios";
 import { message } from "ant-design-vue";
 

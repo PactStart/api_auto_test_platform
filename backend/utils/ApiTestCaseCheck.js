@@ -31,14 +31,7 @@ exports.apiTestCaseAddCheck = {
 
 exports.apiTestCaseDeleteCheck = {
   body: {
-    id,
-    name,
-    run,
-    headers,
-    preCaseId,
-    preFields,
-    requestBody,
-    assert,
+    id
   },
 };
 
@@ -61,6 +54,7 @@ exports.apiTestCaseQueryCheck = {
   query: {
     appId: joi.number().integer(),
     apiId: joi.number().integer(),
+    preCaseId: joi.number().integer(),
     name: joi.string().allow(null,''),
     run,
     page,
@@ -84,5 +78,6 @@ exports.apiTestCaseBatchSetPreCaseCheck = {
   body: {
     appId,
     preCaseId,
+    preFields
   },
 };

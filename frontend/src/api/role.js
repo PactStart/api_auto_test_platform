@@ -58,6 +58,12 @@ import request from "../utils/request";
   return request({ method: "get", url: "/api/v1/role/listPermissions", data });
 };
 
+/**
+ * 列出角色的权限树
+ */
+export const listPermissionTree = (data) => {
+  return request({ method: "get", url: "/api/v1/role/listPermissionTree", data });
+};
 
 /**
  * 角色授权给用户
@@ -70,7 +76,7 @@ import request from "../utils/request";
  * 角色绑定用户
  */
  export const bindUsers = (data) => {
-  return request({ method: "post", url: "/api/v1/role/assignUsers", data });
+  return request({ method: "post", url: "/api/v1/role/bindUsers", data });
 };
 
 /**
@@ -82,7 +88,7 @@ import request from "../utils/request";
 
 
 /**
- * 列出角色的所有权限
+ * 列出角色的所有用户
  */
  export const listUsers = (data) => {
   return request({ method: "get", url: "/api/v1/role/listUsers", data });

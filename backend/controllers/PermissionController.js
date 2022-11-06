@@ -388,7 +388,7 @@ exports.importSwaggerApiPermission = (req, res) => {
             if (err) {
               return connection.rollback(function () {
                 // throw err;
-                res.send({
+                return res.send({
                   code: 1,
                   msg: err.message,
                 });

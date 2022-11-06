@@ -20,11 +20,11 @@
             <a-col :span="20">
                 <a-card size="small">
                     <a-tabs>
-                        <a-tab-pane key="1" tab="关联到权限">
-                            <RolePermissions :roleId="selectedRoleId" />
-                        </a-tab-pane>
-                        <a-tab-pane key="2" tab="授权给账号" force-render>
+                        <a-tab-pane key="1" tab="关联用户" force-render>
                             <RoleUsers :roleId="selectedRoleId" />
+                        </a-tab-pane>
+                        <a-tab-pane key="2" tab="关联权限">
+                            <RolePermissionTree :roleId="selectedRoleId" />
                         </a-tab-pane>
                     </a-tabs>
                 </a-card>
@@ -37,7 +37,8 @@
 import { queryRole } from '@/api/role';
 import { message } from 'ant-design-vue';
 import { ref, onMounted, createVNode, reactive } from 'vue';
-import RolePermissions from './components/RolePermissions.vue'
+import RolePermissions from './components/RolePermissions.vue';
+import RolePermissionTree from './components/RolePermissionTree.vue'
 import RoleUsers from './components/RoleUsers.vue'
 
 const roleDataSource = ref([]);

@@ -303,6 +303,39 @@ router.get('/listPermissions',expressJoi(RoleCheck.roleIdCheck),roleController.l
 
 /**
  * @openapi
+ * /api/v1/role/listPermissionTree:
+ *  get:
+ *    tags:
+ *      - 角色模块
+ *    summary: 查询角色拥有的权限树
+ *    description: 查询角色拥有的权限树
+ *    parameters:
+ *      - name: Authorization
+ *        type: string
+ *        description: jwt
+ *        in: header
+ *        required: true
+ *      - name: roleId
+ *        type: integer
+ *        description: 角色id
+ *        in: query
+ *        required: true
+ *      - name: type
+ *        type: string
+ *        description: 权限类型
+ *        in: query
+ *        required: true
+ *    produces: 
+ *      - application/json 
+ *    responses:
+ *      200:
+ *        description: OK
+ * 
+ */
+ router.get('/listPermissionTree',expressJoi(RoleCheck.listPermissionTreeCheck),roleController.listPermissionTree);
+
+/**
+ * @openapi
  * /api/v1/role/assignUsers:
  *  post:
  *    tags:
@@ -421,8 +454,8 @@ router.post('/unbindUsers',expressJoi(RoleCheck.roleUsersCheck),roleController.u
  *  get:
  *    tags:
  *      - 角色模块
- *    summary: 查询拥有角色的用户
- *    description: 查询拥有角色的用户
+ *    summary: 查询拥有/不拥有角色的用户
+ *    description: 查询拥有/不拥有角色的用户
  *    parameters:
  *      - name: Authorization
  *        type: string
@@ -434,6 +467,10 @@ router.post('/unbindUsers',expressJoi(RoleCheck.roleUsersCheck),roleController.u
  *        description: 角色id
  *        in: query
  *        required: true
+ *      - name: exclue
+ *        type: boolean
+ *        description: true排除,null/false拥有
+ *        in: query
  *    produces: 
  *      - application/json 
  *    responses:
@@ -442,5 +479,6 @@ router.post('/unbindUsers',expressJoi(RoleCheck.roleUsersCheck),roleController.u
  * 
  */
 router.get('/listUsers',expressJoi(RoleCheck.roleIdCheck),roleController.listUsers);
+
 
 module.exports = router;

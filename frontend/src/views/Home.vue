@@ -5,7 +5,7 @@
                 <span>API自动化测试</span>
             </div>
             <a-menu v-model:selectedKeys="selectedKeys" v-model:openKeys="openKeys" theme="light" mode="inline">
-                <template v-for="route of menuRoutes.children">
+                <template v-for="route of menuRoutes[0].children">
                     <RouteMenu :route="route" />
                 </template> 
             </a-menu>
@@ -28,7 +28,7 @@
 import { MenuUnfoldOutlined, MenuFoldOutlined } from '@ant-design/icons-vue';
 import { computed, ref } from 'vue';
 import RouteMenu from "../components/RouteMenu.vue";
-import { menuRoutes } from "../router/index";
+import menuRoutes from "../router/home";
 
 const selectedKeys = ref(['user']);
 const openKeys = ref(['sys','app','test']);

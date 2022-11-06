@@ -42,5 +42,5 @@ import request from "../utils/request";
  * 批量设置前置用例
  */
  export const bactchSetPreCase = (data) => {
-  return request({ method: "post", url: "/api/v1/testCase/createDefaultForAll", data });
+  return request({ method: "post", url: "/api/v1/testCase/bactchSetPreCase", data });
 };

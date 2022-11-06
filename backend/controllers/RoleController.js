@@ -206,7 +206,6 @@ exports.assignPermissions = (req, res) => {
             `(${roleId},${permissionId},${now},'${currentUser.nickname}',${now}),`;
         }
         insertSql = insertSql.substring(0, insertSql.length - 1);
-        console.log(insertSql);
 
         connection.query(insertSql, (err, results) => {
           if (err) {
@@ -315,7 +314,6 @@ exports.listPermissions = (req, res) => {
     "select p.id,parent_id,type,anon,name,description,internal from sys_permission p join sys_role_permission rp on p.id = rp.permission_id where rp.del = 0 and rp.role_id = ? order by rp.id desc limit ?,?";
   const totalSql =
     "select count(1) as total from sys_permission p join sys_role_permission rp on p.id = rp.permission_id where rp.del = 0 and rp.role_id = ? ";
-  console.log(pageSql, totalSql);
   db.query(pageSql, [roleId, Number(page), Number(size)], (err, result1) => {
     if (err) {
       return res.send({
@@ -335,6 +333,103 @@ exports.listPermissions = (req, res) => {
         data: {
           list: convertKeyToCamelCase(result1),
           total: result2[0].total,
+        },
+      });
+    });
+  });
+};
+
+function buildTree(arr, mapping) {
+  arr.forEach((item) => {
+    if (mapping.get(item.id)) {
+      const children = mapping.get(item.id);
+      if (children && children.length) {
+        item.children = children;
+        buildTree(children, mapping);
+      }
+    }
+  });
+}
+
+exports.listPermissionTree = (req, res) => {
+  let { roleId } = req.query;
+  const selectPermissionSql =
+    "select id,parent_id as parentId,type,name,description from sys_permission where del = 0";
+  db.query(selectPermissionSql, (err, results) => {
+    if (err) {
+      return res.send({
+        code: 1,
+        msg: err.message,
+      });
+    }
+
+    const mergeRootArr = [
+      {
+        id: -1,
+        title: "API权限",
+        type: "API",
+      },
+      {
+        id: -2,
+        title: "页面权限",
+        type: "Page",
+      },
+      {
+        id: -3,
+        title: "按钮权限",
+        type: "Button",
+      },
+      {
+        id: -4,
+        title: "数据权限",
+        type: "Data",
+      },
+    ];
+    for (const obj of mergeRootArr) {
+      const rootArr = [];
+      const mapping = new Map();
+
+      results
+        .filter((item) => {
+          return item.type === obj.type;
+        })
+        .forEach((item) => {
+          if (item.parentId) {
+            if (mapping.get(item.parentId)) {
+              mapping.get(item.parentId).push(item);
+            } else {
+              const children = [];
+              children.push(item);
+              mapping.set(item.parentId, children);
+            }
+          } else {
+            rootArr.push(item);
+          }
+          item.key = item.id;
+          item.title =
+            item.description +
+            (item.name.startsWith("/api") ? ` (${item.name})` : "");
+        });
+      buildTree(rootArr, mapping);
+      obj.children = rootArr;
+    }
+
+    const selectPermIdSql =
+      "select permission_id from sys_role_permission where role_id = ? and del = 0";
+    db.query(selectPermIdSql, roleId, (err, results2) => {
+      if (err) {
+        return res.send({
+          code: 1,
+          msg: err.message,
+        });
+      }
+      permissionIds = results2.map((item) => item["permission_id"]);
+      res.send({
+        code: 0,
+        msg: "success",
+        data: {
+          permissionTree: mergeRootArr,
+          ownPermissionIds: permissionIds,
         },
       });
     });
@@ -404,7 +499,7 @@ exports.bindUsers = (req, res) => {
       });
     }
     res.send({
-      code: 1,
+      code: 0,
       msg: "success",
     });
   });
@@ -412,9 +507,10 @@ exports.bindUsers = (req, res) => {
 
 exports.unbindUsers = (req, res) => {
   let { roleId, userIds } = req.body;
-  const deleteSql =
-    "delete from sys_user_role where role_id = ? and user_id in (?)";
-  db.query(deleteSql, [roleId, userIds.join(",")], (err, results) => {
+  const deleteSql = `delete from sys_user_role where role_id = ? and user_id in (${userIds.join(
+    ","
+  )})`;
+  db.query(deleteSql, roleId, (err, results) => {
     if (err) {
       return res.send({
         code: 1,
@@ -429,13 +525,22 @@ exports.unbindUsers = (req, res) => {
 };
 
 exports.listUsers = (req, res) => {
-  let { roleId, page, size } = req.query;
+  let { exclude, roleId, page, size } = req.query;
   page = (page - 1) * size;
 
-  const pageSql =
-    "select u.id,u.nickname,u.username,u.phone,u.email from sys_user u join sys_user_role ur on u.id = ur.user_id where ur.del = 0 and ur.role_id = ? order by ur.id desc limit ?,?";
-  const totalSql =
-    "select count(1) as total from sys_user u join sys_user_role ur on u.id = ur.user_id where ur.del = 0 and ur.role_id = ?";
+  let pageSql;
+  let totalSql;
+  if (exclude) {
+    pageSql =
+      "select u.id,u.nickname,u.username,u.phone,u.email from sys_user u where u.del = 0 and not exists (select 1 from sys_user_role ur where u.id = ur.user_id and ur.role_id = ? ) order by u.id desc limit ?,?";
+    totalSql =
+      "select count(1) as total from sys_user u where u.del = 0 and not exists (select 1 from sys_user_role ur where u.id = ur.user_id and ur.role_id = ? )";
+  } else {
+    pageSql =
+      "select u.id,u.nickname,u.username,u.phone,u.email from sys_user u join sys_user_role ur on u.id = ur.user_id where ur.del = 0 and ur.role_id = ? order by ur.id desc limit ?,?";
+    totalSql =
+      "select count(1) as total from sys_user u join sys_user_role ur on u.id = ur.user_id where ur.del = 0 and ur.role_id = ?";
+  }
 
   db.query(pageSql, [roleId, Number(page), Number(size)], (err, results1) => {
     if (err) {

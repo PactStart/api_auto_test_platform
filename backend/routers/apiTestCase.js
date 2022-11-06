@@ -251,7 +251,7 @@ router.get('/query',expressJoi(ApiTestCaseCheck.apiTestCaseQueryCheck),apiTestCa
  *        description: OK
  * 
  */
- router.post('/delete',expressJoi(ApiTestCaseCheck.apiTestCaseCreateDefaultCheck),apiTestCaseController.createDefault);
+ router.post('/delete',expressJoi(ApiTestCaseCheck.apiTestCaseDeleteCheck),apiTestCaseController.deleteApiTestCase);
 
  /**
  * @openapi
@@ -319,6 +319,10 @@ router.post('/createDefaultForAll',expressJoi(ApiTestCaseCheck.apiTestCaseCreate
  *                type: integer
  *                required: true
  *                description: 用例id
+ *              preFields:
+ *                type: string
+ *                required: true
+ *                description: 前置字段
  *    produces: 
  *      - application/json 
  *    consumes: 
@@ -328,6 +332,6 @@ router.post('/createDefaultForAll',expressJoi(ApiTestCaseCheck.apiTestCaseCreate
  *        description: OK
  * 
  */
- router.post('/bactchSetPreCase',expressJoi(ApiTestCaseCheck.apiTestCaseCreateDefaultForAllCheck),apiTestCaseController.batchSetPreCase);
+ router.post('/bactchSetPreCase',expressJoi(ApiTestCaseCheck.apiTestCaseBatchSetPreCaseCheck),apiTestCaseController.batchSetPreCase);
 
 module.exports = router;

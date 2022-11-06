@@ -3,6 +3,8 @@
         <a-card title="权限管理">
             <template #extra>
                 <a @click="onAddClick">添加</a>
+                <a-divider type="vertical" />
+                <a @click="onImportClick">导入</a>
             </template>
             <div class="search-wrapper">
                 <a-form>
@@ -112,12 +114,37 @@
         :footer-style="{ textAlign: 'right' }" @close="onClose('edit')">
         <PermissionEdit :permission="permission" :onSubmit="handleUpdatePermission" />
     </a-drawer>
+    <a-modal v-model:visible="showImportModal" title="导入权限" @ok="handleImport">
+        <a-tabs>
+            <a-tab-pane key="1" tab="导入API权限" force-render>
+                <a-form :model="importApiForm" :label-col="{ span: 4 }" :wrapper-col="{ span: 20 }" autocomplete="off" style="height: 150px;padding-top: 30px">
+                    <a-form-item label="URL" name="url" :rules="[{ required: true, message: 'Please input url!' }]" st>
+                        <a-input v-model:value="importApiForm.url" placeholder="请输入swagger api文档地址" />
+                    </a-form-item>
+                </a-form>
+            </a-tab-pane>
+            <a-tab-pane key="2" tab="导入页面权限">
+                <a-upload-dragger
+                    v-model:fileList="fileList"
+                    name="file"
+                    :multiple="false"
+                    @change="handleChange"
+                    @drop="handleDrop"
+                >
+                    <p class="ant-upload-drag-icon">
+                     <inbox-outlined></inbox-outlined>
+                    </p>
+                    <p class="ant-upload-text">选择页面路由文件@/router/home.js</p>
+                </a-upload-dragger>
+            </a-tab-pane>
+        </a-tabs>
+    </a-modal>
 </template>
 <script setup>
-import { addPermission, queryPermission, updatePermission, deletePermission } from '@/api/permission';
+import { addPermission, queryPermission, updatePermission, deletePermission, importApiPerms } from '@/api/permission';
 import { message, Modal } from 'ant-design-vue';
 import { ref, onMounted, createVNode, reactive } from 'vue';
-import { ExclamationCircleOutlined } from '@ant-design/icons-vue';
+import { ExclamationCircleOutlined,InboxOutlined } from '@ant-design/icons-vue';
 import PermissionAdd from './components/PermissionAdd.vue';
 import PermissionEdit from './components/PermissionEdit.vue';
 import { formatTimestamp } from '@/utils/time'
@@ -195,6 +222,7 @@ const pagination = ref({
 });
 const showPermissionAddDrawer = ref(false);
 const showPermissionEditDrawer = ref(false);
+const showImportModal = ref(false);
 const permission = ref({});
 const queryForm = ref({
     type: null,
@@ -203,7 +231,9 @@ const queryForm = ref({
     login: null,
     name: null
 })
-
+const importApiForm = reactive({
+    url: null
+})
 onMounted(() => {
     handleQueryPermission();
 });
@@ -273,6 +303,22 @@ const onClose = (type) => {
         showPermissionAddDrawer.value = false;
     } else {
         showPermissionEditDrawer.value = false;
+    }
+}
+const onImportClick = () =>{
+    showImportModal.value = true;
+}
+
+const handleImport = () => {
+    if(importApiForm.url) {
+        importApiPerms(importApiForm).then(res => {
+            if(!res.code) {
+                handleQueryPermission();
+                message.success('导入成功');
+                showImportModal.value = false;
+                importApiForm.url = null;
+            }
+        })
     }
 }
 </script>

@@ -2,15 +2,18 @@
     <div>
         <a-card title="用例管理">
             <template #extra>
-                <a @click="onAddClick">生成默认用例</a>
+                <a @click="onDrawerOpen('batch_create_default_case')">批量创建</a>
                 <a-divider type="vertical" />
-                <a @click="onAddClick">设置前置用例</a>
-
+                <a @click="onDrawerOpen('batch_set_pre_case')">设置前置用例</a>
+                <a-divider type="vertical" />
+                <a @click="onCreatePlanClick">创建测试计划</a>
             </template>
             <div class="search-wrapper">
                 <label>选择应用：</label><AppSelectVue v-model:appId="queryForm.appId" style="width: 200px;" @update:appId="appId = $event" />
-                <label> API ID: </label><a-input-number v-model:value="queryForm.apiId" :min="1" placeholder="请输入API id"
+                <label> 接口ID: </label><a-input-number v-model:value="queryForm.apiId" :min="1" placeholder="请输入API id"
                     style="width: 200px;" />
+                <label> 前置用例: </label><a-input-number v-model:value="queryForm.preCaseId" :min="1" placeholder="请输入用例 id"
+                style="width: 200px;" />
                 <a-input-search v-model:value="queryForm.name" style="width: 350px; margin-left: 20px;" placeholder="模糊搜索用例名称"
                     enter-button="查询" @search="handleQueryTestCase" />
             </div>
@@ -62,13 +65,13 @@
                     </template>
                     <template v-if="column.key === 'action'">
                         <span>
-                            <a @click="onEditClick(record)">编辑</a>
+                            <a @click="onDrawerOpen('edit',record)">编辑</a>
                             <a-divider type="vertical" />
                             <a style="color: red;" @click="onDelClick(record.id)">删除</a>
                             <a-divider type="vertical" />
-                            <a  @click="onCopyClick(record)">克隆</a>
+                            <a  @click="onDrawerOpen('clone',record)">克隆</a>
                             <a-divider type="vertical" />
-                            <a style="color: green;" @click="onRunClick(record)">运行</a>
+                            <a style="color: green;" @click="onDrawerOpen('debug',record)">调试</a>
                         </span>
                     </template>
                 </template>
@@ -76,9 +79,22 @@
         </a-card>
     </div>
     <a-drawer title="编辑测试用例" :width="700" :visible="showTestCaseEditDrawer" :body-style="{ paddingBottom: '80px' }"
-        :footer-style="{ textAlign: 'right' }" @close="onClose('edit')">
+        :footer-style="{ textAlign: 'right' }" @close="onDrawerClose('edit')">
         <TestCaseEdit :testCase="testCase" :onSubmit="handleUpdateTestCase" />
     </a-drawer>
+    <a-drawer title="为应用设置统一的前置用例" :width="700" :visible="showBatchSetPreCaseDrawer" :body-style="{ paddingBottom: '80px' }"
+        :footer-style="{ textAlign: 'right' }" @close="onDrawerClose('batch_set_pre_case')">
+        <BatchSetPreCase :onSubmit="handleBatchSetPreCase" />
+    </a-drawer>
+    <a-drawer title="批量为应用所有接口创建默认用例" :width="700" :visible="showBatchCreateDefaultCaseDrawer" :body-style="{ paddingBottom: '80px' }"
+        :footer-style="{ textAlign: 'right' }" @close="onDrawerClose('batch_create_default_case')">
+        <BatchCreateDefaultCase :onSubmit="handleBatchCreateDefaultCase" />
+    </a-drawer>
+    <a-drawer title="克隆测试用例" :width="700" :visible="showTestCaseCloneDrawer" :body-style="{ paddingBottom: '80px' }"
+        :footer-style="{ textAlign: 'right' }" @close="onDrawerClose('batch_create_default_case')">
+        <TestCaseClone :copyFrom="copyFrom" :onSubmit="handleTestCaseClone" />
+    </a-drawer>
+
     <a-modal v-model:visible="showViewJsonModal" :title="title" @ok="showViewJsonModal = !showViewJsonModal" ok-text="关闭">
         <JsonViewer :value="jsonObj" copyable boxed sort theme="jv-light"/>
     </a-modal>
@@ -93,6 +109,9 @@ import { formatTimestamp } from '@/utils/time'
 import AppSelectVue from '@/components/AppSelect.vue';
 import { EyeOutlined,CheckOutlined,CloseOutlined } from '@ant-design/icons-vue';
 import TestCaseEdit from './components/TestCaseEdit.vue';
+import BatchSetPreCase from './components/BatchSetPreCase.vue';
+import BatchCreateDefaultCase from './components/BatchCreateDefaultCase.vue';
+import TestCaseClone from './components/TestCaseClone.vue';
 
 const dataSource = ref([]);
 const columns = reactive([
@@ -164,10 +183,16 @@ const pagination = ref({
 const queryForm = ref({
     appId: null,
     apiId: null,
+    preCaseId: null,
     name: null,
 })
 const showTestCaseEditDrawer = ref(false);
+const showBatchSetPreCaseDrawer = ref(false);
+const showBatchCreateDefaultCaseDrawer = ref(false);
+const showTestCaseCloneDrawer = ref(false);
+const showTestCaseDebugDrawer = ref(false);
 const testCase = ref(null);
+const copyFrom = ref(null);
 const title = ref('');
 const jsonObj = ref({});
 const showViewJsonModal = ref(false);
@@ -191,27 +216,13 @@ const handleQueryTestCase = () => {
         }
     });
 }
-const handleUpdateTestCase = (testCaseForm) => {
-    updateTestCase(testCaseForm).then(res => {
-        if (!res.code) {
-            message.success('修改成功');
-            handleQueryTestCase();
-            showTestCaseEditDrawer.value = false;
-        }
-    });
-}
+
 const handleTableChange = (page, filters, sorter) => {
     pagination.value.current = page.current;
     pagination.value.pageSize = page.pageSize;
     handleQueryTestCase();
 }
-const onAddClick = () => {
-    // showTestCaseAddDrawer.value = true;
-};
-const onEditClick = (record) => {
-    showTestCaseEditDrawer.value = true;
-    testCase.value = record;
-};
+
 const onDelClick = (id) => {
     Modal.confirm({
         title: '确定删除该API吗?',
@@ -219,7 +230,7 @@ const onDelClick = (id) => {
         content: '删除后不可恢复，请谨慎操作',
         onOk() {
             return new Promise((resolve, reject) => {
-                deleteTestCase({ id }).then(() => {
+                deleteTestCase({ id }).then((res) => {
                     if (!res.code) {
                         handleQueryTestCase();
                         resolve();
@@ -231,19 +242,83 @@ const onDelClick = (id) => {
         onCancel() { },
     });
 };
-const onClose = (type) => {
-    if (type === 'add') {
-        showTestCaseAddDrawer.value = false;
-    } else {
+
+const onDrawerClose = (type) => {
+    if(type == 'edit') {
         showTestCaseEditDrawer.value = false;
+    }  else if(type == 'batch_set_pre_case') {
+        showBatchSetPreCaseDrawer.value = false;
+    } else if(type == 'batch_create_default_case') {
+        showBatchCreateDefaultCaseDrawer.value = false;
+    }else if(type == 'clone') {
+        showBatchCreateDefaultCaseDrawer.value = false;
+    } else if(type == 'debug') {
+        showTestCaseDebugDrawer.value = false;
     }
 };
-const onRunClick = (record) => {
+
+const onDrawerOpen = (type,record) => {
+    if(type == 'edit') {
+        showTestCaseEditDrawer.value = true;
+        testCase.value = record;
+    }  else if(type == 'batch_set_pre_case') {
+        showBatchSetPreCaseDrawer.value = true;
+    } else if(type == 'batch_create_default_case') {
+        showBatchCreateDefaultCaseDrawer.value = true;
+     }else if(type == 'clone') {
+        showTestCaseCloneDrawer.value = true;
+        copyFrom.value = record;
+    } else if (type == 'debug') {
+        showTestCaseDebugDrawer.value = true;
+    }
+};
+
+const handleUpdateTestCase = (testCaseForm) => {
+    updateTestCase(testCaseForm).then(res => {
+        if (!res.code) {
+            message.success('修改成功');
+            handleQueryTestCase();
+            showTestCaseEditDrawer.value = false;
+        }
+    });
+}
+
+const handleBatchSetPreCase = (data) => {
+    bactchSetPreCase(data).then(res => {
+        if(!res.code) {
+            message.success('设置成功')
+            showBatchSetPreCaseDrawer.value = false;
+        }
+    })
+}
+
+const handleBatchCreateDefaultCase = (data) => {
+    createDefaultForAll(data).then(res => {
+        if(!res.code) {
+            message.success('批量创建成功')
+            showBatchCreateDefaultCaseDrawer.value = false;
+            handleQueryTestCase();
+        }
+    })
+}
+
+const handleTestCaseClone = (data) => {
+    addTestCase(data).then(res => {
+        if(!res.code) {
+            message.success('克隆成功')
+            showTestCaseCloneDrawer.value = false;
+            handleQueryTestCase();
+        }
+    })
+}
+
+const handleTestCaseRun = (data) => {
 
 }
-const onCopyClick = (record) => {
 
+const onCreatePlanClick = () => {
 }
+
 </script>
 <style lang='less' scoped>
 .search-wrapper {
