@@ -88,13 +88,13 @@ function recursionFindAll(map, array) {
     }
   }
   let subResult = recursionFindAll(map, result);
-  result = result.push(subResult);
+  result.push(subResult);
   return result;
 }
 
 function recursionFindAllNonredundant(map, array) {
   let result = recursionFindAll(map, array);
-  return Array.from(new Set(arr));
+  return Array.from(new Set(result));
 }
 
 module.exports = {

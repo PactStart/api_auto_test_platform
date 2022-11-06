@@ -1,43 +1,46 @@
 <template>
     <div>
         <a-card title="测试计划">
-            <template #extra>
-                <a @click="onAddClick">添加</a>
-            </template>
             <div class="search-wrapper">
                 <label>选择应用：</label>
                 <AppSelectVue v-model:appId="appId" style="width: 200px;" @update:appId="appId = $event" />
                 <a-input-search v-model:value="keyword" style="width: 350px; margin-left: 20px;" placeholder="模糊搜索用例名称"
                     enter-button="查询" @search="handleQueryTestPlan" />
             </div>
-            <a-table :dataSource="dataSource" :columns="columns" :pagination="pagination" @change="handleTableChange" size="small" >
+            <a-table :dataSource="dataSource" :columns="columns" :pagination="pagination" @change="handleTableChange"  >
                 <template #bodyCell="{ column, record }">
+                    <template v-if="column.key === 'run'">
+                        <span>
+                           {{column.run ? '已执行' : '未执行'}}
+                        </span>
+                    </template>
+                    <template v-if="column.key === 'mailReport'">
+                        <span>
+                            {{column.mailReport ? '是' : '否'}}
+                        </span>
+                    </template>
+                    <template v-if="column.key === 'startAt'">
+                        <span v-if="column.run">
+                            {{ formatTimestamp(record.startAt) }}
+                        </span>
+
+                    </template>
                     <template v-if="column.key === 'createAt'">
                         <span>
                             {{ formatTimestamp(record.createAt) }}
                         </span>
                     </template>
-                    <template v-if="column.key === 'updateAt'">
-                        <span>
-                            {{ formatTimestamp(record.updateAt) }}
-                        </span>
-                    </template>
                     <template v-if="column.key === 'action'">
                         <span>
-                            <a @click="onEditClick(record)">编辑</a>
-                            <a-divider type="vertical" />
                             <a style="color: red;" @click="onDelClick(record.id)">删除</a>
+                            <a-divider type="vertical" />
+                            <a @click="onEditClick(record)">查看测试报告</a>
                         </span>
                     </template>
                 </template>
             </a-table>
         </a-card>
     </div>
-    <!-- <a-drawer title="添加测试计划" :width="700" :visible="showTestPlanAddDrawer" :body-style="{ paddingBottom: '80px' }"
-        :footer-style="{ textAlign: 'right' }" @close="onClose('add')">
-        <TestPlanAdd :onSubmit="handleAddTestPlan" />
-    </a-drawer>
-    -->
 </template>
 <script setup>
 import { addTestPlan, queryTestPlan, deleteTestPlan } from '@/api/testPlan';
@@ -71,8 +74,8 @@ const columns = reactive([
     },
     {
         title: '用例数',
-        dataIndex: 'caseNUm',
-        key: 'caseNUm',
+        dataIndex: 'caseNum',
+        key: 'caseNum',
     },
     {
         title: '通过数',
@@ -90,9 +93,19 @@ const columns = reactive([
         key: 'cost',
     },
     {
-        title: '邮件报告',
+        title: '是否发送邮件测试报告',
         dataIndex: 'mailReport',
         key: 'mailReport',
+    },
+    {
+        title: '创建时间',
+        dataIndex: 'createAt',
+        key: 'createAt',
+    },
+    {
+        title: '创建人',
+        dataIndex: 'createBy',
+        key: 'createBy',
     },
     {
         title: '操作',
@@ -154,7 +167,7 @@ const onDelClick = (id) => {
         content: '删除后不可恢复，请谨慎操作',
         onOk() {
             return new Promise((resolve, reject) => {
-                deleteTestPlan({ id }).then(() => {
+                deleteTestPlan({ id }).then((res) => {
                     if (!res.code) {
                         handleQueryTestPlan();
                         resolve();

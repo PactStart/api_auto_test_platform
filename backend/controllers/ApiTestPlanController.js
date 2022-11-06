@@ -20,7 +20,7 @@ exports.addApiTestPlan = (req, res) => {
         url,
         request_method,
         content_type,
-        headers,
+        tc.headers,
         pre_case_id,
         pre_fields,
         request_body,
@@ -39,7 +39,7 @@ exports.addApiTestPlan = (req, res) => {
         url,
         request_method,
         content_type,
-        headers,
+        tc.headers,
         pre_case_id,
         pre_fields,
         request_body,
@@ -59,7 +59,7 @@ exports.addApiTestPlan = (req, res) => {
       });
     }
     const preCaseIdMappingSql =
-      "select id, pre_case_id from api_test_plan where app_id = ? where pre_case_id != 0";
+      "select id, pre_case_id from api_test_case where app_id = ? and pre_case_id != 0";
     db.query(preCaseIdMappingSql, appId, (err, results) => {
       if (err) {
         return res.send({
@@ -68,9 +68,8 @@ exports.addApiTestPlan = (req, res) => {
         });
       }
       const idMapping = new Map();
-      for (let index = 0; index < results.length; index++) {
-        const row = array[index];
-        idMapping.put(row.id, row.pre_case_id);
+      for (let row of results) {
+        idMapping.set(row.id, row.pre_case_id);
       }
       effectiveCaseIds = [];
       for (let index = 0; index < caseRows.length; index++) {
@@ -95,7 +94,7 @@ exports.addApiTestPlan = (req, res) => {
                 url,
                 request_method,
                 content_type,
-                headers,
+                tc.headers,
                 pre_case_id,
                 pre_fields,
                 request_body,
@@ -137,7 +136,6 @@ exports.addApiTestPlan = (req, res) => {
             [appId, name, baseUrl, caseRows.length, now, currentUser.nickname],
             (err, results) => {
               if (err) {
-                console.log(err);
                 return res.send({
                   code: 1,
                   msg: err.message,
@@ -177,8 +175,6 @@ exports.addApiTestPlan = (req, res) => {
                 insertRunLogSql.length - 1
               );
 
-              console.log(insertRunLogSql);
-
               db.query(insertRunLogSql, (err, results) => {
                 if (err) {
                   return connection.rollback(function () {
@@ -192,7 +188,7 @@ exports.addApiTestPlan = (req, res) => {
                 const updateCaseIdSql = `
                             update api_test_case_run_log t1 
                             join api_test_case_run_log t2 on t1.pre_case_id = t2.case_id 
-                            set t1.pre_case_id = t2.id where t1.pre_case_id = t2.case_id WHERE t1.plan_id = ? and t2.plan_id = ?
+                            set t1.pre_case_id = t2.id where t1.plan_id = ? and t2.plan_id = ?
                             `;
 
                 db.query(updateCaseIdSql, [planId, planId], (err, results) => {

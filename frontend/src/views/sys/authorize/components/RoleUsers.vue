@@ -51,7 +51,7 @@ export default {
     setup(props) {
         const currentRoleId = ref(props.roleId);
         watch(props, (newValue, oldValue) => {
-            console.log("roleId changed", newValue, oldValue);
+            // console.log("roleId changed", newValue, oldValue);
             currentRoleId.value = newValue.roleId;
             handleQueryUser();
         }, { immediate: false, deep: true });

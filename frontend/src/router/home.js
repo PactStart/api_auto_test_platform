@@ -65,7 +65,7 @@ export default [
             },
           },
           {
-            path: "/app/testPlan",
+            path: "/test/testPlan",
             name: "testPlan",
             component: () => import("../views/test/testPlan/TestPlan.vue"),
             meta: {

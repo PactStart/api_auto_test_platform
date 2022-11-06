@@ -9,7 +9,7 @@
                     <a-list item-layout="vertical" :pagination="rolePagination" :data-source="roleDataSource">
                         <template #renderItem="{ item }">
                             <a-list-item>
-                                <span @click="onSelectRole(item)">
+                                <span @click="onSelectRole(item)" :class="selectedRoleId == item.id ? 'active': 'disable'">
                                     {{ item.name }}
                                 </span>
                             </a-list-item>
@@ -37,7 +37,6 @@
 import { queryRole } from '@/api/role';
 import { message } from 'ant-design-vue';
 import { ref, onMounted, createVNode, reactive } from 'vue';
-import RolePermissions from './components/RolePermissions.vue';
 import RolePermissionTree from './components/RolePermissionTree.vue'
 import RoleUsers from './components/RoleUsers.vue'
 
@@ -73,5 +72,11 @@ onMounted(() => {
 });
 </script>
 <style lang='less' scoped>
-
+    .active::before {
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        border-left: 3px solid #1890ff;
+    }
 </style>

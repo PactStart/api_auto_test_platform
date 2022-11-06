@@ -5,8 +5,6 @@
                 <a @click="onDrawerOpen('batch_create_default_case')">批量创建</a>
                 <a-divider type="vertical" />
                 <a @click="onDrawerOpen('batch_set_pre_case')">设置前置用例</a>
-                <a-divider type="vertical" />
-                <a @click="onCreatePlanClick">创建测试计划</a>
             </template>
             <div class="search-wrapper">
                 <label>选择应用：</label><AppSelectVue v-model:appId="queryForm.appId" style="width: 200px;" @update:appId="appId = $event" />
@@ -17,7 +15,7 @@
                 <a-input-search v-model:value="queryForm.name" style="width: 350px; margin-left: 20px;" placeholder="模糊搜索用例名称"
                     enter-button="查询" @search="handleQueryTestCase" />
             </div>
-            <a-table :dataSource="dataSource" :columns="columns" :pagination="pagination" @change="handleTableChange" size="small">
+            <a-table :dataSource="dataSource" :columns="columns" :pagination="pagination" @change="handleTableChange" :row-selection="{ selectedRowKeys: state.selectedRowKeys, onChange: onSelectChange }" size="small" :rowKey="'id'">
                 <template #bodyCell="{ column, record }">
                     <template v-if="column.key === 'run'">
                         <span v-if="record.run">
@@ -76,6 +74,10 @@
                     </template>
                 </template>
             </a-table>
+            <div>
+                <a-button type="primary" v-show="hasSelected" @click="onCreatePlanClick('current_page')">创建计划（当前页选中）</a-button>
+                <a-button type="primary" v-show="hasSelected" style="margin-left: 16px;" @click="onCreatePlanClick('cross_page')">创建计划（跨分页选中）</a-button>
+            </div>
         </a-card>
     </div>
     <a-drawer title="编辑测试用例" :width="700" :visible="showTestCaseEditDrawer" :body-style="{ paddingBottom: '80px' }"
@@ -94,16 +96,26 @@
         :footer-style="{ textAlign: 'right' }" @close="onDrawerClose('batch_create_default_case')">
         <TestCaseClone :copyFrom="copyFrom" :onSubmit="handleTestCaseClone" />
     </a-drawer>
-
     <a-modal v-model:visible="showViewJsonModal" :title="title" @ok="showViewJsonModal = !showViewJsonModal" ok-text="关闭">
         <JsonViewer :value="jsonObj" copyable boxed sort theme="jv-light"/>
+    </a-modal>
+    <a-modal v-model:visible="showCreateTestPlanDrawer" title="创建测试计划" @ok="handleAddTestPlan">
+        <a-form :model="testPlanForm" :label-col="{ span: 4 }" :wrapper-col="{ span: 20 }" autocomplete="off">
+            <a-form-item label="计划名称" name="name" :rules="[{ required: true, message: 'Please input name!' }]" st>
+                <a-input v-model:value="testPlanForm.name" placeholder="请输入计划名称" />
+            </a-form-item>
+            <a-form-item label="BASE URL" name="baseUrl" :rules="[{ required: false, message: 'Please input baseUrl!' }]" st>
+                <a-input v-model:value="testPlanForm.baseUrl" placeholder="请输入接口域名,不填写，将默认使用应用里base_url的配置" />
+            </a-form-item>
+        </a-form>
     </a-modal>
 
 </template>
 <script setup>
 import { addTestCase, queryTestCase, updateTestCase, deleteTestCase, createDefaultForAll,bactchSetPreCase } from '@/api/testCase';
+import { addTestPlan} from '@/api/testPlan';
 import { message, Modal } from 'ant-design-vue';
-import { ref, onMounted, createVNode, reactive,h } from 'vue';
+import { ref, onMounted, createVNode, reactive,computed } from 'vue';
 import { ExclamationCircleOutlined } from '@ant-design/icons-vue';
 import { formatTimestamp } from '@/utils/time'
 import AppSelectVue from '@/components/AppSelect.vue';
@@ -112,6 +124,7 @@ import TestCaseEdit from './components/TestCaseEdit.vue';
 import BatchSetPreCase from './components/BatchSetPreCase.vue';
 import BatchCreateDefaultCase from './components/BatchCreateDefaultCase.vue';
 import TestCaseClone from './components/TestCaseClone.vue';
+import router from '@/router';
 
 const dataSource = ref([]);
 const columns = reactive([
@@ -312,11 +325,41 @@ const handleTestCaseClone = (data) => {
     })
 }
 
-const handleTestCaseRun = (data) => {
-
+const handleTestCaseRun = () => {
+    
 }
 
-const onCreatePlanClick = () => {
+const state = reactive({
+    selectedRowKeys: []
+});
+const hasSelected = computed(() => state.selectedRowKeys.length > 0);
+const showCreateTestPlanDrawer = ref(false);
+const onSelectChange = selectedRowKeys => {
+    state.selectedRowKeys = selectedRowKeys;
+};
+const onCreatePlanClick = (type) => {
+    if(!queryForm.value.appId) {
+        message.error('请先选择应用');
+        return;
+    }
+    showCreateTestPlanDrawer.value = true;
+}
+const testPlanForm = reactive({
+    name: '',
+    baseUrl: 'http://localhost:3000'
+})
+const handleAddTestPlan = ()=> {
+    addTestPlan({
+        ...testPlanForm,
+        chooseAllCase: false,
+        appId: queryForm.value.appId,
+        caseIds: state.selectedRowKeys,
+    }).then(res => {
+        if(!res.code) {
+            message.success('创建成功');
+            router.push('/test/testPlan')
+        }
+    })
 }
 
 </script>
