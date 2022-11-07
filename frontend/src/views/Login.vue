@@ -1,6 +1,7 @@
 <template>
     <div class="login_form">
-        <a-form :model="loginForm" name="basic" :label-col="{ span: 8 }" :wrapper-col="{ span: 16 }" autocomplete="off"
+        <a-card title="欢迎登录" style="width: 500px; height: 300px;">
+            <a-form :model="loginForm" name="basic" :label-col="{ span: 8 }" :wrapper-col="{ span: 16 }" autocomplete="off"
             @finish="onFinish" @finishFailed="onFinishFailed">
             <a-form-item label="用户名" name="username"
                 :rules="[{ required: true, message: 'Please input your username!' }]">
@@ -20,6 +21,7 @@
                 <a-button type="primary" html-type="submit">登录</a-button>
             </a-form-item>
         </a-form>
+        </a-card>
     </div>
 </template>
 <script>
@@ -32,7 +34,7 @@ export default defineComponent({
     setup() {
         const loginForm = reactive({
             username: 'admin',
-            password: '123456',
+            password: 'admin123',
             remember: true,
         });
 
@@ -60,6 +62,10 @@ export default defineComponent({
 </script>
 <style lang='less' scoped>
     .login_form {
-        
+        position: absolute;
+        background-color: green;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%,-60%);
     }
 </style>

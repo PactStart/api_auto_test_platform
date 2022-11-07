@@ -143,7 +143,7 @@ exports.addApiTestPlan = (req, res) => {
               }
               const planId = results.insertId;
 
-              let insertRunLogSql = ` insert api_test_case_run_log(
+              let insertRunLogSql = ` insert api_test_plan_run_log(
                             app_id,
                             plan_id,
                             case_id,
@@ -186,8 +186,8 @@ exports.addApiTestPlan = (req, res) => {
                   });
                 }
                 const updateCaseIdSql = `
-                            update api_test_case_run_log t1 
-                            join api_test_case_run_log t2 on t1.pre_case_id = t2.case_id 
+                            update api_test_plan_run_log t1 
+                            join api_test_plan_run_log t2 on t1.pre_case_id = t2.case_id 
                             set t1.pre_case_id = t2.id where t1.plan_id = ? and t2.plan_id = ?
                             `;
 
@@ -240,6 +240,24 @@ exports.deleteApiTestPlan = (req, res) => {
     res.send({
       code: 0,
       msg: "success",
+    });
+  });
+};
+
+exports.getApiTestPlanById = (req, res) => {
+  let { id } = req.body;
+  const selectSql = "select * from api_test_plan where del = 0 and id = ?";
+  db.query(selectSql, id, (err, results) => {
+    if (err) {
+      res.send({
+        code: 1,
+        msg: err.message,
+      });
+    }
+    res.send({
+      code: 0,
+      msg: "success",
+      data: convertKeyToCamelCase(results[0])
     });
   });
 };
@@ -301,25 +319,23 @@ exports.queryApiTestPlan = (req, res) => {
   });
 };
 
-exports.queryApiTestPlanRunResult = (req, res) => {
+exports.queryApiTestPlanRunLog = (req, res) => {
   let { page, size } = req.query;
   page = (page - 1) * size;
 
   let { whereSql, values } = generateWhereSql(
     req.query,
-    ["planId", "caseId", "pass"],
-    []
+    ["planId", "groupName", "moduleName", "apiName","pass", "caseName"],
+    ["groupName", "moduleName", "apiName", "caseName"]
   );
 
-  //查询api测试用例列表sql
   const pageSql =
-    "select * from api_test_case_run_log " +
+    "select * from api_test_plan_run_log " +
     whereSql +
     " order by id limit ?,?";
 
-  //查询api测试用例总数的sql
   const totalSql =
-    "select count(*) as total from api_test_case_run_log" + whereSql;
+    "select count(*) as total from api_test_plan_run_log" + whereSql;
 
   db.query(pageSql, [...values, Number(page), Number(size)], (err, result1) => {
     if (err) {

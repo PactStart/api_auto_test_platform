@@ -93,7 +93,44 @@ router.post('/add',expressJoi(ApiTestPlanCheck.apiTestPlanAddCheck),apiTestPlanC
  *        description: OK
  * 
  */
-router.post('/delete',expressJoi(ApiTestPlanCheck.apiTestPlanDeleteCheck),apiTestPlanController.deleteApiTestPlan);
+router.post('/delete',expressJoi(ApiTestPlanCheck.apiTestPlanIdCheck),apiTestPlanController.deleteApiTestPlan);
+
+
+/**
+ * @openapi
+ * /api/v1/testPlan/getById:
+ *  post:
+ *    tags:
+ *      - 根据id获取测试计划
+ *    summary: 根据id获取测试计划
+ *    description: 根据id获取测试计划
+ *    parameters:
+ *      - name: Authorization
+ *        type: string
+ *        description: jwt
+ *        in: header
+ *        required: true
+ *    requestBody:
+ *      description: 计划id
+ *      content:
+ *        application/json:
+ *          schema:
+ *            type: object
+ *            properties: 
+ *              id:
+ *                type: integer
+ *                required: true
+ *                description: 计划id
+ *    produces: 
+ *      - application/json
+ *    consumes: 
+ *      - application/json
+ *    responses:
+ *      200:
+ *        description: OK
+ * 
+ */
+ router.post('/getById',expressJoi(ApiTestPlanCheck.apiTestPlanIdCheck),apiTestPlanController.getApiTestPlanById);
 
 /**
  * @openapi
@@ -138,7 +175,7 @@ router.get('/query',expressJoi(ApiTestPlanCheck.apiTestPlanQueryCheck),apiTestPl
 
 /**
  * @openapi
- * /api/v1/testPlan/queryRunResult:
+ * /api/v1/testPlan/queryRunLog:
  *  get:
  *    tags:
  *      - 测试计划模块
@@ -181,6 +218,6 @@ router.get('/query',expressJoi(ApiTestPlanCheck.apiTestPlanQueryCheck),apiTestPl
  *        description: OK
  * 
  */
-router.get('/queryRunResult',expressJoi(ApiTestPlanCheck.apiTestPlanRunResultQueryCheck),apiTestPlanController.queryApiTestPlanRunResult);
+router.get('/queryRunLog',expressJoi(ApiTestPlanCheck.apiTestPlanRunLogQueryCheck),apiTestPlanController.queryApiTestPlanRunLog);
 
 module.exports = router;

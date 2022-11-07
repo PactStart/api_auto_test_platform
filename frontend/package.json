@@ -15,11 +15,13 @@
     "clipboard": "^2.0.11",
     "core-js": "^3.8.3",
     "json-editor-vue3": "^1.0.6",
+    "json-schema-defaults": "^0.4.0",
     "less": "^4.1.2",
     "less-loader": "^7.3.0",
     "vue": "^3.2.13",
     "vue-router": "^4.1.6",
-    "vue3-json-viewer": "^2.2.2"
+    "vue3-json-viewer": "^2.2.2",
+    "vuex": "^4.0.2"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",

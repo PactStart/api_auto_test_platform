@@ -46,21 +46,22 @@ exports.loginByUserName = (req, res) => {
     const token = jwt.sign(user, jwtSecretKey, { expiresIn: "24h" });
 
     const ip = getClientIp(req);
-    const now = Date.now;
+    const now = Date.now();
     const updateSql =
-      "update user set last_login_ip = ? , last_login_time = ? where id = ?";
+      "update sys_user set last_login_ip = ? , last_login_time = ? where id = ?";
+    console.log(updateSql,[ip, now, dbUser.id])
     db.query(updateSql, [ip, now, dbUser.id], (err, results) => {
       if (!err) {
         console.error(err);
       }
-    });
-    res.send({
-      code: 0,
-      msg: "success",
-      data: {
-        token: "Bearer " + token,
-        user: user,
-      },
+      res.send({
+        code: 0,
+        msg: "success",
+        data: {
+          token: "Bearer " + token,
+          user: user,
+        },
+      });
     });
   });
 };
@@ -74,47 +75,69 @@ exports.userInfo = (req, res) => {
   const dataPerms = [];
   const roles = [];
 
-  const roleSelectSql =
-    "select r.* from sys_user_role ur join sys_role r on ur.role_id = r.id where ur.user_id = ?";
-  db.query(roleSelectSql, currentUser.id, (err, results) => {
-    if (!err && results && results.length) {
-      const roleIds = [];
-      for (let index = 0; index < results.length; index++) {
-        const role = results[index];
-        roles.push(role.name);
-        roleIds.push(role.id);
-      }
-      const permissionSelectSql =
-        "select p.type,p.name from sys_role_permission rp join sys_permission p on rp.permission_id = p.id where rp.role_id in (?)";
-      db.query(permissionSelectSql, [roleIds.join(",")], (err, results) => {
-        if (!err && results.length) {
-          for (let index = 0; index < results.length; index++) {
-            const perm = results[index];
-            if (perm.type == "API") {
-              apiPerms.push(perm.name);
-            } else if (perm.type == "PAGE") {
-              pagePerms.push(perm.name);
-            } else if (perm.type == "BUTTON") {
-              buttonPerms.push(perm.name);
-            } else if (perm.type == "DATA") {
-              dataPerms.push(perm.name);
-            }
-          }
-          //api权限和data权限写redis
-          sAdd(`perm:api:${currentUser.id}`, apiPerms);
-          sAdd(`perm:data:${currentUser.id}`, dataPerms);
-        }
+  const userSelectSql = "select * from sys_user where id = ?";
+  db.query(userSelectSql, currentUser.id, (err, results) => {
+    if (err) {
+      return res.send({
+        code: 1,
+        msg: err.message,
       });
     }
-  });
-  res.send({
-    code: 0,
-    data: {
-      currentUser,
-      roles,
-      pagePerms,
-      buttonPerms,
-    },
+    user = results[0];
+    delete user.password;
+
+    const roleSelectSql =
+      "select r.* from sys_user_role ur join sys_role r on ur.role_id = r.id where ur.user_id = ?";
+    db.query(roleSelectSql, currentUser.id, (err, results) => {
+      if (!err && results && results.length) {
+        const roleIds = [];
+        for (let index = 0; index < results.length; index++) {
+          const role = results[index];
+          roles.push(role.name);
+          roleIds.push(role.id);
+        }
+        const permissionSelectSql =
+          "select p.type,p.name from sys_role_permission rp join sys_permission p on rp.permission_id = p.id where rp.role_id in (?)";
+        db.query(permissionSelectSql, [roleIds.join(",")], (err, results) => {
+          if (!err && results.length) {
+            for (let index = 0; index < results.length; index++) {
+              const perm = results[index];
+              if (perm.type == "API") {
+                apiPerms.push(perm.name);
+              } else if (perm.type == "PAGE") {
+                pagePerms.push(perm.name);
+              } else if (perm.type == "BUTTON") {
+                buttonPerms.push(perm.name);
+              } else if (perm.type == "DATA") {
+                dataPerms.push(perm.name);
+              }
+            }
+            //api权限和data权限写redis
+            sAdd(`perm:api:${currentUser.id}`, apiPerms);
+            sAdd(`perm:data:${currentUser.id}`, dataPerms);
+          }
+          return res.send({
+            code: 0,
+            data: {
+              user: convertKeyToCamelCase(user),
+              roles,
+              pagePerms,
+              buttonPerms,
+            },
+          });
+        });
+      } else {
+        return res.send({
+          code: 0,
+          data: {
+            user: convertKeyToCamelCase(user),
+            roles: [],
+            pagePerms: [],
+            buttonPerms: []
+          },
+        });
+      }
+    });
   });
 };
 
@@ -122,6 +145,10 @@ exports.logout = (req, res) => {
   const currentUser = parseToken(req);
   deleteKey(`perm:api:${currentUser.id}`);
   deleteKey(`perm:data:${currentUser.id}`);
+  res.send({
+    code: 0,
+    msg: "success",
+  });
 };
 
 exports.updatePwd = (req, res) => {

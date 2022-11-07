@@ -73,6 +73,16 @@ export default [
               title: "测试计划",
             },
           },
+          {
+            path: "/test/testReport/:planId",
+            name: "testReport",
+            component: () => import("../views/test/testPlan/TestPlanRunLog.vue"),
+            meta: {
+              isAuth: true,
+              title: "测试报告",
+              hideInMenu: true,
+            },
+          },
         ],
       },
       {
@@ -84,6 +94,15 @@ export default [
           open: true,
         },
         children: [
+          {
+            path: "/sys/user/personnel_center",
+            component: () => import("../views/sys/user/PersonnelCenter"),
+            meta: {
+              isAuth: true,
+              title: "个人中心",
+              hideInMenu: true,
+            },
+          },
           {
             path: "/sys/user",
             name: "user",

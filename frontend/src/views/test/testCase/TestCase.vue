@@ -96,6 +96,10 @@
         :footer-style="{ textAlign: 'right' }" @close="onDrawerClose('batch_create_default_case')">
         <TestCaseClone :copyFrom="copyFrom" :onSubmit="handleTestCaseClone" />
     </a-drawer>
+    <a-drawer title="调试测试用例" :width="700" :visible="showTestCaseDebugDrawer" :body-style="{ paddingBottom: '80px' }"
+        :footer-style="{ textAlign: 'right' }" @close="onDrawerClose('debug')">
+        <TestCaseDebug :testCase="testCase" />
+    </a-drawer>
     <a-modal v-model:visible="showViewJsonModal" :title="title" @ok="showViewJsonModal = !showViewJsonModal" ok-text="关闭">
         <JsonViewer :value="jsonObj" copyable boxed sort theme="jv-light"/>
     </a-modal>
@@ -124,6 +128,8 @@ import TestCaseEdit from './components/TestCaseEdit.vue';
 import BatchSetPreCase from './components/BatchSetPreCase.vue';
 import BatchCreateDefaultCase from './components/BatchCreateDefaultCase.vue';
 import TestCaseClone from './components/TestCaseClone.vue';
+import TestCaseDebug from './components/TestCaseDebug.vue';
+
 import router from '@/router';
 
 const dataSource = ref([]);
@@ -282,6 +288,7 @@ const onDrawerOpen = (type,record) => {
         showTestCaseCloneDrawer.value = true;
         copyFrom.value = record;
     } else if (type == 'debug') {
+        testCase.value = record;
         showTestCaseDebugDrawer.value = true;
     }
 };

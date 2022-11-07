@@ -34,7 +34,7 @@
                         <span>
                             <a style="color: red;" @click="onDelClick(record.id)">删除</a>
                             <a-divider type="vertical" />
-                            <a @click="onEditClick(record)">查看测试报告</a>
+                            <a @click="onViewReportClick(record.id)">查看测试报告</a>
                         </span>
                     </template>
                 </template>
@@ -43,13 +43,15 @@
     </div>
 </template>
 <script setup>
-import { addTestPlan, queryTestPlan, deleteTestPlan } from '@/api/testPlan';
-import { message, Modal } from 'ant-design-vue';
+import { queryTestPlan, deleteTestPlan } from '@/api/testPlan';
+import { Modal } from 'ant-design-vue';
 import { ref, onMounted, createVNode, reactive } from 'vue';
 import { ExclamationCircleOutlined } from '@ant-design/icons-vue';
 // import TestPlanAdd from './components/TestPlanAdd.vue';
 import { formatTimestamp } from '@/utils/time'
 import AppSelectVue from '@/components/AppSelect.vue';
+import router from '@/router';
+
 const dataSource = ref([]);
 const columns = reactive([
     {
@@ -124,9 +126,6 @@ const pagination = ref({
 });
 const appId = ref(null);
 const keyword = ref(null);
-const showTestPlanAddDrawer = ref(false);
-const api = ref({});
-
 onMounted(() => {
     handleQueryTestPlan();
 });
@@ -143,23 +142,12 @@ const handleQueryTestPlan = () => {
         }
     });
 }
-const handleAddTestPlan = (api) => {
-    addTestPlan(api).then(res => {
-        if (!res.code) {
-            message.success('添加成功');
-            handleQueryTestPlan();
-            showTestPlanAddDrawer.value = false;
-        }
-    });
-}
 const handleTableChange = (page, filters, sorter) => {
     pagination.value.current = page.current;
     pagination.value.pageSize = page.pageSize;
     handleQueryTestPlan();
 }
-const onAddClick = () => {
-    showTestPlanAddDrawer.value = true;
-};
+
 const onDelClick = (id) => {
     Modal.confirm({
         title: '确定删除该API吗?',
@@ -179,7 +167,9 @@ const onDelClick = (id) => {
         onCancel() { },
     });
 };
-
+const onViewReportClick = (planId) => {
+    router.push('/test/testReport/'+planId);
+}
 </script>
 <style lang='less' scoped>
 .search-wrapper {

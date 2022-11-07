@@ -55,4 +55,5 @@ module.exports = {
   sAdd,
   sIsMember,
   sMembers,
+  deleteKey
 };

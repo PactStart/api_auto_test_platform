@@ -52,7 +52,7 @@
             </a-form-item>
 
             <a-form-item label="确认新密码" name="confirmPassword"
-                :rules="[{ required: true, message: 'Please input password!' }]">
+                :rules="[{ required: true, message: 'Please input confirmPassword!' }]">
                 <a-input-password v-model:value="resetPwdForm.confirmPassword" />
             </a-form-item>
         </a-form>

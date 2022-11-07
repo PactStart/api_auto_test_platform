@@ -21,7 +21,7 @@ exports.apiTestPlanAddCheck = {
   },
 };
 
-exports.apiTestPlanDeleteCheck = {
+exports.apiTestPlanIdCheck = {
   body: {
     id,
   },
@@ -36,10 +36,13 @@ exports.apiTestPlanQueryCheck = {
   },
 };
 
-exports.apiTestPlanRunResultQueryCheck = {
+exports.apiTestPlanRunLogQueryCheck = {
   query: {
     planId: joi.number().integer(),
-    caseId: joi.number().integer(),
+    groupName: joi.string().allow(null,''),
+    moduleName: joi.string().allow(null,''),
+    apiName: joi.string().allow(null,''),
+    caseName: joi.string().allow(null,''),
     pass: joi.bool(),
     page,
     size,

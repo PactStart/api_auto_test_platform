@@ -32,7 +32,7 @@
     </div>
 </template>
 <script >
-import { defineComponent, ref, reactive, onMounted, watch } from 'vue';
+import { defineComponent, ref, onMounted, watch } from 'vue';
 import JsonEditorVue from 'json-editor-vue3';
 import { getById } from '@/api/api';
 import defaults from 'json-schema-defaults';

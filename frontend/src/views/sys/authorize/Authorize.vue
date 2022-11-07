@@ -36,7 +36,7 @@
 <script setup>
 import { queryRole } from '@/api/role';
 import { message } from 'ant-design-vue';
-import { ref, onMounted, createVNode, reactive } from 'vue';
+import { ref, onMounted} from 'vue';
 import RolePermissionTree from './components/RolePermissionTree.vue'
 import RoleUsers from './components/RoleUsers.vue'
 

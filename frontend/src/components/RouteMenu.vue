@@ -11,7 +11,7 @@
             </template>
         </a-sub-menu>
     </template>
-    <template v-else>
+    <template v-else-if="!route.meta?.hideInMenu">
         <a-menu-item :key="route.name" @click="go(route)">
             <!-- <Icon v-if="route.meta?.icon" :type="route.meta.icon" /> -->
             <span class="nav-text"> {{ route.meta?.title || "未命名" }} </span>

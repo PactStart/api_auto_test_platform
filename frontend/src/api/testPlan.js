@@ -15,6 +15,13 @@ import request from "../utils/request";
 };
 
 /**
+ * 获取测试计划
+ */
+ export const getTestPlan = (data) => {
+  return request({ method: "post", url: "/api/v1/testPlan/getById", data });
+};
+
+/**
  * 删除测试计划
  */
  export const deleteTestPlan = (data) => {
@@ -24,6 +31,6 @@ import request from "../utils/request";
 /**
  * 查看测试报告
  */
- export const queryRunResult = (data) => {
-  return request({ method: "get", url: "/api/v1/testPlan/queryRunResult", data });
+ export const queryRunLog = (data) => {
+  return request({ method: "get", url: "/api/v1/testPlan/queryRunLog", data });
 };

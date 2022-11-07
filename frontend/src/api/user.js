@@ -7,6 +7,14 @@ export const login = (data) => {
 };
 
 /**
+ * 退出登录接口
+ */
+ export const logout = (data) => {
+  return request({ method: "get", url: "/api/v1/user/logout", data });
+};
+
+
+/**
  * 获取用户信息接口
  */
 export const getUserInfo = () => {
@@ -46,4 +54,11 @@ export const getUserInfo = () => {
  */
  export const resetPwd = (data) => {
   return request({ method: "post", url: "/api/v1/user/resetPwd", data });
+};
+
+/**
+ * 更新密码
+ */
+ export const updatePwd = (data) => {
+  return request({ method: "post", url: "/api/v1/user/updatePwd", data });
 };
