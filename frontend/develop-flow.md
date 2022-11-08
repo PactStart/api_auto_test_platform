@@ -273,3 +273,96 @@ QA:
 
 
 4、Vue3中如何实现父子组件数据的双向绑定？
+
+5、watch
+```
+1) 监听 ref 定义的数据
+
+    //监听基本类型
+    watch(num, (newValue, oldValue) => {
+        console.log("num增加了", newValue, oldValue);
+    },{ immediate: true, deep: true });
+    ​
+    // 监听多个ref定义的数据
+    watch([num, num1], (newValue, oldValue) => {
+        console.log("num增加了", newValue, oldValue);
+    });
+
+2) 监听 reactive 定义的数据
+
+    //监听对象类型
+    watch(numObj, (newValue, oldValue) => {
+        console.log("numObj变化了", newValue, oldValue);
+    });
+
+    //监听对象中的一个基本类型属性
+    watch(
+        () => numObj.a,
+        (newValue, oldValue) => {
+            console.log("numObj变化了", newValue, oldValue);
+        }
+    );
+
+    //监听对象中的一些基本类型属性
+    watch(
+        [() => numObj.a, () => numObj.b], 
+        (newValue, oldValue) => {
+            console.log("numObj变化了", newValue, oldValue);
+        }
+    );
+
+    //监听对象中的对象类型属性
+    watch(
+        numObj.c,
+        (newValue, oldValue) => {
+            console.log("numObj.c变化了", newValue, oldValue);
+        }
+    );
+3）总结
+    ref 定义的数据
+        基本类型数据作为监听值
+        对象作为监听值，需要加 .value（用的少）
+    reactive 定义的数据
+        对象作为监听值
+        属性作为监听值，需要放在回调函数中
+    如果监听 reactive 定义的对象，则无法正确输出 oldValue ，且深度监听是强制开启的，无法关闭 （vue3配置）
+
+```
+6、watchEffect
+``` 
+    //在监听的回调函数中使用了属性，则监听该属性，不用在参数上指明监听哪个属性,watchEffect 会初始化执行一次
+    watchEffect(() => {
+        let n1 = numa.value;
+        let n2 = numb.value;
+        console.log("watchEffect函数执行了");
+    });
+```
+
+6、Vue生命周期函数
+```
+    创建
+        创建前、后：beforeCreate、created
+        创建：setup
+    挂载
+        挂载前、后：beforeMount、mounted
+        挂载：onBeforeMount、onMounted
+    更新
+        更新前、后（beforeUpdate、updated）
+        更新：onBeforeUpdate、onUpdated
+    卸载
+        销毁前、后：beforeDestroy、destroyed
+        卸载：onBeforeUnmount、onUnmounted
+```
+
+7、多层嵌套的组价间的通讯—provide和inject
+```
+    //实现祖孙组件间的传值
+    
+    //祖组件使用 provide 提供数据
+    let name = ref("Rex.Lei");
+    provide("name", name);
+
+    //后代组件使用 inject 使用数据
+    const name = inject("name");
+
+```
