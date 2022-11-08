@@ -34,7 +34,7 @@ export default defineComponent({
     setup() {
         const loginForm = reactive({
             username: 'admin',
-            password: 'admin123',
+            password: '123456',
             remember: true,
         });
 

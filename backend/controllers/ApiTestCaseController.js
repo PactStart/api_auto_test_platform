@@ -259,7 +259,7 @@ getBodyExample = (api) => {
   ) {
     const schema = JSON.parse(api.body);
     bodyExample = defaults(schema);
-    console.log(bodyExample);
+    // console.log(bodyExample);
   } else if (api.request_method == "get") {
     queryParamArr = JSON.parse(api.query);
     if (queryParamArr.length) {
@@ -393,7 +393,6 @@ exports.createDefaultForAll = (req, res) => {
   let { appId } = req.body;
   const selectSql = "select * from api where app_id = ? and del = 0";
   db.query(selectSql, appId, (err, results) => {
-    console.log(err);
     if (err) {
       return res.send({
         code: 1,
@@ -522,15 +521,23 @@ exports.batchSetPreCase = (req, res) => {
 };
 
 exports.debug = (req, res) => {
-  let { url, requestMethod, requestHeaders, requestBody } = req.body;
+  let { url, requestMethod, requestHeaders, queryString, requestBody } = req.body;
 
-  const options = {
-    uri: url,
-    method: requestMethod,
-    headers: JSON.parse(requestHeaders),
-    body: requestBody,
-  };
-  console.log(options);
+  let options = {};
+  if(requestMethod == 'get') {
+    options = {
+      uri: url+'?' + queryString,
+      method: requestMethod,
+      headers: JSON.parse(requestHeaders),
+    };
+  } else {
+    options = {
+      uri: url,
+      method: requestMethod,
+      headers: JSON.parse(requestHeaders),
+      body: requestBody,
+    };
+  }
   request(options, (err, response, body) => {
     if (err) {
       console.error(err);

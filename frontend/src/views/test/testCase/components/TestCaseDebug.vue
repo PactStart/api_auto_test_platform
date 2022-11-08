@@ -34,7 +34,7 @@
                 </a-col>
             </a-row>
         </div>
-        <div v-if="requestObj.requestMethod == 'get'">
+        <div v-if="requestObj.requestMethod == 'get'&& requestObj.requestParams && requestObj.requestParams.length > 0">
             <label>请求参数</label>
             <a-row v-for="item in requestObj.requestParams">
                 <a-col :span="12">
@@ -51,15 +51,15 @@
         </div>
         <div>
             <label>响应</label>
-            <div v-show="responseObj.statusCode">状态码：{{responseObj.statusCode}}</div>
-            <JsonEditorVue class="editor" v-model="responseObj.response" style="height: 300px;" />
+            <div v-show="statusCode != null">状态码：{{statusCode}}</div>
+            <JsonEditorVue class="editor" v-model="response" style="height: 300px;" />
         </div>
     </div>
 </template>
 <script >
 import { getById } from '@/api/api';
 import { debugTestCase } from '@/api/testCase';
-import { defineComponent, ref, reactive, onMounted, watch } from 'vue';
+import { defineComponent, ref, onMounted, watch } from 'vue';
 import JsonEditorVue from 'json-editor-vue3';
 
 export default defineComponent({
@@ -68,11 +68,9 @@ export default defineComponent({
         JsonEditorVue
     },
     setup(props) {
-        const requestObj = ref({
-            statusCode: null,
-            response: null
-        });
-        const responseObj = ref({});
+        const statusCode = ref(null);
+        const response = ref({});
+        const requestObj = ref({});
         const init = (testCase) => {
             getById({
                 id: testCase.apiId
@@ -89,7 +87,7 @@ export default defineComponent({
                             value: headerObj[name]
                         })
                     }
-                    if(api.contentType) {
+                    if(api.contentType && !headerObj['content-type']) {
                         requestHeaders.push({
                             name: 'Content-Type',
                             value: api.contentType
@@ -102,7 +100,7 @@ export default defineComponent({
                     if (api.requestMethod == 'get') {
                         //请求参数
                         const requestBodyObj = JSON.parse(testCase.requestBody);
-                        for (const name in requestBody) {
+                        for (const name in requestBodyObj) {
                             requestParams.push({
                                 name,
                                 value: requestBodyObj[name]
@@ -121,8 +119,11 @@ export default defineComponent({
                         requestParams,
                         requestBody
                     }
+                    // console.log(api,testCase,requestObj);
                 }
             });
+            statusCode.value = null;
+            response.value = {};
         }
         onMounted(() => {
             init(props.testCase);
@@ -140,27 +141,37 @@ export default defineComponent({
             return obj;
         }
 
+        const arrayToString = (arr) => {
+            let str = '';
+            for (const item of arr) {
+                str = str + item['name'] + '=' + item['value'] + '&';
+            }
+            return str;
+        }
+
         const onSendClick = () => {
-            responseObj.value = {}
+            statusCode.value = null;
+            response.value = {};
             debugTestCase({
                 ...requestObj.value,
                 url: requestObj.value.baseUrl + requestObj.value.url,
                 requestMethod: requestObj.value.requestMethod,
                 requestHeaders: JSON.stringify(arrayToObj(requestObj.value.requestHeaders)),
-                requestParams: JSON.stringify(arrayToObj(requestObj.value.requestParams)),
+                queryString: arrayToString(requestObj.value.requestParams),
                 requestBody: JSON.stringify(requestObj.value.requestBody)
             }).then(res => {
                 if(!res.code) {
-                    responseObj.value.statusCode = res.data.statusCode;
+                    statusCode.value = res.data.statusCode;
                     if(res.data.statusCode == '200') {
-                        responseObj.value.response = JSON.parse(res.data.body);
+                        response.value = JSON.parse(res.data.body);
                     }
                 }
             })
         };
         return {
             requestObj,
-            responseObj,
+            statusCode,
+            response,
             onSendClick
         }
     }

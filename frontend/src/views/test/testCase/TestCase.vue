@@ -88,7 +88,7 @@
         :footer-style="{ textAlign: 'right' }" @close="onDrawerClose('batch_set_pre_case')">
         <BatchSetPreCase :onSubmit="handleBatchSetPreCase" />
     </a-drawer>
-    <a-drawer title="批量为应用所有接口创建默认用例" :width="700" :visible="showBatchCreateDefaultCaseDrawer" :body-style="{ paddingBottom: '80px' }"
+    <a-drawer title="批量为应用所有接口创建默认用例" :width="600" :visible="showBatchCreateDefaultCaseDrawer" :body-style="{ paddingBottom: '80px' }"
         :footer-style="{ textAlign: 'right' }" @close="onDrawerClose('batch_create_default_case')">
         <BatchCreateDefaultCase :onSubmit="handleBatchCreateDefaultCase" />
     </a-drawer>
@@ -96,7 +96,7 @@
         :footer-style="{ textAlign: 'right' }" @close="onDrawerClose('batch_create_default_case')">
         <TestCaseClone :copyFrom="copyFrom" :onSubmit="handleTestCaseClone" />
     </a-drawer>
-    <a-drawer title="调试测试用例" :width="700" :visible="showTestCaseDebugDrawer" :body-style="{ paddingBottom: '80px' }"
+    <a-drawer title="调试测试用例" :width="800" :visible="showTestCaseDebugDrawer" :body-style="{ paddingBottom: '80px' }"
         :footer-style="{ textAlign: 'right' }" @close="onDrawerClose('debug')">
         <TestCaseDebug :testCase="testCase" />
     </a-drawer>
@@ -233,7 +233,7 @@ onMounted(() => {
     watch(
         () => route.query,
         (newValue, oldValue) => {
-            console.log('route.query changed',newValue,oldValue)
+            // console.log('route.query changed',newValue,oldValue)
             if(newValue?.appId) {
                 queryForm.value.appId = parseInt(newValue.appId);
             }
@@ -332,6 +332,7 @@ const handleBatchSetPreCase = (data) => {
         if(!res.code) {
             message.success('设置成功')
             showBatchSetPreCaseDrawer.value = false;
+            handleQueryTestCase();
         }
     })
 }

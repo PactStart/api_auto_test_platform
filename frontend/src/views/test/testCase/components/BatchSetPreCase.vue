@@ -35,9 +35,9 @@ export default defineComponent({
             preCaseId: null,
             preFields: [
                 {
-                    "field":"token",
-                    "scope":"header|query|body",
-                    "replace":"Authorization"
+                    "field":"Authorization",
+                    "scope":"header",
+                    "replaceField":"token"
                 },
             ]
         });
@@ -49,7 +49,6 @@ export default defineComponent({
                 ...batchSetPreCaseForm,
                 preFields: JSON.stringify(batchSetPreCaseForm.preFields)
             })
-
         };
         return {
             batchSetPreCaseForm,

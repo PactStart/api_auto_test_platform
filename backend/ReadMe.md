@@ -3,8 +3,10 @@
     cd backend
     npm install 或者 cnpm install
 ```
+2、配置mysql连接信息和redis连接信息
+    修改config/db.js和redis.js中的相应配置
 
-2、启动项目
+3、启动项目
 ```
     node index.js
     
@@ -12,7 +14,7 @@
     sudo cnpm install nodemon -g
     nodemon index.js
 ```
-3、接口文档
+4、接口文档
 ```
     健康检查端口：http://localhost:3000/
     接口文档：http://localhost:3000/swagger
@@ -20,7 +22,7 @@
 
 ```
 
-4、待完善
+5、待完善
 
     ```
     ```
