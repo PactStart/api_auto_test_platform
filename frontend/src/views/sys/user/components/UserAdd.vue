@@ -1,7 +1,7 @@
 <template>
 <div>
     <a-form :model="userForm" name="basic" :label-col="{ span: 4 }" :wrapper-col="{ span: 20 }" autocomplete="off"
-        @finish="onSubmit" @finishFailed="onFinishFailed">
+        @finish="onFinish" @finishFailed="onFinishFailed">
         <a-form-item label="用户名" name="username"
             :rules="[{ required: true, message: 'Please input username!' }]">
             <a-input v-model:value="userForm.username" />
@@ -24,10 +24,11 @@
 </div>
 </template>
 <script>
+    import { addUser} from '@/api/user';
     import { reactive } from 'vue';
     export default {
-        props:["onSubmit"],
-        setup() {
+        props:["onSuccess"],
+        setup(props) {
             const userForm = reactive({
                 username: '',
                 password: '',
@@ -36,9 +37,20 @@
             const onFinishFailed = errorInfo => {
                 console.log('Failed:', errorInfo);
             };
+            const onFinish = ()=> {
+                addUser(userForm).then(res => {
+                    if (!res.code) {
+                        props.onSuccess();
+                        userForm.username = '';
+                        userForm.password = '';
+                        userForm.nickname = '';
+                    }
+                });
+            };
             return {
                 userForm,
-                onFinishFailed
+                onFinishFailed,
+                onFinish
             }
         }
     }

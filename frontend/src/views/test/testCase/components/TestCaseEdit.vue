@@ -32,7 +32,7 @@
     </div>
 </template>
 <script >
-import { defineComponent, ref, reactive, onMounted, watch } from 'vue';
+import { defineComponent, ref, watch } from 'vue';
 import JsonEditorVue from 'json-editor-vue3';
 
 export default defineComponent({
@@ -41,18 +41,21 @@ export default defineComponent({
         JsonEditorVue
     },
     setup(props) {
-        const testCase = props.testCase;
         const testCaseForm = ref({
-            ...testCase,
-            preFields: JSON.parse(testCase.preFields),
-            headers: JSON.parse(testCase.headers),
-            requestBody: JSON.parse(testCase.requestBody),
-            assert: JSON.parse(testCase.assert),
         });
-        
-        watch(props.testCase, (newValue, oldValue) => {
+        const init = testCase => {
+            testCaseForm.value = {
+                ...testCase,
+                preFields: JSON.parse(testCase.preFields),
+                headers: JSON.parse(testCase.headers),
+                requestBody: JSON.parse(testCase.requestBody),
+                assert: JSON.parse(testCase.assert),
+            }
+        }
+        watch(props, (newValue, oldValue) => {
             console.log("testCase changed", newValue, oldValue);
-        }, { immediate: false, deep: true });
+            init(newValue.testCase);
+        }, { immediate: true, deep: true });
 
         const onFinishFailed = errorInfo => {
             console.log('Failed:', errorInfo);

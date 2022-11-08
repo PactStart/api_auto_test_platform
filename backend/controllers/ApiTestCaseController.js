@@ -1,6 +1,7 @@
 const db = require("../config/db");
 const { parseToken } = require("../utils/TokenParser");
 const defaults = require("json-schema-defaults");
+const request = require("request");
 
 const {
   generateWhereSql,
@@ -507,5 +508,35 @@ exports.batchSetPreCase = (req, res) => {
         });
       }
     );
+  });
+};
+
+exports.debug = (req, res) => {
+  let { url, requestMethod, requestHeaders, requestBody } = req.body;
+
+  const options = {
+    uri: url,
+    method: requestMethod,
+    headers: JSON.parse(requestHeaders),
+    body: requestBody,
+  };
+  console.log(options);
+  request(options, (err, response, body) => {
+    if (err) {
+      console.error(err);
+      return res.send({
+        code: 1,
+        msg: err.message,
+      });
+    }
+    res.send({
+      code: 0,
+      msg: "success",
+      data: {
+        statusCode: response.statusCode,
+        headers: response.headers,
+        body: response.body,
+      },
+    });
   });
 };

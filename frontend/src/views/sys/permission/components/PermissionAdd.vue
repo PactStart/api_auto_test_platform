@@ -1,7 +1,7 @@
 <template>
     <div>
         <a-form :model="permissionForm" name="basic" :label-col="{ span: 7 }" :wrapper-col="{ span: 17 }"
-            autocomplete="off" @finish="onSubmit" @finishFailed="onFinishFailed">
+            autocomplete="off" @finish="onFinish" @finishFailed="onFinishFailed">
             <a-form-item label="类型" name="type" :rules="[{ required: true, message: 'Please choose type!' }]">
                 <a-radio-group v-model:value="permissionForm.type">
                     <a-radio value="API">API</a-radio>
@@ -48,11 +48,12 @@
     </div>
 </template>
 <script>
-import { reactive } from 'vue';
+import { addPermission } from '@/api/permission';
+import { ref } from 'vue';
 export default {
-    props: ["onSubmit"],
-    setup() {
-        const permissionForm = reactive({
+    props: ["onSuccess"],
+    setup(props) {
+        const permissionForm = ref({
             type: null,
             name: '',
             description: '',
@@ -63,9 +64,27 @@ export default {
         const onFinishFailed = errorInfo => {
             console.log('Failed:', errorInfo);
         };
+        const onFinish = () => {
+            addPermission({
+                ...permissionForm.value
+            }).then(res => {
+                if (!res.code) {
+                    props.onSuccess();
+                    permissionForm.value = {
+                        type: null,
+                        name: '',
+                        description: '',
+                        internal: null,
+                        anon: null,
+                        login: null
+                    };
+                }
+            });
+        };
         return {
             permissionForm,
-            onFinishFailed
+            onFinishFailed,
+            onFinish
         }
     }
 }

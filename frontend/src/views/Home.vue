@@ -78,7 +78,7 @@ import {ref ,onMounted } from 'vue';
 import RouteMenu from "../components/RouteMenu.vue";
 import menuRoutes from "../router/home";
 
-const selectedKeys = ref(['user']);
+const selectedKeys = ref(['app']);
 const openKeys = ref(['sys','app','test']);
 const collapsed = ref(false);
 
@@ -93,7 +93,7 @@ onMounted(() => {
 const handleLogout = () => {
     logout({}).then(res => {
         if(!res.code) {
-            message.info('退出成功');
+            message.success('退出成功');
             localStorage.removeItem('token');
             router.push('/login');
         }

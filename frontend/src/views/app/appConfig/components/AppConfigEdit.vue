@@ -1,7 +1,7 @@
 <template>
     <div>
         <a-form :model="appConfigForm" name="basic" :label-col="{ span: 4 }" :wrapper-col="{ span: 20 }"
-            autocomplete="off" @finish="onSubmit(appConfigForm)" @finishFailed="onFinishFailed">
+            autocomplete="off" @finish="onSubmit" @finishFailed="onFinishFailed">
 
             <a-form-item label="选择应用" name="appId" :rules="[{ required: true, message: 'Please choose app!' }]">
                 <AppSelect v-model:appId="appConfigForm.appId" style="width:100%" v-model:readonly="readonly"

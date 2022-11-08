@@ -1,7 +1,7 @@
 <template>
     <div class="login_form">
-        <a-card title="欢迎登录" style="width: 500px; height: 300px;">
-            <a-form :model="loginForm" name="basic" :label-col="{ span: 8 }" :wrapper-col="{ span: 16 }" autocomplete="off"
+        <a-card title="欢迎登录API自动化测试平台" style="width: 500px; height: 300px;">
+            <a-form :model="loginForm" name="basic" :label-col="{ span: 4 }" :wrapper-col="{ span: 20 }" autocomplete="off"
             @finish="onFinish" @finishFailed="onFinishFailed">
             <a-form-item label="用户名" name="username"
                 :rules="[{ required: true, message: 'Please input your username!' }]">
@@ -13,11 +13,11 @@
                 <a-input-password v-model:value="loginForm.password" />
             </a-form-item>
 
-            <a-form-item name="记住我" :wrapper-col="{ offset: 8, span: 16 }">
+            <a-form-item name="记住我" :wrapper-col="{ offset: 4, span: 20 }">
                 <a-checkbox v-model:checked="loginForm.remember">Remember me</a-checkbox>
             </a-form-item>
 
-            <a-form-item :wrapper-col="{ offset: 8, span: 16 }">
+            <a-form-item :wrapper-col="{ offset: 4, span: 20 }">
                 <a-button type="primary" html-type="submit">登录</a-button>
             </a-form-item>
         </a-form>

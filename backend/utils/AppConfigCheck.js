@@ -35,7 +35,7 @@ exports.appConfigDeleteCheck = {
 exports.appConfigQueryCheck = {
   query: {
     appId: joi.number().integer(),
-    configKey: joi.string(),
+    configKey: joi.string().allow(null,''),
     page,
     size,
   },

@@ -334,4 +334,48 @@ router.post('/createDefaultForAll',expressJoi(ApiTestCaseCheck.apiTestCaseCreate
  */
  router.post('/bactchSetPreCase',expressJoi(ApiTestCaseCheck.apiTestCaseBatchSetPreCaseCheck),apiTestCaseController.batchSetPreCase);
 
+
+ /**
+ * @openapi
+ * /api/v1/testCase/debug:
+ *  post:
+ *    tags:
+ *      - 调试
+ *    summary: 调试
+ *    description: 调试
+ *    parameters:
+ *      - name: Authorization
+ *        type: string
+ *        description: jwt
+ *        in: header
+ *        required: true
+ *    requestBody:
+ *      description: 用例id
+ *      content:
+ *        application/json:
+ *          schema:
+ *            type: object
+ *            properties: 
+ *              appId:
+ *                type: integer
+ *                required: true
+ *                description: 应用id
+ *              preCaseId:
+ *                type: integer
+ *                required: true
+ *                description: 用例id
+ *              preFields:
+ *                type: string
+ *                required: true
+ *                description: 前置字段
+ *    produces: 
+ *      - application/json 
+ *    consumes: 
+ *      - application/json
+ *    responses:
+ *      200:
+ *        description: OK
+ * 
+ */
+router.post('/debug',apiTestCaseController.debug);
 module.exports = router;

@@ -1,7 +1,7 @@
 <template>
 <div>
     <a-form :model="roleForm" name="basic" :label-col="{ span: 4 }" :wrapper-col="{ span: 20 }" autocomplete="off"
-        @finish="onSubmit" @finishFailed="onFinishFailed">
+        @finish="onFinish" @finishFailed="onFinishFailed">
         <a-form-item label="角色名称" name="name"
             :rules="[{ required: true, message: 'Please input name!' }]">
             <a-input v-model:value="roleForm.name" />
@@ -19,9 +19,10 @@
 </template>
 <script>
     import { reactive } from 'vue';
+    import { addRole } from '@/api/role';
     export default {
-        props:["onSubmit"],
-        setup() {
+        props:["onSuccess"],
+        setup(props) {
             const roleForm = reactive({
                 name: '',
                 description: '',
@@ -29,9 +30,19 @@
             const onFinishFailed = errorInfo => {
                 console.log('Failed:', errorInfo);
             };
+            const onFinish = () => {
+                addRole(roleForm).then(res => {
+                    if (!res.code) {
+                        props.onSuccess();
+                        roleForm.name = '';
+                        roleForm.description = '';
+                    }
+                });
+            }
             return {
                 roleForm,
-                onFinishFailed
+                onFinishFailed,
+                onFinish
             }
         }
     }

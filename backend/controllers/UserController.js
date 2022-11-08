@@ -49,7 +49,7 @@ exports.loginByUserName = (req, res) => {
     const now = Date.now();
     const updateSql =
       "update sys_user set last_login_ip = ? , last_login_time = ? where id = ?";
-    console.log(updateSql,[ip, now, dbUser.id])
+    // console.log(updateSql,[ip, now, dbUser.id])
     db.query(updateSql, [ip, now, dbUser.id], (err, results) => {
       if (!err) {
         console.error(err);
@@ -113,8 +113,8 @@ exports.userInfo = (req, res) => {
               }
             }
             //api权限和data权限写redis
-            sAdd(`perm:api:${currentUser.id}`, apiPerms);
-            sAdd(`perm:data:${currentUser.id}`, dataPerms);
+            // sAdd(`perm:api:${currentUser.id}`, apiPerms);
+            // sAdd(`perm:data:${currentUser.id}`, dataPerms);
           }
           return res.send({
             code: 0,

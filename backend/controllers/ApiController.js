@@ -175,7 +175,7 @@ exports.importSwaggerApi = (req, res) => {
     apiArr
   );
   promise.then((groupNum) => {
-    console.log(apiArr.length);
+    // console.log(apiArr.length);
     const currentUser = parseToken(req);
     const now = Date.now();
     let insertSql =
@@ -209,7 +209,7 @@ exports.importSwaggerApi = (req, res) => {
         headers = values(headers),
         update_at=values(update_at),
         update_by='${currentUser.nickname}'`;
-    console.log(insertSql);
+    // console.log(insertSql);
     db.query(insertSql, (err, results) => {
       if (err) {
         return res.send({
@@ -250,14 +250,14 @@ exports.queryGroupAndModule = (req, res) => {
           msg: err.message,
         });
       }
-      console.log(result1, result2);
+      // console.log(result1, result2);
       let groupNameList = !result1.length
         ? []
         : result1.map((row) => row.groupName);
       let moduleNameList = !result2.length
         ? []
         : result2.map((row) => row.moduleName);
-      console.log(groupNameList, moduleNameList);
+      // console.log(groupNameList, moduleNameList);
       res.send({
         code: 0,
         msg: "success",

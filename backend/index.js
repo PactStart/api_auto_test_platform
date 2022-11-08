@@ -124,7 +124,7 @@ app.use((req, res, next) => {
         if (currentUser.superAdmin) {
           next();
         } else {
-          const promise = sIsMember(`perm:api:${currentUser.id}`, url);
+          const promise = sIsMember(`perm:api:${currentUser.id}`, path);
           promise.then((hasPerm) => {
             console.log(hasPerm);
             if (!hasPerm) {

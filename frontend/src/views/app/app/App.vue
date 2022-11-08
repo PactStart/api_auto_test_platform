@@ -33,7 +33,7 @@
     </div>
     <a-drawer title="添加应用" :width="500" :visible="showAppAddDrawer" :body-style="{ paddingBottom: '80px' }"
         :footer-style="{ textAlign: 'right' }" @close="onClose('add')">
-        <AppAdd :onSubmit="handleAddApp" />
+        <AppAdd :onSuccess="onAddAppSuccess" />
     </a-drawer>
     <a-drawer title="编辑应用" :width="500" :visible="showAppEditDrawer" :body-style="{ paddingBottom: '80px' }"
         :footer-style="{ textAlign: 'right' }" @close="onClose('edit')">
@@ -41,7 +41,7 @@
     </a-drawer>
 </template>
 <script setup>
-import { addApp, queryApp, updateApp, deleteApp } from '@/api/app';
+import { queryApp, updateApp, deleteApp } from '@/api/app';
 import { message, Modal } from 'ant-design-vue';
 import { ref, onMounted, createVNode, reactive } from 'vue';
 import { ExclamationCircleOutlined } from '@ant-design/icons-vue';
@@ -115,14 +115,10 @@ const handleQueryApp = () => {
         }
     });
 }
-const handleAddApp = (app) => {
-    addApp(app).then(res => {
-        if (!res.code) {
-            message.success('添加成功');
-            handleQueryApp();
-            showAppAddDrawer.value = false;
-        }
-    });
+const onAddAppSuccess = () => {
+    message.success('添加成功');
+    handleQueryApp();
+    showAppAddDrawer.value = false;
 }
 const handleUpdateApp = (app) => {
     updateApp(app).then(res => {

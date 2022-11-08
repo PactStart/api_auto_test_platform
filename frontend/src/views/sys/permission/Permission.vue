@@ -108,7 +108,7 @@
     </div>
     <a-drawer title="添加权限" :width="560" :visible="showPermissionAddDrawer" :body-style="{ paddingBottom: '80px' }"
         :footer-style="{ textAlign: 'right' }" @close="onClose('add')">
-        <PermissionAdd :onSubmit="handleAddPermission" />
+        <PermissionAdd :onSuccess="onAddSuccess" />
     </a-drawer>
     <a-drawer title="编辑权限" :width="500" :visible="showPermissionEditDrawer" :body-style="{ paddingBottom: '80px' }"
         :footer-style="{ textAlign: 'right' }" @close="onClose('edit')">
@@ -141,7 +141,7 @@
     </a-modal>
 </template>
 <script setup>
-import { addPermission, queryPermission, updatePermission, deletePermission, importApiPerms } from '@/api/permission';
+import { queryPermission, updatePermission, deletePermission, importApiPerms } from '@/api/permission';
 import { message, Modal } from 'ant-design-vue';
 import { ref, onMounted, createVNode, reactive } from 'vue';
 import { ExclamationCircleOutlined,InboxOutlined } from '@ant-design/icons-vue';
@@ -249,14 +249,10 @@ const handleQueryPermission = () => {
         }
     });
 }
-const handleAddPermission = (permission) => {
-    addPermission(permission).then(res => {
-        if (!res.code) {
-            message.success('添加成功');
-            handleQueryPermission();
-            showPermissionAddDrawer.value = false;
-        }
-    });
+const onAddSuccess = (permission) => {
+    message.success('添加成功');
+    handleQueryPermission();
+    showPermissionAddDrawer.value = false;
 }
 const handleUpdatePermission = (permission) => {
     updatePermission(permission).then(res => {

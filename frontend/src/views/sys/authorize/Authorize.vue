@@ -7,9 +7,9 @@
                     <a-input-search v-model:value="roleKeyword" style="width: 100%" placeholder="模糊搜索角色名"
                 @search="handleQueryRole" />
                     <a-list item-layout="vertical" :pagination="rolePagination" :data-source="roleDataSource">
-                        <template #renderItem="{ item }">
-                            <a-list-item>
-                                <span @click="onSelectRole(item)" :class="selectedRoleId == item.id ? 'active': 'disable'">
+                        <template #renderItem="{ item }" >
+                            <a-list-item :class="selectedRoleId == item.id ? 'item-active': 'item-disable'">
+                                <span @click="onSelectRole(item)" >
                                     {{ item.name }}
                                 </span>
                             </a-list-item>
@@ -72,7 +72,7 @@ onMounted(() => {
 });
 </script>
 <style lang='less' scoped>
-    .active::before {
+    .item-active::before {
         position: absolute;
         top: 0;
         left: 0;

@@ -15,7 +15,7 @@
                 <label> 模块：</label>
                 <a-auto-complete v-model:value="queryForm.moduleName" :options="moduleNameList" style="width: 150px"
                     placeholder="请输入API模块" :filter-option="filterOption" />
-                <a-input-search v-model:value="keyword" style="width: 350px; margin-left: 20px;" placeholder="模糊搜索API名称"
+                <a-input-search v-model:value="queryForm.apiName" style="width: 350px; margin-left: 20px;" placeholder="模糊搜索API名称"
                     enter-button="查询" @search="handleQueryApi" />
             </div>
             <a-table :dataSource="dataSource" :columns="columns" :pagination="pagination" @change="handleTableChange"
@@ -50,6 +50,13 @@
                             {{ formatTimestamp(record.updateAt) }}
                         </span>
                     </template>
+                    <template v-if="column.key === 'caseNum'">
+                        <span>
+                            <a @click="onViewCaseClick(record)">
+                                <span class="case_num">{{record.caseNum}}</span>
+                            </a>
+                        </span>
+                    </template>
                     <template v-if="column.key === 'action'">
                         <span>
                             <a @click="onEditClick(record)">编辑</a>
@@ -65,7 +72,7 @@
     </div>
     <a-drawer title="添加API" :width="700" :visible="showApiAddDrawer" :body-style="{ paddingBottom: '80px' }"
         :footer-style="{ textAlign: 'right' }" @close="onClose('api_add')">
-        <ApiAdd :onSubmit="handleAddApi" />
+        <ApiAdd :onSuccess="onAddApiSuccess" />
     </a-drawer>
     <a-drawer title="编辑API" :width="700" :visible="showApiEditDrawer" :body-style="{ paddingBottom: '80px' }"
         :footer-style="{ textAlign: 'right' }" @close="onClose('api_edit')">
@@ -73,7 +80,7 @@
     </a-drawer>
     <a-drawer title="添加测试用例" :width="700" :visible="showTestCaseAddDrawer" :body-style="{ paddingBottom: '80px' }"
         :footer-style="{ textAlign: 'right' }" @close="onClose('test_case_add')">
-        <TestCaseAdd :apiId="apiId" :onSubmit="handleAddTestCase"/>
+        <TestCaseAdd :apiId="apiId" :onSuccess="onAddTestCaseSuccess"/>
     </a-drawer>
 
     <a-modal v-model:visible="showApiImportModal" title="导入API" @ok="handleImport" ok-text="提交"
@@ -97,7 +104,7 @@
 
 </template>
 <script setup>
-import { addApi, queryApi, updateApi, deleteApi, importApi, queryGroupAndModule } from '@/api/api';
+import { queryApi, updateApi, deleteApi, importApi, queryGroupAndModule } from '@/api/api';
 import { message, Modal } from 'ant-design-vue';
 import { ref, onMounted, createVNode, reactive, h, watch } from 'vue';
 import { ExclamationCircleOutlined } from '@ant-design/icons-vue';
@@ -107,7 +114,7 @@ import { formatTimestamp } from '@/utils/time'
 import AppSelectVue from '@/components/AppSelect.vue';
 import { EyeOutlined } from '@ant-design/icons-vue';
 import TestCaseAdd from '@/views/test/testCase/components/TestCaseAdd.vue';
-import { addTestCase } from '@/api/testCase';
+import router from '@/router';
 
 const dataSource = ref([]);
 const columns = reactive([
@@ -191,9 +198,9 @@ const groupNameList = ref([]);
 const moduleNameList = ref([]);
 const queryForm = ref({
     groupName: null,
-    moduleName: null
+    moduleName: null,
+    apiName: null,
 });
-const keyword = ref(null);
 const showApiAddDrawer = ref(false);
 const showApiEditDrawer = ref(false);
 const showApiImportModal = ref(false);
@@ -205,7 +212,7 @@ const importForm = reactive({
 });
 const api = ref({});
 watch(appId, (newValue, oldValue) => {
-    console.log('appId changed', newValue, oldValue);
+    // console.log('appId changed', newValue, oldValue);
     if (newValue == null) {
         groupNameList.value = [];
         moduleNameList.value = [];
@@ -252,7 +259,6 @@ const handleQueryApi = () => {
     queryApi({
         page: pagination.value.current,
         size: pagination.value.pageSize,
-        name: keyword.value,
         appId: appId.value,
         ...queryForm.value
     }).then(res => {
@@ -262,14 +268,10 @@ const handleQueryApi = () => {
         }
     });
 }
-const handleAddApi = (api) => {
-    addApi(api).then(res => {
-        if (!res.code) {
-            message.success('添加成功');
-            handleQueryApi();
-            showApiAddDrawer.value = false;
-        }
-    });
+const onAddApiSuccess = (api) => {
+    message.success('添加成功');
+    handleQueryApi();
+    showApiAddDrawer.value = false;
 }
 const handleUpdateApi = (api) => {
     updateApi(api).then(res => {
@@ -336,6 +338,7 @@ const handleImport = () => {
                 width: 400,
                 content: h('div', {}, [h('p', `分组：${res.data.groupNum}个`), h('p', `模块：${res.data.groupNum}个`), h('p', `API：${res.data.apiNum}个`)]),
             });
+            handleQueryApi();
         }
         importLoading.value = false;
     })
@@ -348,12 +351,15 @@ const onAddCaseClick = (api) => {
     showTestCaseAddDrawer.value = true;
 }
 
-const handleAddTestCase = (api) => {
-    addTestCase(api).then(res => {
-        if(!res.code) {
-            message.success('添加成功');
-            showTestCaseAddDrawer.value = false;
-        }
+const onAddTestCaseSuccess = () => {
+    message.success('添加成功');
+    showTestCaseAddDrawer.value = false;
+    handleQueryApi();
+}
+
+const onViewCaseClick = (record) => {
+    router.push({
+      path: '/test/testCase', query:{appId: record.appId, apiId: record.id}
     })
 }
 </script>
@@ -364,5 +370,9 @@ const handleAddTestCase = (api) => {
 
 .ant-table-striped :deep(.table-striped) td {
     background-color: #fafafa;
+}
+
+.case_num {
+    padding: 16px;
 }
 </style>

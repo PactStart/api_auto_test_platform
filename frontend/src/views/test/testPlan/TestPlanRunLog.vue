@@ -69,6 +69,12 @@
                             </a>
                         </span>
                     </template>
+                    <template v-if="column.key === 'startAt'">
+                        <span v-if="column.startAt != null">
+                            {{ formatTimestamp(record.startAt) }}
+                        </span>
+
+                    </template>
                     <template v-if="column.key === 'pass'">
                         <span v-if="record.pass == null">
                             <minus-outlined />
@@ -176,6 +182,11 @@ export default defineComponent({
                 dataIndex: 'msg',
                 key: 'msg',
             },
+            // {
+            //     title: '开始时间',
+            //     dataIndex: 'startAt',
+            //     key: 'startAt',
+            // },
             {
                 title: '耗时（ms）',
                 dataIndex: 'cost',

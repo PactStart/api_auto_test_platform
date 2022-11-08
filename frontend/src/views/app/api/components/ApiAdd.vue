@@ -1,7 +1,7 @@
 <template>
     <div>
         <a-form :model="apiForm" name="basic" :label-col="{ span: 5 }" :wrapper-col="{ span: 19 }" autocomplete="off"
-            @finish="onSubmit" @finishFailed="onFinishFailed">
+            @finish="onFinish" @finishFailed="onFinishFailed">
 
             <a-form-item label="选择应用" name="appId" :rules="[{ required: true, message: 'Please choose app!' }]">
                 <AppSelect v-model:appId=apiForm.appId style="width:100%;" />
@@ -60,15 +60,16 @@
     </div>
 </template>
 <script>
-import { reactive } from 'vue';
+import { addApi } from '@/api/api';
+import { ref } from 'vue';
 import AppSelect from '@/components/AppSelect.vue';
 export default {
-    props: ["onSubmit"],
+    props: ["onSuccess"],
     components: {
         AppSelect
     },
-    setup() {
-        const apiForm = reactive({
+    setup(props) {
+        const apiForm = ref({
             appId: null,
             groupName: '',
             moduleName: '',
@@ -83,9 +84,31 @@ export default {
         const onFinishFailed = errorInfo => {
             console.log('Failed:', errorInfo);
         };
+        const onFinish = () => {
+            addApi({
+                ...apiForm.value
+            }).then(res => {
+                if (!res.code) {
+                    props.onSuccess();
+                    apiForm.value = {
+                        appId: null,
+                        groupName: '',
+                        moduleName: '',
+                        apiName: '',
+                        url: '',
+                        requestMethod: 'post',
+                        contentType: 'application/json',
+                        query: '{}',
+                        body: '{}',
+                        headers: '{}',
+                    }
+                }
+            });
+        }
         return {
             apiForm,
-            onFinishFailed
+            onFinishFailed,
+            onFinish
         }
     }
 }

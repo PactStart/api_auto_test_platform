@@ -37,7 +37,7 @@
     </div>
     <a-drawer title="添加用户" :width="500" :visible="showUserAddDrawer" :body-style="{ paddingBottom: '80px' }"
         :footer-style="{ textAlign: 'right' }" @close="onClose('add')">
-        <UserAdd :onSubmit="handleAddUser" />
+        <UserAdd :onSuccess="onAddUserSuccess" />
     </a-drawer>
     <a-drawer title="编辑用户" :width="500" :visible="showUserEditDrawer" :body-style="{ paddingBottom: '80px' }"
         :footer-style="{ textAlign: 'right' }" @close="onClose('edit')">
@@ -149,14 +149,10 @@ const handleQueryUser = () => {
         }
     });
 }
-const handleAddUser = (user) => {
-    addUser(user).then(res => {
-        if (!res.code) {
-            message.success('添加成功');
-            handleQueryUser();
-            showUserAddDrawer.value = false;
-        }
-    });
+const onAddUserSuccess = (user) => {
+    message.success('添加成功');
+    handleQueryUser();
+    showUserAddDrawer.value = false;
 }
 const handleUpdateUser = (user) => {
     updateUser(user).then(res => {

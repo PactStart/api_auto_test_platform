@@ -44,3 +44,11 @@ import request from "../utils/request";
  export const bactchSetPreCase = (data) => {
   return request({ method: "post", url: "/api/v1/testCase/bactchSetPreCase", data });
 };
+
+
+/**
+ * 调试测试用例
+ */
+ export const debugTestCase = (data) => {
+  return request({ method: "post", url: "/api/v1/testCase/debug", data });
+};

@@ -6,7 +6,7 @@
             </template>
             <div class="search-wrapper">
                 <label>选择应用：</label><AppSelectVue  v-model:appId="queryForm.appId" style="width: 200px;" @update:appId="queryForm.appId = $event"/>
-                <a-input-search v-model:value="queryForm.name" style="width: 350px; margin-left: 20px;" placeholder="模糊搜索配置名"
+                <a-input-search v-model:value="queryForm.configKey" style="width: 350px; margin-left: 20px;" placeholder="模糊搜索配置名"
                     enter-button="查询" @search="handleQueryAppConfig" />
             </div>
             <a-table :dataSource="dataSource" :columns="columns" :pagination="pagination" @change="handleTableChange">
@@ -34,7 +34,7 @@
     </div>
     <a-drawer title="添加配置" :width="500" :visible="showAppConfigAddDrawer" :body-style="{ paddingBottom: '80px' }"
         :footer-style="{ textAlign: 'right' }" @close="onClose('add')">
-        <AppConfigAdd :onSubmit="handleAddAppConfig" />
+        <AppConfigAdd :onSuccess="onAddConfigSuccess" />
     </a-drawer>
     <a-drawer title="编辑配置" :width="500" :visible="showAppConfigEditDrawer" :body-style="{ paddingBottom: '80px' }"
         :footer-style="{ textAlign: 'right' }" @close="onClose('edit')">
@@ -42,7 +42,7 @@
     </a-drawer>
 </template>
 <script setup>
-import { addAppConfig, queryAppConfig, updateAppConfig, deleteAppConfig } from '@/api/appConfig';
+import { queryAppConfig, updateAppConfig, deleteAppConfig } from '@/api/appConfig';
 import { message, Modal } from 'ant-design-vue';
 import { ref, onMounted, createVNode, reactive } from 'vue';
 import { ExclamationCircleOutlined } from '@ant-design/icons-vue';
@@ -114,7 +114,7 @@ const pagination = ref({
 });
 const queryForm = ref({
     appId: null,
-    name: null,
+    configKey: null,
 })
 const showAppConfigAddDrawer = ref(false);
 const showAppConfigEditDrawer = ref(false);
@@ -127,7 +127,7 @@ const handleQueryAppConfig = () => {
     queryAppConfig({
         page: pagination.value.current,
         size: pagination.value.pageSize,
-        ...queryForm
+        ...queryForm.value
     }).then(res => {
         if (!res.code) {
             dataSource.value = res.data.list;
@@ -135,14 +135,10 @@ const handleQueryAppConfig = () => {
         }
     });
 }
-const handleAddAppConfig = (appConfig) => {
-    addAppConfig(appConfig).then(res => {
-        if (!res.code) {
-            message.success('添加成功');
-            handleQueryAppConfig();
-            showAppConfigAddDrawer.value = false;
-        }
-    });
+const onAddConfigSuccess = (appConfig) => {
+    message.success('添加成功');
+    handleQueryAppConfig();
+    showAppConfigAddDrawer.value = false;
 }
 const handleUpdateAppConfig = (appConfig) => {
     updateAppConfig(appConfig).then(res => {

@@ -119,7 +119,7 @@
 import { addTestCase, queryTestCase, updateTestCase, deleteTestCase, createDefaultForAll,bactchSetPreCase } from '@/api/testCase';
 import { addTestPlan} from '@/api/testPlan';
 import { message, Modal } from 'ant-design-vue';
-import { ref, onMounted, createVNode, reactive,computed } from 'vue';
+import { ref, onMounted, createVNode, reactive,computed, watch } from 'vue';
 import { ExclamationCircleOutlined } from '@ant-design/icons-vue';
 import { formatTimestamp } from '@/utils/time'
 import AppSelectVue from '@/components/AppSelect.vue';
@@ -129,8 +129,8 @@ import BatchSetPreCase from './components/BatchSetPreCase.vue';
 import BatchCreateDefaultCase from './components/BatchCreateDefaultCase.vue';
 import TestCaseClone from './components/TestCaseClone.vue';
 import TestCaseDebug from './components/TestCaseDebug.vue';
-
 import router from '@/router';
+import { useRoute } from 'vue-router';
 
 const dataSource = ref([]);
 const columns = reactive([
@@ -199,12 +199,21 @@ const pagination = ref({
     pageSize: 10,
     total: 0
 });
+
 const queryForm = ref({
     appId: null,
     apiId: null,
     preCaseId: null,
     name: null,
-})
+});
+
+const route = useRoute();
+if(route.query?.appId) {
+    queryForm.value.appId = parseInt(route.query.appId);
+}
+if(route.query?.apiId) {
+    queryForm.value.apiId = parseInt(route.query.apiId);
+}
 const showTestCaseEditDrawer = ref(false);
 const showBatchSetPreCaseDrawer = ref(false);
 const showBatchCreateDefaultCaseDrawer = ref(false);
@@ -221,7 +230,22 @@ const onViewJsonClick = (json,text) => {
     title.value = text;
 };
 onMounted(() => {
+    watch(
+        () => route.query,
+        (newValue, oldValue) => {
+            console.log('route.query changed',newValue,oldValue)
+            if(newValue?.appId) {
+                queryForm.value.appId = parseInt(newValue.appId);
+            }
+            if(newValue?.apiId) {
+                queryForm.value.apiId = parseInt(newValue.apiId);
+            }
+            handleQueryTestCase();
+        },
+        { immediate: true }
+    );
     handleQueryTestCase();
+
 });
 const handleQueryTestCase = () => {
     queryTestCase({

@@ -55,8 +55,8 @@ exports.apiDeleteCheck = {
 exports.apiQueryCheck = {
   query: {
     appId: joi.number().integer(),
-    groupName: joi.string(),
-    moduleName: joi.string(),
+    groupName: joi.string().allow(null,''),
+    moduleName: joi.string().allow(null,''),
     apiName: joi.string(),
     page,
     size,
@@ -74,8 +74,6 @@ exports.apiImportCheck = {
 exports.apiGroupAndModuleQueryCheck = {
   query: {
     appId,
-    groupName: joi.string(),
-    moduleName: joi.string(),
   },
 };
 

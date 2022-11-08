@@ -28,7 +28,7 @@
     </div>
     <a-drawer title="添加角色" :width="500" :visible="showRoleAddDrawer" :body-style="{ paddingBottom: '80px' }"
         :footer-style="{ textAlign: 'right' }" @close="onClose('add')">
-        <RoleAdd :onSubmit="handleAddRole" />
+        <RoleAdd :onSuccess="onAddRoleSuccess" />
     </a-drawer>
     <a-drawer title="编辑角色" :width="500" :visible="showRoleEditDrawer" :body-style="{ paddingBottom: '80px' }"
         :footer-style="{ textAlign: 'right' }" @close="onClose('edit')">
@@ -36,7 +36,7 @@
     </a-drawer>
 </template>
 <script setup>
-import { addRole, queryRole, updateRole, deleteRole } from '@/api/role';
+import { queryRole, updateRole, deleteRole } from '@/api/role';
 import { message, Modal } from 'ant-design-vue';
 import { ref, onMounted, createVNode, reactive } from 'vue';
 import { ExclamationCircleOutlined } from '@ant-design/icons-vue';
@@ -115,14 +115,10 @@ const handleQueryRole = () => {
         }
     });
 }
-const handleAddRole = (role) => {
-    addRole(role).then(res => {
-        if (!res.code) {
-            message.success('添加成功');
-            handleQueryRole();
-            showRoleAddDrawer.value = false;
-        }
-    });
+const onAddRoleSuccess = (role) => {
+    message.success('添加成功');
+    handleQueryRole();
+    showRoleAddDrawer.value = false;
 }
 const handleUpdateRole = (role) => {
     updateRole(role).then(res => {

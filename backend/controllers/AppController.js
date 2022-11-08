@@ -74,7 +74,7 @@ exports.updateApp = (req, res) => {
     "update app set name = ?,update_at = ?,update_by = ? where id = ?";
   db.query(
     updateSql,
-    [name, id, Date.now(), currentUser.nickname],
+    [name, Date.now(), currentUser.nickname,id],
     (err, results) => {
       if (err) {
         return res.send({
