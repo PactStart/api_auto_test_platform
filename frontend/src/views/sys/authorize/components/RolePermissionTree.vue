@@ -19,15 +19,26 @@ import { message } from 'ant-design-vue';
 export default defineComponent({
     props:['roleId'],
     setup(props) {
-        const roleId = props.roleId;
+        const currentRoleId = ref(props.roleId);
         const treeData = ref([]);
         const selectedKeys = ref([]);
         const expandedKeys = ref([]);
         const checkedKeys = ref([]);
         const defaultExpandAll = ref(false);
+
+        watch(props, (newValue, oldValue) => {
+            // console.log("roleId changed", newValue, oldValue);
+            currentRoleId.value = newValue.roleId;
+            handleListPermissionTree();
+        }, { immediate: false, deep: true });
+
         onMounted(() => {
+            handleListPermissionTree();
+        })
+
+        const handleListPermissionTree = () => {
             listPermissionTree({
-                roleId
+                roleId:currentRoleId.value
             }).then(res => {
                 if(!res.code) {
                     treeData.value = res.data.permissionTree
@@ -35,7 +46,7 @@ export default defineComponent({
                     defaultExpandAll.value = true;
                 }
             })
-        })
+        }
         
         watch(expandedKeys, () => {
         });
@@ -48,7 +59,7 @@ export default defineComponent({
                 return item > 0
             })
             assignPermissions({
-                roleId,
+                roleId: currentRoleId.value,
                 permissionIds
             }).then(res => {
                 if(!res.code) {

@@ -130,14 +130,14 @@ class TestPlanExecutor:
                     for header in headers:
                         field_name = pre_fields['field']
                         if header == field_name:
-                            field_value = pre_case_response['data'][field_name]
+                            field_value = pre_case_response['data']['replaceField']
                             headers[field_name] = field_value
                 elif pre_field['scope'] == 'body' or pre_field['scope'] == 'query':
                     # 替换body或者query中的动态参数
                     for key in body.keys():
                         field_name = pre_fields['field']
                         if key == field_name:
-                            field_value = pre_case_response['data'][field_name]
+                            field_value = pre_case_response['data']['replaceField']
                             body[field_name] = field_value
 
         # 请求

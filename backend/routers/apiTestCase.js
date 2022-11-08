@@ -334,15 +334,14 @@ router.post('/createDefaultForAll',expressJoi(ApiTestCaseCheck.apiTestCaseCreate
  */
  router.post('/bactchSetPreCase',expressJoi(ApiTestCaseCheck.apiTestCaseBatchSetPreCaseCheck),apiTestCaseController.batchSetPreCase);
 
-
  /**
  * @openapi
  * /api/v1/testCase/debug:
  *  post:
  *    tags:
- *      - 调试
- *    summary: 调试
- *    description: 调试
+ *      - 测试用例模块
+ *    summary: 调试测试用例
+ *    description: 调试测试用例
  *    parameters:
  *      - name: Authorization
  *        type: string

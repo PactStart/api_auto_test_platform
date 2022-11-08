@@ -11,28 +11,9 @@
       <span v-else>否</span>
     </a-descriptions-item>
     <a-descriptions-item label="角色" :span="3">
-      Data disk type: MongoDB
-      <br />
-      Database version: 3.4
-      <br />
-      Package: dds.mongo.mid
-      <br />
-    </a-descriptions-item>
-    <a-descriptions-item label="API权限" :span="3">
-      Data disk type: MongoDB
-      <br />
-      Database version: 3.4
-      <br />
-      Package: dds.mongo.mid
-      <br />
-    </a-descriptions-item>
-    <a-descriptions-item label="按钮权限" :span="3">
-      Data disk type: MongoDB
-      <br />
-      Database version: 3.4
-      <br />
-      Package: dds.mongo.mid
-      <br />
+      <div v-for="role in roles">
+        {{role}}
+      </div>
     </a-descriptions-item>
   </a-descriptions>
 </template>
@@ -41,10 +22,12 @@ import { getUserInfo } from '@/api/user';
 import { ref, onMounted } from 'vue';
 import { formatTimestamp } from '@/utils/time';
 const user = ref({});
+const roles = ref([]);
 onMounted(() => {
   getUserInfo({}).then((res) => {
     if (!res.code) {
       user.value = res.data.user;
+      roles.value = res.data.roles;
     }
   })
 });

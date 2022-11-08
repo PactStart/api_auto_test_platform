@@ -48,8 +48,9 @@ const defaultAssert = [
 ];
 const defaultPreFields = [
     {
-        field: "token",
-        scope: 'header'
+        field: "Authorization",
+        scope: 'header',
+        replaceField: 'token'
     }
 ];
 const genJsonFromSchema = schema => {

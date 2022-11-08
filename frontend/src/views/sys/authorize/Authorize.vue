@@ -8,8 +8,8 @@
                 @search="handleQueryRole" />
                     <a-list item-layout="vertical" :pagination="rolePagination" :data-source="roleDataSource">
                         <template #renderItem="{ item }" >
-                            <a-list-item :class="selectedRoleId == item.id ? 'item-active': 'item-disable'">
-                                <span @click="onSelectRole(item)" >
+                            <a-list-item :class="selectedRoleId == item.id ? 'role-active': 'role-disable'">
+                                <span @click="onSelectRole(item)" style="margin-left: 16px;">
                                     {{ item.name }}
                                 </span>
                             </a-list-item>
@@ -64,7 +64,7 @@ const handleQueryRole = () => {
     });
 };
 const onSelectRole = (role) => {
-    message.success(role.name + '选中了');
+    // message.success(role.name + '选中了');
     selectedRoleId.value = role.id;
 }
 onMounted(() => {
@@ -72,11 +72,8 @@ onMounted(() => {
 });
 </script>
 <style lang='less' scoped>
-    .item-active::before {
-        position: absolute;
-        top: 0;
-        left: 0;
-        bottom: 0;
-        border-left: 3px solid #1890ff;
+    .role-active {
+        background-color: #1890ff;
+        color: #fff;
     }
 </style>

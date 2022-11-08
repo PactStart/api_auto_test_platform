@@ -297,6 +297,29 @@ getHeaderExample = (api) => {
   return JSON.stringify(headerExample);
 };
 
+getAssertExample = () => {
+  const defaultAssert = [
+    {
+      "fieldPath": "$.code",
+      "predicate": "=",
+      "expectValue": 0,
+      "msg": "code不为0"
+    }
+  ];
+  return JSON.stringify(defaultAssert);
+}
+
+getPreFieldsExample = () => {
+  const defaultPreFields = [
+    {
+      "field": "Authorization",
+      "scope": "header",
+      "replaceField": "token"
+    }
+  ]
+  return JSON.stringify(defaultPreFields);
+}
+
 exports.createDefault = (req, res) => {
   let { id } = req.body;
   const selectSql = "select * from api where id = ? and del = 0";
@@ -319,15 +342,16 @@ exports.createDefault = (req, res) => {
 
         let insertSql =
           "insert api_test_case(app_id,api_id,name,run,headers,pre_case_id,pre_fields,request_body,assert,create_at,create_by,update_at) values \r\n";
-        const defaultAssert =
-          '[{"fieldPath":"$.code","predicate":"=","expectValue":0,"msg":"code不为0"}]';
-        let bodyExample = getBodyExample(api);
-        let headerExample = getHeaderExample(api);
+        const bodyExample = getBodyExample(api);
+        const headerExample = getHeaderExample(api);
+        const assertExample = getAssertExample();
+        const preFieldExample = getPreFieldsExample();
+
         insertSql =
           insertSql +
           `(${appId},'${api.id}','默认',1,'${JSON.stringify(
             headerExample
-          )}',0,'{}','${bodyExample}','${defaultAssert}',${now}),${
+          )}',0,'${preFieldExample}','${bodyExample}','${assertExample}',${now}),${
             currentUser.nickname
           },${now}),\r\n`;
         insertSql = insertSql.substring(0, insertSql.lastIndexOf(","));

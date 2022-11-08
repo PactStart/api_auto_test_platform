@@ -11,7 +11,7 @@
  Target Server Version : 50734
  File Encoding         : 65001
 
- Date: 30/10/2022 17:44:59
+ Date: 08/11/2022 17:46:53
 */
 
 SET NAMES utf8mb4;
@@ -31,14 +31,14 @@ CREATE TABLE `api` (
   `request_method` varchar(6) COLLATE utf8mb4_bin NOT NULL COMMENT '请求方式',
   `content_type` varchar(20) COLLATE utf8mb4_bin NOT NULL DEFAULT '' COMMENT '数据提交方式：application/json | multipart/form-data | application/x-www-form-urlencoded | ''''',
   `query` varchar(1024) COLLATE utf8mb4_bin NOT NULL DEFAULT '' COMMENT 'query参数定义',
-  `body` varchar(2048) COLLATE utf8mb4_bin NOT NULL DEFAULT '' COMMENT 'body参数定义，json schema',
+  `body` text COLLATE utf8mb4_bin NOT NULL COMMENT 'body参数定义，json schema',
   `headers` varchar(1024) COLLATE utf8mb4_bin NOT NULL DEFAULT '' COMMENT 'header参数定义',
   `case_num` int(11) NOT NULL DEFAULT '0' COMMENT '用例数量',
   `create_at` bigint(20) NOT NULL COMMENT '创建时间',
   `create_by` varchar(50) COLLATE utf8mb4_bin NOT NULL COMMENT '创建人',
   `update_at` bigint(20) NOT NULL COMMENT '修改时间',
   `update_by` varchar(50) COLLATE utf8mb4_bin NOT NULL DEFAULT '' COMMENT '修改人',
-  `del` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否删除',
+  `del` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否删除',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE KEY `uk_appid_url` (`app_id`,`url`) COMMENT '应用url唯一索引'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin COMMENT='API接口';
@@ -67,10 +67,33 @@ CREATE TABLE `api_test_case` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
 -- ----------------------------
--- Table structure for api_test_case_run_log
+-- Table structure for api_test_plan
 -- ----------------------------
-DROP TABLE IF EXISTS `api_test_case_run_log`;
-CREATE TABLE `api_test_case_run_log` (
+DROP TABLE IF EXISTS `api_test_plan`;
+CREATE TABLE `api_test_plan` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `app_id` int(20) NOT NULL COMMENT '应用id',
+  `name` varchar(50) COLLATE utf8mb4_bin NOT NULL COMMENT '计划名称',
+  `base_url` varchar(255) COLLATE utf8mb4_bin NOT NULL COMMENT 'API接口地址前缀',
+  `case_num` int(20) NOT NULL DEFAULT '0' COMMENT 'TestCase数量',
+  `pass_num` int(20) NOT NULL DEFAULT '0' COMMENT 'TestCase通过数量',
+  `create_at` bigint(20) NOT NULL COMMENT '创建时间',
+  `create_by` varchar(50) COLLATE utf8mb4_bin NOT NULL COMMENT '创建人',
+  `start_at` bigint(20) DEFAULT NULL COMMENT '开始时间',
+  `end_at` bigint(20) DEFAULT NULL COMMENT '结束时间',
+  `cost` int(11) DEFAULT NULL COMMENT '耗时',
+  `run` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否已完成运行',
+  `mail_report` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否邮件发送测试报告',
+  `mail_receivers` varchar(200) COLLATE utf8mb4_bin NOT NULL DEFAULT '' COMMENT '测试报告邮件接收人',
+  `del` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否删除',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin COMMENT='api测试计划';
+
+-- ----------------------------
+-- Table structure for api_test_plan_run_log
+-- ----------------------------
+DROP TABLE IF EXISTS `api_test_plan_run_log`;
+CREATE TABLE `api_test_plan_run_log` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `app_id` int(20) NOT NULL COMMENT '应用id',
   `plan_id` int(11) NOT NULL COMMENT '计划 id',
@@ -98,29 +121,6 @@ CREATE TABLE `api_test_case_run_log` (
   `del` tinyint(1) NOT NULL DEFAULT '0' COMMENT '删除标记',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin COMMENT='api测试用例执行日志';
-
--- ----------------------------
--- Table structure for api_test_plan
--- ----------------------------
-DROP TABLE IF EXISTS `api_test_plan`;
-CREATE TABLE `api_test_plan` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `app_id` int(20) NOT NULL COMMENT '应用id',
-  `name` varchar(50) COLLATE utf8mb4_bin NOT NULL COMMENT '计划名称',
-  `base_url` varchar(255) COLLATE utf8mb4_bin NOT NULL COMMENT 'API接口地址前缀',
-  `case_num` int(20) NOT NULL DEFAULT '0' COMMENT 'TestCase数量',
-  `pass_num` int(20) NOT NULL DEFAULT '0' COMMENT 'TestCase通过数量',
-  `create_at` bigint(20) NOT NULL COMMENT '创建时间',
-  `create_by` varchar(50) COLLATE utf8mb4_bin NOT NULL COMMENT '创建人',
-  `start_at` bigint(20) DEFAULT NULL COMMENT '开始时间',
-  `end_at` bigint(20) DEFAULT NULL COMMENT '结束时间',
-  `cost` int(11) DEFAULT NULL COMMENT '耗时',
-  `run` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否已完成运行',
-  `mail_report` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否邮件发送测试报告',
-  `mail_receivers` varchar(200) COLLATE utf8mb4_bin NOT NULL DEFAULT '' COMMENT '测试报告邮件接收人',
-  `del` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否删除',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin COMMENT='api测试计划';
 
 -- ----------------------------
 -- Table structure for app
@@ -225,9 +225,9 @@ CREATE TABLE `sys_user` (
   `phone` varchar(11) NOT NULL DEFAULT '' COMMENT '手机号',
   `email` varchar(255) NOT NULL DEFAULT '' COMMENT '邮箱地址',
   `last_login_ip` varchar(63) NOT NULL DEFAULT '' COMMENT '最近一次登录IP地址',
-  `last_login_time` bigint(20) NOT NULL DEFAULT '0' COMMENT '最近一次登录时间',
+  `last_login_time` bigint(20) DEFAULT NULL COMMENT '最近一次登录时间',
   `avatar` varchar(255) NOT NULL DEFAULT '' COMMENT '头像图片',
-  `super_admin` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否是超级管理员',
+  `super_admin` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否是超级管理员',
   `create_at` bigint(20) NOT NULL COMMENT '创建时间',
   `create_by` varchar(50) NOT NULL COMMENT '创建人',
   `update_at` bigint(20) NOT NULL COMMENT '更新时间',
@@ -253,3 +253,5 @@ CREATE TABLE `sys_user_role` (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE KEY `uk_uid_rid` (`user_id`,`role_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='角色表';
+
+SET FOREIGN_KEY_CHECKS = 1;
