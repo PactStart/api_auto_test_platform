@@ -29,7 +29,7 @@
         sampleresult.default.encoding=UTF-8
 ```
 
-4、基本组件适用
+4、基本组件使用
 
 ```
     1) 线程组
