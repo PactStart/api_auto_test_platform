@@ -6,7 +6,7 @@ const db = mysql.createPool({
   host: "127.0.0.1",
   user: "root",
   password: "123456",
-  database: "auto_test",
+  database: "api_auto_test",
   debug: false,
   typeCast: function (field, next) {
     // console.log(field.type,field.length)

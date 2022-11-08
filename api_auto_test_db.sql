@@ -13,6 +13,8 @@
 
  Date: 08/11/2022 17:46:53
 */
+CREATE DATABASE IF NOT EXISTS api_auto_test;
+USE api_auto_test;
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
@@ -253,5 +255,8 @@ CREATE TABLE `sys_user_role` (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE KEY `uk_uid_rid` (`user_id`,`role_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='角色表';
+
+
+INSERT INTO `sys_user` VALUES (1, 'admin', '$2a$10$5o4WeYzr7UYZQII2pYUPhO9WBtdD7F8zMvN4BAzHsBuJIj4fBg09i', '', 'admin', '', '', '', NULL, '', 0, 1667902454625, '雷迪', 1667902454625, '', 0);
 
 SET FOREIGN_KEY_CHECKS = 1;

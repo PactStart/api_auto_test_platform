@@ -1,7 +1,7 @@
 1、初始化项目
 ```
     cd backend
-    npm install
+    npm install 或者 cnpm install
 ```
 
 2、启动项目

@@ -347,13 +347,7 @@ exports.createDefault = (req, res) => {
         const assertExample = getAssertExample();
         const preFieldExample = getPreFieldsExample();
 
-        insertSql =
-          insertSql +
-          `(${appId},'${api.id}','默认',1,'${JSON.stringify(
-            headerExample
-          )}',0,'${preFieldExample}','${bodyExample}','${assertExample}',${now}),${
-            currentUser.nickname
-          },${now}),\r\n`;
+        insertSql = insertSql +`(${appId},'${api.id}','默认',1,'${JSON.stringify(headerExample)}',0,'${preFieldExample}','${bodyExample}','${assertExample}',${now}),${currentUser.nickname},${now}),\r\n`;
         insertSql = insertSql.substring(0, insertSql.lastIndexOf(","));
 
         connection.query(insertSql, (err, results) => {
@@ -432,21 +426,13 @@ exports.createDefaultForAll = (req, res) => {
 
         const now = Date.now();
         const currentUser = parseToken(req);
-        const defaultAssert =
-          '[{"fieldPath":"$.code","predicate":"=","expectValue":0,"msg":"code不为0"}]';
+        const defaultAssert = getAssertExample();
+        const defaultPreFields = getPreFieldsExample();
         for (let api of results) {
           let bodyExample = getBodyExample(api);
           let headerExample = getHeaderExample(api);
-          insertSql =
-            insertSql +
-            `
-                    (${appId},${api.id},'${
-              api.api_name
-            }-默认用例，判断code=0',1,${JSON.stringify(
-              headerExample
-            )},0,'[]',${JSON.stringify(
-              bodyExample
-            )},'${defaultAssert}',${now},'${currentUser.nickname}',${now}),`;
+          insertSql = insertSql +
+            `(${appId},${api.id},'${api.api_name}-默认用例，判断code=0',1,${JSON.stringify(headerExample)},0,'${defaultPreFields}',${JSON.stringify(bodyExample)},'${defaultAssert}',${now},'${currentUser.nickname}',${now}),`;
         }
         insertSql = insertSql.substring(0, insertSql.lastIndexOf(","));
         connection.query(insertSql, (err, results) => {

@@ -6,6 +6,20 @@
     performance: jmeter性能测试
     
 ```
-2、安装部署
+2、本地运行
+```
+    1）git拉取代码
+
+    2）执行sql脚本./api_auto_test_db/sql
+    
+    3) 配置sql连接信息（./backend/config/db.js）
+
+    4) 运行服务器（按照./backend/ReadMe.md执行）
+
+    5）运行界面（按照./frontend/ReadMe.md执行）
+
+```
+
+3、安装部署
 ```
 ```
