@@ -3,7 +3,7 @@
         <a-button type="primary" @click="onSaveBtnClick" style="margin-bottom: 16px;">
             保存
         </a-button>
-        <a-tree v-model:expandedKeys="expandedKeys" v-model:selectedKeys="selectedKeys" :defaultExpandAll="defaultExpandAll"
+        <a-tree v-model:selectedKeys="selectedKeys" :defaultExpandAll="defaultExpandAll" v-if="treeData.length"
             v-model:checkedKeys="checkedKeys" checkable :tree-data="treeData">
             <template #title="{ title, key }">
                 <span>{{ title }}</span>
@@ -22,9 +22,9 @@ export default defineComponent({
         const currentRoleId = ref(props.roleId);
         const treeData = ref([]);
         const selectedKeys = ref([]);
-        const expandedKeys = ref([]);
+        // const expandedKeys = ref([]);
         const checkedKeys = ref([]);
-        const defaultExpandAll = ref(false);
+        const defaultExpandAll = ref(true);
 
         watch(props, (newValue, oldValue) => {
             // console.log("roleId changed", newValue, oldValue);
@@ -43,13 +43,12 @@ export default defineComponent({
                 if(!res.code) {
                     treeData.value = res.data.permissionTree
                     checkedKeys.value = res.data.ownPermissionIds;
-                    defaultExpandAll.value = true;
                 }
             })
         }
         
-        watch(expandedKeys, () => {
-        });
+        // watch(expandedKeys, () => {
+        // });
         watch(selectedKeys, () => {
         });
         watch(checkedKeys, () => {
@@ -69,7 +68,7 @@ export default defineComponent({
         }
         return {
             treeData,
-            expandedKeys,
+            // expandedKeys,
             selectedKeys,
             checkedKeys,
             defaultExpandAll,

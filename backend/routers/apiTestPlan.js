@@ -101,7 +101,7 @@ router.post('/delete',expressJoi(ApiTestPlanCheck.apiTestPlanIdCheck),apiTestPla
  * /api/v1/testPlan/getById:
  *  post:
  *    tags:
- *      - 根据id获取测试计划
+ *      - 测试计划模块
  *    summary: 根据id获取测试计划
  *    description: 根据id获取测试计划
  *    parameters:
