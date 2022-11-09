@@ -26,6 +26,8 @@ class TestPlanExecutor:
         cases = self.load_test_case(plan_id);
         # 加载配置
         config_map = self.load_config(plan['app_id']);
+        if(plan['base_url'] != ''):
+            config_map.__setitem__('base_url',plan['base_url'])
 
         context = {}
         context['start_at'] = round(time.time() * 1000)
@@ -34,6 +36,7 @@ class TestPlanExecutor:
         for case in cases:
             try:
                 # 执行测试用例
+                print('------------------------------------------------')
                 start_at = round(time.time() * 1000)
                 response = self.exec_test_case(case, config_map)
                 end_at = round(time.time() * 1000)
@@ -47,10 +50,9 @@ class TestPlanExecutor:
                     pass_num = pass_num + 1
                 # 更新测试用例运行结果
                 self.update_test_case_result(case, response, assert_result)
-
+                print('------------------------------------------------')
             except Exception as e:
-                print(e)
-                # print('测试用例执行发生异常:case_id: {0}, case_name: {1}'.format(case['case_id'], case['case_name']), e)
+                print('测试用例执行发生异常:case_id: {0}, case_name: {1}, '.format(case['case_id'], case['case_name']), e)
 
         context['end_at'] = round(time.time() * 1000)
         context['pass_num'] = pass_num
@@ -66,7 +68,7 @@ class TestPlanExecutor:
         :param plan_id: 计划id
         :return:
         """
-        print('load_test_plan')
+        print('加载测试计划')
         my_db = MysqlDb()
         sql = "select * from `api_test_plan` where id = {0}".format(plan_id)
         results = my_db.query(sql)
@@ -78,9 +80,9 @@ class TestPlanExecutor:
         :param plan_id:
         :return:
         """
-        print("load_test_case")
+        print("加载测试用例")
         my_db = MysqlDb()
-        sql = "select * from `api_test_case_run_log` where plan_id='{0}'".format(plan_id)
+        sql = "select * from `api_test_plan_run_log` where plan_id='{0}'".format(plan_id)
         results = my_db.query(sql)
         return results
 
@@ -90,7 +92,7 @@ class TestPlanExecutor:
         :param app_id:
         :return:
         """
-        print('load_config')
+        print('加载应用配置')
         my_db = MysqlDb()
         sql = "select * from `app_config` where app_id = {0}".format(app_id)
         results = my_db.query(sql)
@@ -106,7 +108,7 @@ class TestPlanExecutor:
         :param config_map:
         :return:
         """
-        print('exec_test_case')
+        print('执行测试用例:{0},{1}'.format(case['case_name'],case['url']))
         headers = json.loads(case['headers'])
         content_type = case['content_type']
         body = json.loads(case['request_body'])
@@ -120,24 +122,26 @@ class TestPlanExecutor:
             # 递归调用
             pre_case_response = self.exec_test_case(pre_case, config_map)
             pre_case_assert_result = self.assert_response(pre_case, pre_case_response)
-            if not pre_case_assert_result['pass']:
+            if not pre_case_assert_result['is_pass']:
                 # 前置用例没有通过
                 return pre_case_response
             pre_fields = json.loads(case['pre_fields'])
             for pre_field in pre_fields:
-                if pre_fields['scope'] == 'header':
+                if pre_field['scope'] == 'header':
                     # 替换header中的动态参数
                     for header in headers:
-                        field_name = pre_fields['field']
+                        field_name = pre_field['field']
                         if header == field_name:
-                            field_value = pre_case_response['data']['replaceField']
+                            replace_field = pre_field['replaceField']
+                            field_value = pre_case_response['data'][replace_field]
                             headers[field_name] = field_value
                 elif pre_field['scope'] == 'body' or pre_field['scope'] == 'query':
                     # 替换body或者query中的动态参数
                     for key in body.keys():
-                        field_name = pre_fields['field']
+                        field_name = pre_field['field']
                         if key == field_name:
-                            field_value = pre_case_response['data']['replaceField']
+                            replace_field = pre_field['replaceField']
+                            field_value = pre_case_response['data'][replace_field]
                             body[field_name] = field_value
 
         # 请求
@@ -156,9 +160,9 @@ class TestPlanExecutor:
         :param case_id:
         :return:
         """
-        print('get_case_by_id')
+        print('获取测试用例:{0}'.format(case_id))
         my_db = MysqlDb();
-        sql = "select * from api_test_case_run_log where id = {0}".format(case_id)
+        sql = "select * from api_test_plan_run_log where id = {0}".format(case_id)
         results = my_db.query(sql)
         if(len(results) > 0):
             return results[0]
@@ -172,8 +176,8 @@ class TestPlanExecutor:
         :param assert_result: 断言结果
         :return:
         """
-        print('update_test_case_result')
-        sql = "update api_test_case_run_log set pass = {0}, msg = '{1}', response = \"{2}\", start_at = {3} , end_at = {4}, cost = {5} where id = {6}".format(
+        print('更新测试用例执行结果:{0}'.format(case['case_name']))
+        sql = "update api_test_plan_run_log set pass = {0}, msg = '{1}', response = \"{2}\", start_at = {3} , end_at = {4}, cost = {5} where id = {6}".format(
             '1' if assert_result['is_pass'] else '0', assert_result['msg'], str(response), assert_result['start_at'],
             assert_result['end_at'], assert_result['end_at'] - assert_result['start_at'], case['id'])
         my_db = MysqlDb()
@@ -187,7 +191,7 @@ class TestPlanExecutor:
         :param response: http响应
         :return:
         """
-        print('assert_response')
+        print('执行断言:{0}'.format(case['case_name']))
         assert_obj_arr = json.loads(case['assert'])
 
         is_all_pass = True
@@ -237,7 +241,7 @@ class TestPlanExecutor:
         :param context:
         :return:
         """
-        print('update_test_plan_result')
+        print('更新测试计划执行结果:{0}'.format(plan['name']))
 
         sql = "update api_test_plan set start_at = {0}, end_at = {1}, cost = {2} ,pass_num = {3}, run = 1 where id = {4}".format(
             context['start_at'], context['end_at'], context['end_at'] - context['start_at'], context['pass_num'], plan['id'])
@@ -252,7 +256,7 @@ class TestPlanExecutor:
         :param config_map:
         :return:
         """
-        print('send_test_report')
+        print('发送测试报告')
         test_report_url = config_map['test_report_url']
         content = "您的测试计划:{0} 已执行完成，点击连接查看测试报告：{1}/{2}".format(plan['name'], test_report_url, plan['id'])
         mail_host = config_map['mail_host']
@@ -265,4 +269,4 @@ class TestPlanExecutor:
 
 if __name__ == '__main__':
     executor = TestPlanExecutor();
-    executor.exec(4);
+    executor.exec(17);

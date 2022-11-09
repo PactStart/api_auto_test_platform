@@ -15,7 +15,7 @@ class MysqlDb:
 
     def __init__(self):
         # 建立数据库连接
-        self.conn = pymysql.connect(host="127.0.0.1", port=3306, user="root", password="123456", db="auto_test")
+        self.conn = pymysql.connect(host="127.0.0.1", port=3306, user="root", password="123456", db="api_auto_test")
 
         # 使用 cursor 方法获取操作游标，得到一个可以执行sql语句，并且操作结果作为字典返回的游标
         self.cur = self.conn.cursor(cursor=pymysql.cursors.DictCursor)

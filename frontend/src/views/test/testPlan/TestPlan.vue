@@ -11,16 +11,16 @@
                 <template #bodyCell="{ column, record }">
                     <template v-if="column.key === 'run'">
                         <span>
-                           {{column.run ? '已执行' : '未执行'}}
+                           {{record.run ? '已执行' : '未执行'}}
                         </span>
                     </template>
                     <template v-if="column.key === 'mailReport'">
                         <span>
-                            {{column.mailReport ? '是' : '否'}}
+                            {{record.mailReport ? '是' : '否'}}
                         </span>
                     </template>
                     <template v-if="column.key === 'startAt'">
-                        <span v-if="column.run">
+                        <span v-if="record.run">
                             {{ formatTimestamp(record.startAt) }}
                         </span>
 
@@ -90,7 +90,7 @@ const columns = reactive([
         key: 'startAt',
     },
     {
-        title: '耗时',
+        title: '耗时(ms)',
         dataIndex: 'cost',
         key: 'cost',
     },

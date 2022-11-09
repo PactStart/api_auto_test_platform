@@ -84,11 +84,15 @@ function recursionFindAll(map, array) {
   for (let index = 0; index < array.length; index++) {
     const element = array[index];
     if (map.has(element)) {
-      result.push(element);
+      result.push(map.get(element));
     }
   }
-  let subResult = recursionFindAll(map, result);
-  result.push(subResult);
+  if(result.length) {
+    let subResult = recursionFindAll(map, result);
+    if(subResult.length) {
+      result.push(...subResult);
+    }
+  }
   return result;
 }
 
