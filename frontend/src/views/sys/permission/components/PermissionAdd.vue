@@ -5,9 +5,9 @@
             <a-form-item label="类型" name="type" :rules="[{ required: true, message: 'Please choose type!' }]">
                 <a-radio-group v-model:value="permissionForm.type">
                     <a-radio value="API">API</a-radio>
-                    <a-radio value="PAGE">页面</a-radio>
-                    <a-radio value="BUTTON">按钮</a-radio>
-                    <a-radio value="DATA">数据</a-radio>
+                    <a-radio value="Page">页面</a-radio>
+                    <a-radio value="Button">按钮</a-radio>
+                    <a-radio value="Data">数据</a-radio>
                 </a-radio-group>
             </a-form-item>
 

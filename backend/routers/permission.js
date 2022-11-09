@@ -234,7 +234,42 @@ router.get('/query',expressJoi(permissionCheck.permissionQueryCheck),permissionC
  *        description: OK
  * 
  */
- router.post('/importApiPerms',expressJoi(permissionCheck.apiPermsImportCheck),permissionController.importSwaggerApiPermission);
+ router.post('/importApiPerms',expressJoi(permissionCheck.apiPermsImportCheck),permissionController.importApiPermission);
 
+/**
+ * @openapi
+ * /api/v1/permission/importPagePerms:
+ *  post:
+ *    tags:
+ *      - 权限模块
+ *    summary: 批量导入页面权限点
+ *    description: 批量导入页面权限点
+ *    parameters:
+ *      - name: Authorization
+ *        type: string
+ *        description: jwt
+ *        in: header
+ *        required: true
+ *    requestBody:
+ *      description: 权限信息
+ *      content:
+ *        application/json:
+ *          schema:
+ *            type: object
+ *            properties: 
+ *              pages:
+ *                type: array
+ *                required: true
+ *                description: 页面数组
+ *    produces: 
+ *      - application/json 
+ *    consumes: 
+ *      - application/json 
+ *    responses:
+ *      200:
+ *        description: OK
+ * 
+ */
+ router.post('/importPagePerms',permissionController.importPagePermission);
 
 module.exports = router;

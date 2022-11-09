@@ -35,3 +35,9 @@ import request from "../utils/request";
   return request({ method: "post", url: "/api/v1/permission/importApiPerms", data });
 };
 
+/**
+ * 导入页面权限
+ */
+ export const importPagePerms = (data) => {
+  return request({ method: "post", url: "/api/v1/permission/importPagePerms", data });
+};

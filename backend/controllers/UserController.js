@@ -49,30 +49,94 @@ exports.loginByUserName = (req, res) => {
     const now = Date.now();
     const updateSql =
       "update sys_user set last_login_ip = ? , last_login_time = ? where id = ?";
-    // console.log(updateSql,[ip, now, dbUser.id])
     db.query(updateSql, [ip, now, dbUser.id], (err, results) => {
-      if (!err) {
-        console.error(err);
+      if (err) {
+        return res.send({
+          code:1,
+          msg: err.message
+        })
       }
-      res.send({
-        code: 0,
-        msg: "success",
-        data: {
-          token: "Bearer " + token,
-          user: user,
-        },
-      });
+      getUserRoleAndPerms(dbUser.id).then(roleAndPerms => {
+        let {roleIds,roles,perms} = roleAndPerms;
+        let apiPermNames = [];
+        let dataPermNames = [];
+        perms.forEach(perm => {
+          if(perm.type == 'API' && perm.name.startsWith('/api')) {
+            apiPermNames.push(perm.name);
+          } else if(perm.type == 'Data') {
+            dataPermNames.push(perm.name);
+          }
+        })
+        // console.log(apiPermNames,dataPermNames);
+        const promiseArr =[];
+        if(apiPermNames.length) {
+          const promise1 = sAdd(`perm:api:${dbUser.id}`, apiPermNames)
+          promiseArr.push(promise1);
+        }
+        if(dataPermNames.length) {
+          const promise2 = sAdd(`perm:data:${dbUser.id}`, dataPermNames)
+          promiseArr.push(promise2);
+        }
+        Promise.all(promiseArr).then(() => {
+          res.send({
+            code: 0,
+            msg: "success",
+            data: {
+              token: "Bearer " + token,
+              user: user,
+            },
+          });
+        })
+      })
     });
   });
 };
+
+const getUserRoleAndPerms = (userId) => {
+  return new Promise( resolve => {
+    const roleSelectSql =
+      "select r.* from sys_user_role ur join sys_role r on ur.role_id = r.id where ur.user_id = ?";
+    db.query(roleSelectSql, userId, (err, results) => {
+      if(err) {
+        throw err;
+      }
+      const roleIds = [];
+      const roles = [];
+      if (results && results.length) {
+        results.forEach(item => {
+          roles.push(item.name);
+          roleIds.push(item.id);
+        })
+      }
+      if(roleIds.length) {
+        const permissionSelectSql =
+          "select p.type,p.name from sys_role_permission rp join sys_permission p on rp.permission_id = p.id where rp.role_id in (?)";
+        db.query(permissionSelectSql, [roleIds.join(",")], (err, results) => {
+          if(err) {
+            throw err;
+          }
+          resolve({
+            roleIds,
+            roles,
+            perms: results
+          })
+        });
+      } else {
+        resolve({
+          roleIds,
+          roles,
+          perms: []
+        })
+      }
+    });
+  });
+}
 
 exports.userInfo = (req, res) => {
   const currentUser = parseToken(req);
 
   const pagePerms = [];
   const buttonPerms = [];
-  const apiPerms = [];
-  const dataPerms = [];
   const roles = [];
 
   const userSelectSql = "select * from sys_user where id = ?";
@@ -102,19 +166,12 @@ exports.userInfo = (req, res) => {
           if (!err && results.length) {
             for (let index = 0; index < results.length; index++) {
               const perm = results[index];
-              if (perm.type == "API") {
-                apiPerms.push(perm.name);
-              } else if (perm.type == "PAGE") {
+              if (perm.type == "Page") {
                 pagePerms.push(perm.name);
-              } else if (perm.type == "BUTTON") {
+              } else if (perm.type == "Button") {
                 buttonPerms.push(perm.name);
-              } else if (perm.type == "DATA") {
-                dataPerms.push(perm.name);
               }
             }
-            //api权限和data权限写redis
-            // sAdd(`perm:api:${currentUser.id}`, apiPerms);
-            // sAdd(`perm:data:${currentUser.id}`, dataPerms);
           }
           return res.send({
             code: 0,

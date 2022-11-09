@@ -131,8 +131,10 @@ const goToPersonelCenter = () => {
 <style lang='less' scoped>
 .logo {
     height: 32px;
+    line-height: 32px;
     margin: 16px;
-    background: #fff;
+    // background: #1890ff;
+    text-align: center;
 }
 
 .trigger {

@@ -13,9 +13,9 @@
                             <a-form-item label="类型" name="type">
                                 <a-select v-model:value="queryForm.type" style="width: 150px" allowClear>
                                     <a-select-option value="API">API接口</a-select-option>
-                                    <a-select-option value="PAGE">页面</a-select-option>
-                                    <a-select-option value="BUTTON">按钮</a-select-option>
-                                    <a-select-option value="DATA">数据</a-select-option>
+                                    <a-select-option value="Page">页面</a-select-option>
+                                    <a-select-option value="Button">按钮</a-select-option>
+                                    <a-select-option value="Data">数据</a-select-option>
                                 </a-select>
                             </a-form-item>
                         </a-col>
@@ -114,7 +114,7 @@
         :footer-style="{ textAlign: 'right' }" @close="onClose('edit')">
         <PermissionEdit :permission="permission" :onSubmit="handleUpdatePermission" />
     </a-drawer>
-    <a-modal v-model:visible="showImportModal" title="导入权限" @ok="handleImport">
+    <a-modal v-model:visible="showImportModal" title="导入权限" @ok="handleImport" okText="导入" cancelText="取消">
         <a-tabs>
             <a-tab-pane key="1" tab="导入API权限" force-render>
                 <a-form :model="importApiForm" :label-col="{ span: 4 }" :wrapper-col="{ span: 20 }" autocomplete="off" style="height: 150px;padding-top: 30px">
@@ -124,30 +124,23 @@
                 </a-form>
             </a-tab-pane>
             <a-tab-pane key="2" tab="导入页面权限">
-                <a-upload-dragger
-                    v-model:fileList="fileList"
-                    name="file"
-                    :multiple="false"
-                    @change="handleChange"
-                    @drop="handleDrop"
-                >
-                    <p class="ant-upload-drag-icon">
-                     <inbox-outlined></inbox-outlined>
-                    </p>
-                    <p class="ant-upload-text">选择页面路由文件@/router/home.js</p>
-                </a-upload-dragger>
+                <div style="padding: 32px 32px;">
+                    <inbox-outlined /><span>是否将本系统最新页面信息上传?</span>
+                </div>
             </a-tab-pane>
         </a-tabs>
     </a-modal>
 </template>
 <script setup>
-import { queryPermission, updatePermission, deletePermission, importApiPerms } from '@/api/permission';
+import { queryPermission, updatePermission, deletePermission, importApiPerms, importPagePerms } from '@/api/permission';
 import { message, Modal } from 'ant-design-vue';
 import { ref, onMounted, createVNode, reactive } from 'vue';
 import { ExclamationCircleOutlined,InboxOutlined } from '@ant-design/icons-vue';
 import PermissionAdd from './components/PermissionAdd.vue';
 import PermissionEdit from './components/PermissionEdit.vue';
-import { formatTimestamp } from '@/utils/time'
+import { formatTimestamp } from '@/utils/time';
+import homeRouter from '@/router/home';
+import { forEach } from 'lodash-es';
 const dataSource = ref([]);
 const columns = reactive([
     {
@@ -282,7 +275,7 @@ const onDelClick = (id) => {
         content: '删除后不可恢复，请谨慎操作',
         onOk() {
             return new Promise((resolve, reject) => {
-                deletePermission({ id }).then(() => {
+                deletePermission({ id }).then((res) => {
                     if (!res.code) {
                         handleQueryPermission();
                         resolve();
@@ -315,7 +308,34 @@ const handleImport = () => {
                 importApiForm.url = null;
             }
         })
+    } else {
+        const pages = convertRouter(homeRouter);
+        importPagePerms({
+            pages
+        }).then(res => {
+            if(!res.code) {
+                handleQueryPermission();
+                message.success('导入成功');
+                showImportModal.value = false;
+            }
+        })
     }
+}
+
+const convertRouter = (srcRoutes) => {
+    let destRoutes = [];
+    for (const item of srcRoutes) {
+        let destItem = {
+            name: item.name,
+            path: item.path,
+            ...item.meta        
+        }
+        if(item.children && item.children.length > 0) {
+            destItem.children = convertRouter(item.children);
+        }
+        destRoutes.push(destItem);
+    }
+    return destRoutes;
 }
 </script>
 <style lang='less' scoped>

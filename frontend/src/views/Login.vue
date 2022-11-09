@@ -43,7 +43,7 @@ export default defineComponent({
                 if (res?.data?.token) {
                     localStorage.setItem('token', res?.data?.token)
                     message.success('登录成功')
-                    router.push('/home')
+                    router.push('/app/app')
                 }
             })
         };

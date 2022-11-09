@@ -34,7 +34,8 @@ service.interceptors.response.use(
       return res.data;
     } else {
       message.error(msg);
-      if (code === -1) {
+      if (code == -1) {
+        localStorage.removeItem('token')
         router.push("/login");
       }
       return res.data;

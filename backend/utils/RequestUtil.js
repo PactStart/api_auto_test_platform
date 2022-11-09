@@ -1,5 +1,5 @@
 const request = require("request");
-const { parseApi } = require("./SwaggerParser");
+const { parseApi,parseApiTree } = require("./SwaggerParser");
 
 function getClientIp(req) {
   return (
@@ -57,4 +57,61 @@ async function requestSwaggerApi(url, groupName, apiArr) {
   });
 }
 
-module.exports = { getClientIp, requestSwaggerApi };
+
+async function requestSwaggerApiTree(url, groupName) {
+  return new Promise((resolve) => {
+    console.log( {
+      uri: url,
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+    });
+    request(
+      {
+        uri: url,
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+        },
+      },
+      (err, response, body) => {
+        if (err || response.statusCode != 200) {
+          throw new Error("api读取失败:" + url);
+        }
+        let obj = JSON.parse(body);
+        let groupArr = [];
+        if (obj instanceof Array) {
+          const promiseArr = [];
+          for (let index = 0; index < obj.length; index++) {
+            const fullGroupUrl = new URL(url).origin + obj[index].url;
+            const groupName = obj[index].name;
+            const promise = requestSwaggerApiTree(fullGroupUrl, groupName);
+            promise.then(moduleArr => {
+              groupArr.push({
+                groupName,
+                moduleArr
+              })
+            })
+            promiseArr.push(promise);
+          }
+          Promise.all(promiseArr).then(function () {
+            resolve(groupArr);
+          });
+        } else if (Object.hasOwnProperty.call(obj, "paths")) {
+          const moduleArr = parseApiTree(groupName, obj);
+          resolve([
+            {
+              groupName,
+              moduleArr
+            }
+          ]);
+        } else {
+          throw new Error("api解析paths字段失败:" + url);
+        }
+      }
+    );
+  });
+}
+
+module.exports = { getClientIp, requestSwaggerApi, requestSwaggerApiTree };

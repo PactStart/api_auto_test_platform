@@ -110,7 +110,7 @@ function parseApiTree(groupName, apiDocObj) {
   let moduleArr = [];
   for (let entry of moduleMap.entries()) {
     moduleArr.push({
-      name: groupName + "-" + entry[0],
+      moduleName: entry[0],
       description: entry[0],
       children: entry[1],
     });

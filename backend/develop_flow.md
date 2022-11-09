@@ -210,3 +210,7 @@
 16、如何等待多个异步请求完成后，再继续逻辑处理
 
 17、根据json shcema生成默认的json样例
+
+18、Promise.all简化代码
+
+19、App Crash如何解决？提前响应，异步代码抛出异常会导致AppCrashed

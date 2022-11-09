@@ -1,5 +1,6 @@
 import { createRouter, createWebHashHistory } from "vue-router";
 import homeRouters from './home';
+import {message} from 'ant-design-vue';
 
 const routes = [
   {
