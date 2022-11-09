@@ -10,7 +10,7 @@
 ```
     1）git拉取代码
 
-    2）执行sql脚本./api_auto_test_db/sql
+    2）执行sql脚本./api_auto_test_db.sql
     
     3) 运行服务器（按照./backend/ReadMe.md执行）
 
