@@ -109,7 +109,7 @@
                 <a-input v-model:value="testPlanForm.name" placeholder="请输入计划名称" />
             </a-form-item>
             <a-form-item label="BASE URL" name="baseUrl" :rules="[{ required: false, message: 'Please input baseUrl!' }]" st>
-                <a-input v-model:value="testPlanForm.baseUrl" placeholder="请输入接口域名,不填写，将默认使用应用里base_url的配置" />
+                <a-input v-model:value="testPlanForm.baseUrl" placeholder="请输入接口域名,不填写，将默认使用应用的base_url的配置" />
             </a-form-item>
         </a-form>
     </a-modal>
@@ -378,7 +378,7 @@ const onCreatePlanClick = (type) => {
 }
 const testPlanForm = reactive({
     name: '',
-    baseUrl: 'http://localhost:3000'
+    baseUrl: ''
 })
 const handleAddTestPlan = ()=> {
     addTestPlan({
