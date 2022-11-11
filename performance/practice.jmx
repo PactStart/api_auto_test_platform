@@ -57,7 +57,7 @@
               <elementProp name="" elementType="HTTPArgument">
                 <boolProp name="HTTPArgument.always_encode">false</boolProp>
                 <stringProp name="Argument.value">{&#xd;
-&quot;mail&quot;:&quot;794666918@qq.com&quot;,&#xd;
+&quot;mail&quot;:&quot;120@qq.com&quot;,&#xd;
 &quot;pwd&quot;:&quot;123456&quot;&#xd;
 &#xd;
 }&#xd;
@@ -98,7 +98,7 @@
           <boolProp name="LoopController.continue_forever">false</boolProp>
           <stringProp name="LoopController.loops">1</stringProp>
         </elementProp>
-        <stringProp name="ThreadGroup.num_threads">500</stringProp>
+        <stringProp name="ThreadGroup.num_threads">10</stringProp>
         <stringProp name="ThreadGroup.ramp_time">1</stringProp>
         <boolProp name="ThreadGroup.scheduler">false</boolProp>
         <stringProp name="ThreadGroup.duration">1</stringProp>
@@ -255,7 +255,7 @@
           <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="CSV 数据文件设置" enabled="true">
             <stringProp name="delimiter">,</stringProp>
             <stringProp name="fileEncoding"></stringProp>
-            <stringProp name="filename">/Users/leidi/IdeaProjects/jmeter-scripts/goods.csv</stringProp>
+            <stringProp name="filename">/Users/leidi/python_workspace/api_auto_test/performance/goods.csv</stringProp>
             <boolProp name="ignoreFirstLine">false</boolProp>
             <boolProp name="quotedData">false</boolProp>
             <boolProp name="recycle">true</boolProp>
@@ -264,7 +264,7 @@
             <stringProp name="variableNames">id,title</stringProp>
           </CSVDataSet>
           <hashTree/>
-          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="响应断言" enabled="false">
+          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="响应断言" enabled="true">
             <collectionProp name="Asserion.test_strings">
               <stringProp name="841326">机器</stringProp>
             </collectionProp>
@@ -331,12 +331,12 @@
           <stringProp name="HTTPSampler.response_timeout"></stringProp>
         </HTTPSamplerProxy>
         <hashTree>
-          <DurationAssertion guiclass="DurationAssertionGui" testclass="DurationAssertion" testname="断言持续时间" enabled="false">
+          <DurationAssertion guiclass="DurationAssertionGui" testclass="DurationAssertion" testname="断言持续时间" enabled="true">
             <stringProp name="DurationAssertion.duration">200</stringProp>
           </DurationAssertion>
           <hashTree/>
           <SyncTimer guiclass="TestBeanGUI" testclass="SyncTimer" testname="同步定时器" enabled="true">
-            <intProp name="groupSize">500</intProp>
+            <intProp name="groupSize">100</intProp>
             <longProp name="timeoutInMs">3000</longProp>
           </SyncTimer>
           <hashTree/>
@@ -468,7 +468,7 @@
       </ThreadGroup>
       <hashTree>
         <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="CSV 数据文件设置" enabled="true">
-          <stringProp name="filename">/Users/leidi/IdeaProjects/jmeter-scripts/tokens.txt</stringProp>
+          <stringProp name="filename">/Users/leidi/python_workspace/api_auto_test/performance/tokens.txt</stringProp>
           <stringProp name="fileEncoding">UTF-8</stringProp>
           <stringProp name="variableNames">token</stringProp>
           <boolProp name="ignoreFirstLine">false</boolProp>
@@ -545,7 +545,7 @@
         </ResultCollector>
         <hashTree/>
       </hashTree>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="BeanShell练习1" enabled="false">
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="BeanShell练习1" enabled="true">
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="循环控制器" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
@@ -659,7 +659,7 @@ log.info(&quot;lang=&quot;+lang);</stringProp>
         </ResultCollector>
         <hashTree/>
       </hashTree>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="BeanShell练习2" enabled="true">
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="BeanShell练习2" enabled="false">
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="循环控制器" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
@@ -891,7 +891,7 @@ if(code == 0 ){
         </BeanShellPostProcessor>
         <hashTree/>
       </hashTree>
-      <PostThreadGroup guiclass="PostThreadGroupGui" testclass="PostThreadGroup" testname="tearDown 线程组" enabled="true">
+      <PostThreadGroup guiclass="PostThreadGroupGui" testclass="PostThreadGroup" testname="tearDown 线程组" enabled="false">
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="循环控制器" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>

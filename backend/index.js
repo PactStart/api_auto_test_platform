@@ -79,7 +79,7 @@ app.use((req, res, next) => {
       return next();
     }
     perm = JSON.parse(value);
-    if (perm.anon || perm.name == '/api/v1/user/login') {
+    if (perm.anon || perm.name == '/api/v1/user/login' || perm.name.indexOf('/pt/') > -1) {
       next();
     } else if (perm.login) {
       let currentUser = null;

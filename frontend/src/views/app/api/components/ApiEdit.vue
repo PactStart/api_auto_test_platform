@@ -68,21 +68,20 @@ export default {
     },
     setup(props) {
         const readonly = ref(true);
-        const api = props.api;
         const apiForm = reactive({
-            ...api
+            ...props.api
         });
         watchEffect(() => {
-            apiForm.id = api.id;
-            apiForm.appId = api.appId;
-            apiForm.groupName = api.groupName;
-            apiForm.moduleName = api.moduleName;
-            apiForm.apiName = api.apiName;
-            apiForm.requestMethod = api.requestMethod;
-            apiForm.contentType = api.contentType;
-            apiForm.query = api.query;
-            apiForm.body = api.body;
-            apiForm.headers = api.headers;
+            apiForm.id = props.api.id;
+            apiForm.appId = props.api.appId;
+            apiForm.groupName = props.api.groupName;
+            apiForm.moduleName = props.api.moduleName;
+            apiForm.apiName = props.api.apiName;
+            apiForm.requestMethod = props.api.requestMethod;
+            apiForm.contentType = props.api.contentType;
+            apiForm.query = props.api.query;
+            apiForm.body = props.api.body;
+            apiForm.headers = props.api.headers;
         })
         const onFinishFailed = errorInfo => {
             console.log('Failed:', errorInfo);

@@ -39,7 +39,7 @@ exports.getGoodsList = (req, res) => {
 
 exports.getGoodsDetail = (req, res) => {
   let { id } = req.query;
-  const arr = list.filter((item) => item.id != id);
+  const arr = list.filter((item) => item.id == id);
   let goods = null;
   if (arr && arr.length) {
     goods = arr[0];
@@ -55,7 +55,8 @@ exports.secKill = (req, res) => {
   let { id } = req.body;
   ms = parseInt(Math.random() * 500);
   const promise = sleep(ms);
-  promise.then((ms) => {
+  promise.then(() => {
+    console.log('done')
     res.send({
       code: 0,
       msg: "success",
@@ -68,5 +69,5 @@ exports.secKill = (req, res) => {
 };
 
 function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve(), ms));
 }
