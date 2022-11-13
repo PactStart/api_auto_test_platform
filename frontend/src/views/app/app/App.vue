@@ -2,7 +2,7 @@
     <div>
         <a-card title="应用管理">
             <template #extra>
-                <a @click="onAddClick">添加</a>
+                <a v-show="showAddBtn" @click="onAddClick">添加</a>
             </template>
             <div class="search-wrapper">
                 <a-input-search v-model:value="keyword" style="width: 350px" placeholder="模糊搜索应用" enter-button="查询"
@@ -22,9 +22,9 @@
                     </template>
                     <template v-if="column.key === 'action'">
                         <span>
-                            <a @click="onEditClick(record)">编辑</a>
+                            <a v-show="showEditBtn" @click="onEditClick(record)">编辑</a>
                             <a-divider type="vertical" />
-                            <a style="color: red;" @click="onDelClick(record.id)">删除</a>
+                            <a v-show="showDelBtn" style="color: red;" @click="onDelClick(record.id)">删除</a>
                         </span>
                     </template>
                 </template>
@@ -43,11 +43,23 @@
 <script setup>
 import { queryApp, updateApp, deleteApp } from '@/api/app';
 import { message, Modal } from 'ant-design-vue';
-import { ref, onMounted, createVNode, reactive } from 'vue';
+import { ref, onMounted, createVNode, reactive, computed } from 'vue';
 import { ExclamationCircleOutlined } from '@ant-design/icons-vue';
 import AppAdd from './components/AppAdd.vue';
 import AppEdit from './components/AppEdit.vue';
-import { formatTimestamp } from '@/utils/time'
+import { formatTimestamp } from '@/utils/time';
+import { useStore } from 'vuex';
+const store = useStore();
+const showAddBtn = computed(() => {
+    return store.state.currentUser.superAdmin || store.state.buttonPermList.indexOf('add-app-btn') > -1  || store.state.buttonPermList.indexOf('all-app-btn') > -1 
+});
+const showDelBtn = computed(() => {
+    return store.state.currentUser.superAdmin || store.state.buttonPermList.indexOf('del-app-btn') > -1  || store.state.buttonPermList.indexOf('all-app-btn') > -1 
+});
+const showEditBtn = computed(() => {
+    return store.state.currentUser.superAdmin || store.state.buttonPermList.indexOf('edit-app-btn') > -1  || store.state.buttonPermList.indexOf('all-app-btn') > -1 
+});
+
 const dataSource = ref([]);
 const columns = reactive([
     {

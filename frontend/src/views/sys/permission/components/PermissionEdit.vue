@@ -2,6 +2,10 @@
     <div>
         <a-form :model="permissionForm" name="basic" :label-col="{ span: 7 }" :wrapper-col="{ span: 17 }"
             autocomplete="off" @finish="onSubmit" @finishFailed="onFinishFailed">
+            <a-form-item label="上级ID" name="parentId" :rules="[{ required: true, message: 'Please input parentId!' }]">
+                <a-input-number v-model:value="permissionForm.parentId" :min="1" placeholder="请输入上级权限ID，无则为0"
+                    style="width: 100%;" />
+            </a-form-item>
             <a-form-item label="类型" name="type" :rules="[{ required: true, message: 'Please choose type!' }]">
                 <a-radio-group v-model:value="permissionForm.type" disabled>
                     <a-radio value="API">API</a-radio>
@@ -55,6 +59,7 @@ export default {
         const permission = props.permission;
         const permissionForm = reactive({
             id: permission.id,
+            parentId: permission.parentId,
             type: permission.type,
             name: permission.name,
             description: permission.description,
@@ -64,6 +69,7 @@ export default {
         });
         watchEffect(() => {
             permissionForm.id = permission.id;
+            permissionForm.parentId = permission.parentId;
             permissionForm.type = permission.type;
             permissionForm.name = permission.name;
             permissionForm.description = permission.description;

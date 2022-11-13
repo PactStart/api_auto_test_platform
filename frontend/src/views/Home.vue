@@ -5,7 +5,7 @@
                 <span>API自动化测试</span>
             </div>
             <a-menu v-model:selectedKeys="selectedKeys" v-model:openKeys="openKeys" theme="light" mode="inline">
-                <template v-for="route of menuRoutes[0].children">
+                <template v-for="route of availRoutes">
                     <RouteMenu :route="route" />
                 </template> 
             </a-menu>
@@ -74,21 +74,30 @@ import {logout,getUserInfo, updatePwd}  from '@/api/user';
 import router from '@/router';
 import { MenuUnfoldOutlined, MenuFoldOutlined, UserOutlined } from '@ant-design/icons-vue';
 import { message } from 'ant-design-vue';
-import {ref ,onMounted } from 'vue';
+import {ref, computed } from 'vue';
 import RouteMenu from "../components/RouteMenu.vue";
 import menuRoutes from "../router/home";
+import { useStore } from 'vuex';
+import {getAvailRoutes} from '@/utils/util';
 
 const selectedKeys = ref(['app']);
 const openKeys = ref(['sys','app','test']);
 const collapsed = ref(false);
 
-onMounted(() => {
-    getUserInfo((res) => {
-        if(!res.code) {
-            console.log(res.data);
-        }
-    })
+const store = useStore();
+
+getUserInfo().then(res => {
+    if(!res.code) {
+        store.commit('setCurrentUser',res.data.user);
+        store.commit('setPagePermList',res.data.pagePerms);
+        store.commit('setButtonPermList',res.data.buttonPerms);
+    }
 });
+
+const availRoutes = computed(() => {
+    return store.state.currentUser.superAdmin ? menuRoutes[0].children : getAvailRoutes(menuRoutes[0].children,store.state.pagePermList);
+})
+console.log(availRoutes.value);
 
 const handleLogout = () => {
     logout({}).then(res => {

@@ -1,9 +1,9 @@
 <template>
     <div>
-        <a-button type="primary" @click="onSaveBtnClick" style="margin-bottom: 16px;">
+        <a-button v-show="showSaveBtn" type="primary" @click="onSaveBtnClick" style="margin-bottom: 16px;">
             保存
         </a-button>
-        <a-tree v-model:selectedKeys="selectedKeys" :defaultExpandAll="defaultExpandAll" v-if="treeData.length"
+        <a-tree v-model:selectedKeys="selectedKeys" :defaultExpandAll="defaultExpandAll" v-if="treeData.length" :disabled="!showSaveBtn"
             v-model:checkedKeys="checkedKeys" checkable :tree-data="treeData">
             <template #title="{ title, key }">
                 <span>{{ title }}</span>
@@ -13,9 +13,10 @@
     </div>
 </template>
 <script>
-import { defineComponent, ref, watch ,onMounted } from 'vue';
+import { defineComponent, ref, watch ,onMounted,computed } from 'vue';
 import {listPermissionTree, assignPermissions} from '@/api/role';
 import { message } from 'ant-design-vue';
+import { useStore } from 'vuex';
 export default defineComponent({
     props:['roleId'],
     setup(props) {
@@ -66,13 +67,18 @@ export default defineComponent({
                 }
             })
         }
+        const store = useStore();
+        const showSaveBtn = computed(() => {
+            return store.state.currentUser.superAdmin || store.state.buttonPermList.indexOf('save-rolePermission-btn') > -1  || store.state.buttonPermList.indexOf('all-authorize-btn') > -1 
+        });
         return {
             treeData,
             // expandedKeys,
             selectedKeys,
             checkedKeys,
             defaultExpandAll,
-            onSaveBtnClick
+            onSaveBtnClick,
+            showSaveBtn
         };
     }
 });

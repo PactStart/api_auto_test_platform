@@ -41,3 +41,10 @@ import request from "../utils/request";
  export const importPagePerms = (data) => {
   return request({ method: "post", url: "/api/v1/permission/importPagePerms", data });
 };
+
+/**
+ * 导入按钮权限
+ */
+ export const importButtonPerms = (data) => {
+  return request({ method: "post", url: "/api/v1/permission/importButtonPerms", data });
+};

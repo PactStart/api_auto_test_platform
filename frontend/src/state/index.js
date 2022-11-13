@@ -3,12 +3,20 @@ import { createStore } from "vuex";
 const store = createStore({
   state() {
     return {
-      count: 0,
+      currentUser: {},
+      buttonPermList: [],
+      pagePermList: []
     };
   },
   mutations: {
-    increment(state) {
-      state.count++;
+    setCurrentUser(state,currentUser) {
+      state.currentUser = currentUser;
+    },
+    setButtonPermList(state,buttonPermList) {
+      state.buttonPermList = buttonPermList;
+    },
+    setPagePermList(state,pagePermList) {
+      state.pagePermList = pagePermList;
     },
   },
 });

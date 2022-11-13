@@ -2,7 +2,7 @@
     <div>
         <a-card title="角色管理">
             <template #extra>
-                <a @click="onAddClick">添加</a>
+                <a v-show="showAddBtn" @click="onAddClick">添加</a>
             </template>
             <div class="search-wrapper">
                 <a-input-search v-model:value="keyword" style="width: 350px" placeholder="模糊搜索角色名" enter-button="查询"
@@ -17,9 +17,9 @@
                     </template>
                     <template v-if="column.key === 'action'">
                         <span>
-                            <a @click="onEditClick(record)">编辑</a>
+                            <a v-show="showEditBtn" @click="onEditClick(record)">编辑</a>
                             <a-divider type="vertical" />
-                            <a style="color: red;" @click="onDelClick(record.id)">删除</a>
+                            <a v-show="showDelBtn" style="color: red;" @click="onDelClick(record.id)">删除</a>
                         </span>
                     </template>
                 </template>
@@ -38,11 +38,23 @@
 <script setup>
 import { queryRole, updateRole, deleteRole } from '@/api/role';
 import { message, Modal } from 'ant-design-vue';
-import { ref, onMounted, createVNode, reactive } from 'vue';
+import { ref, onMounted, createVNode, reactive, computed } from 'vue';
 import { ExclamationCircleOutlined } from '@ant-design/icons-vue';
 import RoleAdd from './components/RoleAdd.vue';
 import RoleEdit from './components/RoleEdit.vue';
-import { formatTimestamp } from '@/utils/time'
+import { formatTimestamp } from '@/utils/time';
+import { useStore } from 'vuex';
+const store = useStore();
+const showAddBtn = computed(() => {
+    return store.state.currentUser.superAdmin || store.state.buttonPermList.indexOf('add-role-btn') > -1  || store.state.buttonPermList.indexOf('all-role-btn') > -1 
+});
+const showDelBtn = computed(() => {
+    return store.state.currentUser.superAdmin || store.state.buttonPermList.indexOf('del-role-btn') > -1  || store.state.buttonPermList.indexOf('all-role-btn') > -1 
+});
+const showEditBtn = computed(() => {
+    return store.state.currentUser.superAdmin || store.state.buttonPermList.indexOf('edit-role-btn') > -1  || store.state.buttonPermList.indexOf('all-role-btn') > -1 
+});
+
 const dataSource = ref([]);
 const columns = reactive([
     {

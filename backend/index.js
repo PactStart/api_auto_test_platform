@@ -126,7 +126,6 @@ app.use((req, res, next) => {
         } else {
           const promise = sIsMember(`perm:api:${currentUser.id}`, path);
           promise.then((hasPerm) => {
-            console.log(hasPerm);
             if (!hasPerm) {
               return res.send({
                 code: 1,

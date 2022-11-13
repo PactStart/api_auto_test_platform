@@ -2,7 +2,7 @@
     <div>
         <a-card title="用户管理">
             <template #extra>
-                <a @click="onAddClick">添加</a>
+                <a v-show="showAddBtn" @click="onAddClick">添加</a>
             </template>
             <div class="search-wrapper">
                 <a-input-search v-model:value="keyword" style="width: 350px" placeholder="模糊搜索昵称、用户名、手机号、邮箱" enter-button="查询"
@@ -22,12 +22,12 @@
                     </template>
                     <template v-if="column.key === 'action'">
                         <span>
-                            <a @click="onEditClick(record)">编辑</a>
+                            <a v-show="showEditBtn" @click="onEditClick(record)">编辑</a>
                             <span v-if="!column.superAdmin">
                                 <a-divider type="vertical" />
-                                <a style="color: red;" @click="onDelClick(record.id)">删除</a>
+                                <a v-show="showDelBtn" style="color: red;" @click="onDelClick(record.id)">删除</a>
                                 <a-divider type="vertical" />
-                                <a @click="onResetPwdClick(record.id)">重置密码</a>
+                                <a v-show="showRestPwdBtn" @click="onResetPwdClick(record.id)">重置密码</a>
                             </span>
                         </span>
                     </template>
@@ -65,7 +65,23 @@ import { ref, onMounted, createVNode, reactive, computed } from 'vue';
 import { ExclamationCircleOutlined } from '@ant-design/icons-vue';
 import UserAdd from './components/UserAdd.vue';
 import UserEdit from './components/UserEdit.vue';
-import { formatTimestamp } from '@/utils/time'
+import { formatTimestamp } from '@/utils/time';
+import { useStore } from 'vuex';
+const store = useStore();
+const showAddBtn = computed(() => {
+    return store.state.currentUser.superAdmin || store.state.buttonPermList.indexOf('add-user-btn') > -1  || store.state.buttonPermList.indexOf('all-user-btn') > -1 
+});
+const showDelBtn = computed(() => {
+    return store.state.currentUser.superAdmin || store.state.buttonPermList.indexOf('del-user-btn') > -1  || store.state.buttonPermList.indexOf('all-user-btn') > -1 
+});
+const showEditBtn = computed(() => {
+    return store.state.currentUser.superAdmin || store.state.buttonPermList.indexOf('edit-user-btn') > -1  || store.state.buttonPermList.indexOf('all-user-btn') > -1 
+});
+
+const showRestPwdBtn = computed(() => {
+    return store.state.currentUser.superAdmin || store.state.buttonPermList.indexOf('restPwd-user-btn') > -1  || store.state.buttonPermList.indexOf('all-user-btn') > -1 
+});
+
 const dataSource = ref([]);
 const columns = reactive([
     {

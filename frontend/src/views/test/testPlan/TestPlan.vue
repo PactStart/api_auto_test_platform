@@ -32,7 +32,7 @@
                     </template>
                     <template v-if="column.key === 'action'">
                         <span>
-                            <a style="color: red;" @click="onDelClick(record.id)">删除</a>
+                            <a v-show="showDelBtn" style="color: red;" @click="onDelClick(record.id)">删除</a>
                             <a-divider type="vertical" />
                             <a @click="onViewReportClick(record.id)">查看测试报告</a>
                         </span>
@@ -45,12 +45,18 @@
 <script setup>
 import { queryTestPlan, deleteTestPlan } from '@/api/testPlan';
 import { Modal } from 'ant-design-vue';
-import { ref, onMounted, createVNode, reactive } from 'vue';
+import { ref, onMounted, createVNode, reactive,computed } from 'vue';
 import { ExclamationCircleOutlined } from '@ant-design/icons-vue';
-// import TestPlanAdd from './components/TestPlanAdd.vue';
 import { formatTimestamp } from '@/utils/time'
 import AppSelectVue from '@/components/AppSelect.vue';
 import router from '@/router';
+import { useStore } from 'vuex';
+
+const store = useStore();
+
+const showDelBtn = computed(() => {
+    return store.state.currentUser.superAdmin || store.state.buttonPermList.indexOf('del-testPlan-btn') > -1  || store.state.buttonPermList.indexOf('all-testPlan-btn') > -1 
+});
 
 const dataSource = ref([]);
 const columns = reactive([

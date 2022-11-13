@@ -134,11 +134,6 @@ const getUserRoleAndPerms = (userId) => {
 
 exports.userInfo = (req, res) => {
   const currentUser = parseToken(req);
-
-  const pagePerms = [];
-  const buttonPerms = [];
-  const roles = [];
-
   const userSelectSql = "select * from sys_user where id = ?";
   db.query(userSelectSql, currentUser.id, (err, results) => {
     if (err) {
@@ -149,52 +144,33 @@ exports.userInfo = (req, res) => {
     }
     user = results[0];
     delete user.password;
+    delete user.mfa_key;
 
-    const roleSelectSql =
-      "select r.* from sys_user_role ur join sys_role r on ur.role_id = r.id where ur.user_id = ?";
-    db.query(roleSelectSql, currentUser.id, (err, results) => {
-      if (!err && results && results.length) {
-        const roleIds = [];
-        for (let index = 0; index < results.length; index++) {
-          const role = results[index];
-          roles.push(role.name);
-          roleIds.push(role.id);
-        }
-        const permissionSelectSql =
-          "select p.type,p.name from sys_role_permission rp join sys_permission p on rp.permission_id = p.id where rp.role_id in (?)";
-        db.query(permissionSelectSql, [roleIds.join(",")], (err, results) => {
-          if (!err && results.length) {
-            for (let index = 0; index < results.length; index++) {
-              const perm = results[index];
-              if (perm.type == "Page") {
-                pagePerms.push(perm.name);
-              } else if (perm.type == "Button") {
-                buttonPerms.push(perm.name);
-              }
-            }
-          }
-          return res.send({
-            code: 0,
-            data: {
-              user: convertKeyToCamelCase(user),
-              roles,
-              pagePerms,
-              buttonPerms,
-            },
-          });
-        });
-      } else {
-        return res.send({
-          code: 0,
-          data: {
-            user: convertKeyToCamelCase(user),
-            roles: [],
-            pagePerms: [],
-            buttonPerms: []
-          },
-        });
-      }
-    });
+    getUserRoleAndPerms(user.id).then(data => {
+      let {roles, perms} = data;
+
+      const pagePerms = perms.filter(item => {
+        return item.type == 'Page'
+      }).map(item => {
+        return item.name
+      });
+
+      const buttonPerms = perms.filter(item => {
+        return item.type == 'Button'
+      }).map(item => {
+        return item.name
+      });
+
+      res.send({
+        code: 0,
+        data: {
+          user: convertKeyToCamelCase(user),
+          roles: roles,
+          pagePerms: pagePerms,
+          buttonPerms: buttonPerms
+        },
+      });
+    })
   });
 };
 

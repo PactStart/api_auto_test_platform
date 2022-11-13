@@ -2,9 +2,9 @@
     <div>
         <a-card title="用例管理">
             <template #extra>
-                <a @click="onDrawerOpen('batch_create_default_case')">批量创建</a>
+                <a v-show="showBatchAddBtn" @click="onDrawerOpen('batch_create_default_case')">批量创建</a>
                 <a-divider type="vertical" />
-                <a @click="onDrawerOpen('batch_set_pre_case')">设置前置用例</a>
+                <a v-show="showBatchUpdateBtn" @click="onDrawerOpen('batch_set_pre_case')">设置前置用例</a>
             </template>
             <div class="search-wrapper">
                 <label>选择应用：</label><AppSelectVue v-model:appId="queryForm.appId" style="width: 200px;" @update:appId="appId = $event" />
@@ -63,13 +63,13 @@
                     </template>
                     <template v-if="column.key === 'action'">
                         <span>
-                            <a @click="onDrawerOpen('edit',record)">编辑</a>
+                            <a v-show="showEditBtn" @click="onDrawerOpen('edit',record)">编辑</a>
                             <a-divider type="vertical" />
-                            <a style="color: red;" @click="onDelClick(record.id)">删除</a>
+                            <a v-show="showDelBtn"  style="color: red;" @click="onDelClick(record.id)">删除</a>
                             <a-divider type="vertical" />
-                            <a  @click="onDrawerOpen('clone',record)">克隆</a>
+                            <a v-show="showCloneBtn" @click="onDrawerOpen('clone',record)">克隆</a>
                             <a-divider type="vertical" />
-                            <a style="color: green;" @click="onDrawerOpen('debug',record)">调试</a>
+                            <a v-show="showDebugBtn" style="color: green;" @click="onDrawerOpen('debug',record)">调试</a>
                         </span>
                     </template>
                 </template>
@@ -131,6 +131,29 @@ import TestCaseClone from './components/TestCaseClone.vue';
 import TestCaseDebug from './components/TestCaseDebug.vue';
 import router from '@/router';
 import { useRoute } from 'vue-router';
+import { useStore } from 'vuex';
+
+const store = useStore();
+
+const showBatchAddBtn = computed(() => {
+    return store.state.currentUser.superAdmin || store.state.buttonPermList.indexOf('batchAdd-testCase-btn') > -1  || store.state.buttonPermList.indexOf('all-testCase-btn') > -1 
+});
+
+const showBatchUpdateBtn = computed(() => {
+    return store.state.currentUser.superAdmin || store.state.buttonPermList.indexOf('batchUpdate-testCase-btn') > -1  || store.state.buttonPermList.indexOf('all-testCase-btn') > -1 
+});
+const showDelBtn = computed(() => {
+    return store.state.currentUser.superAdmin || store.state.buttonPermList.indexOf('del-testCase-btn') > -1  || store.state.buttonPermList.indexOf('all-testCase-btn') > -1 
+});
+const showEditBtn = computed(() => {
+    return store.state.currentUser.superAdmin || store.state.buttonPermList.indexOf('edit-testCase-btn') > -1  || store.state.buttonPermList.indexOf('all-testCase-btn') > -1 
+});
+const showCloneBtn = computed(() => {
+    return store.state.currentUser.superAdmin || store.state.buttonPermList.indexOf('clone-testCase-btn') > -1  || store.state.buttonPermList.indexOf('all-testCase-btn') > -1 
+});
+const showDebugBtn = computed(() => {
+    return store.state.currentUser.superAdmin || store.state.buttonPermList.indexOf('debug-testCase-btn') > -1  || store.state.buttonPermList.indexOf('all-testCase-btn') > -1 
+});
 
 const dataSource = ref([]);
 const columns = reactive([

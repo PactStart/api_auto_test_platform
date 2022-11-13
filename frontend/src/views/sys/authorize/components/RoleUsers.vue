@@ -2,8 +2,8 @@
     <div>
         <a-card title="" size="small">
             <template #extra>
-                <a-button type="primary" @click="onAddBindingBtnClick">添加关联</a-button>
-                <a-button type="primary" danger style="margin-left: 10px;" @click="handleCancelBindings">取消关联
+                <a-button type="primary" @click="onAddBindingBtnClick" v-show="showSaveBtn">添加关联</a-button>
+                <a-button type="primary" danger style="margin-left: 10px;" @click="handleCancelBindings" v-show="showSaveBtn">取消关联
                 </a-button>
             </template>
             <div class="search-wrapper">
@@ -42,6 +42,7 @@ import { ref, reactive, onMounted, watch, createVNode, toRefs, computed } from '
 import SelectUser from './SelectUser.vue';
 import { ExclamationCircleOutlined } from '@ant-design/icons-vue';
 import { message, Modal } from 'ant-design-vue';
+import { useStore } from 'vuex';
 
 export default {
     props: ["roleId"],
@@ -217,6 +218,10 @@ export default {
                 onCancel() { },
             });
         };
+        const store = useStore();
+        const showSaveBtn = computed(() => {
+            return store.state.currentUser.superAdmin || store.state.buttonPermList.indexOf('save-roleUser-btn') > -1  || store.state.buttonPermList.indexOf('all-authorize-btn') > -1 
+        });
         return {
             currentRoleId,
             keyword,
@@ -234,6 +239,7 @@ export default {
             ...toRefs(state),
             hasSelected,
             onSelectChange,
+            showSaveBtn
         }
     }
 }

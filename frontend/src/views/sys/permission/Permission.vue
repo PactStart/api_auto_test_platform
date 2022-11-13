@@ -2,9 +2,9 @@
     <div>
         <a-card title="权限管理">
             <template #extra>
-                <a @click="onAddClick">添加</a>
+                <a v-show="showAddBtn" @click="onAddClick">添加</a>
                 <a-divider type="vertical" />
-                <a @click="onImportClick">导入</a>
+                <a v-show="showImportBtn" @click="onImportClick">导入</a>
             </template>
             <div class="search-wrapper">
                 <a-form>
@@ -97,9 +97,9 @@
                     </template>
                     <template v-if="column.key === 'action'">
                         <span>
-                            <a @click="onEditClick(record)">编辑</a>
+                            <a v-show="showEditBtn" @click="onEditClick(record)">编辑</a>
                             <a-divider type="vertical" />
-                            <a style="color: red;" @click="onDelClick(record.id)">删除</a>
+                            <a v-show="showDelBtn" style="color: red;" @click="onDelClick(record.id)">删除</a>
                         </span>
                     </template>
                 </template>
@@ -128,19 +128,40 @@
                     <inbox-outlined /><span>是否将本系统最新页面信息上传?</span>
                 </div>
             </a-tab-pane>
+            <a-tab-pane key="3" tab="导入按钮权限">
+                <div style="padding: 32px 32px;">
+                    <inbox-outlined /><span>是否将本系统最新页面按钮信息上传?</span>
+                </div>
+            </a-tab-pane>
         </a-tabs>
     </a-modal>
 </template>
 <script setup>
-import { queryPermission, updatePermission, deletePermission, importApiPerms, importPagePerms } from '@/api/permission';
+import { queryPermission, updatePermission, deletePermission, importApiPerms, importPagePerms, importButtonPerms } from '@/api/permission';
 import { message, Modal } from 'ant-design-vue';
-import { ref, onMounted, createVNode, reactive } from 'vue';
+import { ref, onMounted, createVNode, reactive, computed } from 'vue';
 import { ExclamationCircleOutlined,InboxOutlined } from '@ant-design/icons-vue';
 import PermissionAdd from './components/PermissionAdd.vue';
 import PermissionEdit from './components/PermissionEdit.vue';
 import { formatTimestamp } from '@/utils/time';
 import homeRouter from '@/router/home';
-import { forEach } from 'lodash-es';
+import btns from '@/config/btn';
+
+import { useStore } from 'vuex';
+const store = useStore();
+const showAddBtn = computed(() => {
+    return store.state.currentUser.superAdmin || store.state.buttonPermList.indexOf('add-permission-btn') > -1  || store.state.buttonPermList.indexOf('all-permission-btn') > -1 
+});
+const showImportBtn = computed(() => {
+    return store.state.currentUser.superAdmin || store.state.buttonPermList.indexOf('import-permission-btn') > -1  || store.state.buttonPermList.indexOf('all-permission-btn') > -1 
+});
+const showDelBtn = computed(() => {
+    return store.state.currentUser.superAdmin || store.state.buttonPermList.indexOf('del-permission-btn') > -1  || store.state.buttonPermList.indexOf('all-permission-btn') > -1 
+});
+const showEditBtn = computed(() => {
+    return store.state.currentUser.superAdmin || store.state.buttonPermList.indexOf('edit-permission-btn') > -1  || store.state.buttonPermList.indexOf('all-permission-btn') > -1 
+});
+const activeTab = ref("1");
 const dataSource = ref([]);
 const columns = reactive([
     {
@@ -297,9 +318,12 @@ const onClose = (type) => {
 const onImportClick = () =>{
     showImportModal.value = true;
 }
-
+const changeTab = (activeKey) => {
+    console.log('tab changed',activeKey);
+    activeTab.value = activeKey;
+}
 const handleImport = () => {
-    if(importApiForm.url) {
+    if(activeTab.value == '1' && importApiForm.url) {
         importApiPerms(importApiForm).then(res => {
             if(!res.code) {
                 handleQueryPermission();
@@ -308,10 +332,20 @@ const handleImport = () => {
                 importApiForm.url = null;
             }
         })
-    } else {
+    } else if(activeTab.value == '2') {
         const pages = convertRouter(homeRouter);
         importPagePerms({
             pages
+        }).then(res => {
+            if(!res.code) {
+                handleQueryPermission();
+                message.success('导入成功');
+                showImportModal.value = false;
+            }
+        })
+    } else if(activeTab.value == '3') {
+        importButtonPerms({
+            btns
         }).then(res => {
             if(!res.code) {
                 handleQueryPermission();

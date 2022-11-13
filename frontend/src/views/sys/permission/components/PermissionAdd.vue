@@ -2,6 +2,10 @@
     <div>
         <a-form :model="permissionForm" name="basic" :label-col="{ span: 7 }" :wrapper-col="{ span: 17 }"
             autocomplete="off" @finish="onFinish" @finishFailed="onFinishFailed">
+            <a-form-item label="上级ID" name="parentId" :rules="[{ required: true, message: 'Please input parentId!' }]">
+                <a-input-number v-model:value="permissionForm.parentId" :min="0" placeholder="请输入上级权限ID，无则为0"
+                    style="width: 100%;" />
+            </a-form-item>
             <a-form-item label="类型" name="type" :rules="[{ required: true, message: 'Please choose type!' }]">
                 <a-radio-group v-model:value="permissionForm.type">
                     <a-radio value="API">API</a-radio>
@@ -54,6 +58,7 @@ export default {
     props: ["onSuccess"],
     setup(props) {
         const permissionForm = ref({
+            parentId: 0,
             type: null,
             name: '',
             description: '',
@@ -71,6 +76,7 @@ export default {
                 if (!res.code) {
                     props.onSuccess();
                     permissionForm.value = {
+                        parentId: 0,
                         type: null,
                         name: '',
                         description: '',

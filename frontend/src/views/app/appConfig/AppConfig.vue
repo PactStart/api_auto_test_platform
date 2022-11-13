@@ -2,7 +2,7 @@
     <div>
         <a-card title="应用配置管理">
             <template #extra>
-                <a @click="onAddClick">添加</a>
+                <a v-show="showAddBtn" @click="onAddClick">添加</a>
             </template>
             <div class="search-wrapper">
                 <label>选择应用：</label><AppSelectVue  v-model:appId="queryForm.appId" style="width: 200px;" @update:appId="queryForm.appId = $event"/>
@@ -23,9 +23,9 @@
                     </template>
                     <template v-if="column.key === 'action'">
                         <span>
-                            <a @click="onEditClick(record)">编辑</a>
+                            <a v-show="showEditBtn" @click="onEditClick(record)">编辑</a>
                             <a-divider type="vertical" />
-                            <a style="color: red;" @click="onDelClick(record.id)">删除</a>
+                            <a v-show="showDelBtn" style="color: red;" @click="onDelClick(record.id)">删除</a>
                         </span>
                     </template>
                 </template>
@@ -44,12 +44,24 @@
 <script setup>
 import { queryAppConfig, updateAppConfig, deleteAppConfig } from '@/api/appConfig';
 import { message, Modal } from 'ant-design-vue';
-import { ref, onMounted, createVNode, reactive } from 'vue';
+import { ref, onMounted, createVNode, reactive, computed } from 'vue';
 import { ExclamationCircleOutlined } from '@ant-design/icons-vue';
 import AppConfigAdd from './components/AppConfigAdd.vue';
 import AppConfigEdit from './components/AppConfigEdit.vue';
 import { formatTimestamp } from '@/utils/time'
 import AppSelectVue from '@/components/AppSelect.vue';
+import { useStore } from 'vuex';
+const store = useStore();
+const showAddBtn = computed(() => {
+    return store.state.currentUser.superAdmin || store.state.buttonPermList.indexOf('add-appConfig-btn') > -1  || store.state.buttonPermList.indexOf('all-appConfig-btn') > -1 
+});
+const showDelBtn = computed(() => {
+    return store.state.currentUser.superAdmin || store.state.buttonPermList.indexOf('del-appConfig-btn') > -1  || store.state.buttonPermList.indexOf('all-appConfig-btn') > -1 
+});
+const showEditBtn = computed(() => {
+    return store.state.currentUser.superAdmin || store.state.buttonPermList.indexOf('edit-appConfig-btn') > -1  || store.state.buttonPermList.indexOf('all-appConfig-btn') > -1 
+});
+
 const dataSource = ref([]);
 const columns = reactive([
     {

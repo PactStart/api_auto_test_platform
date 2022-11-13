@@ -2,9 +2,9 @@
     <div>
         <a-card title="API管理">
             <template #extra>
-                <a @click="onAddClick">添加</a>
+                <a v-show="showAddBtn" @click="onAddClick">添加</a>
                 <a-divider type="vertical" />
-                <a @click="onImportClick">导入</a>
+                <a v-show="showImportBtn" @click="onImportClick">导入</a>
             </template>
             <div class="search-wrapper">
                 <label>选择应用：</label>
@@ -59,11 +59,11 @@
                     </template>
                     <template v-if="column.key === 'action'">
                         <span>
-                            <a @click="onEditClick(record)">编辑</a>
+                            <a v-show="showEditBtn" @click="onEditClick(record)">编辑</a>
                             <a-divider type="vertical" />
-                            <a style="color: red;" @click="onDelClick(record.id)">删除</a>
+                            <a v-show="showDelBtn" style="color: red;" @click="onDelClick(record.id)">删除</a>
                             <a-divider type="vertical" />
-                            <a @click="onAddCaseClick(record)">添加用例</a>
+                            <a v-show="showAddCaseBtn" @click="onAddCaseClick(record)">添加用例</a>
                         </span>
                     </template>
                 </template>
@@ -106,7 +106,7 @@
 <script setup>
 import { queryApi, updateApi, deleteApi, importApi, queryGroupAndModule } from '@/api/api';
 import { message, Modal } from 'ant-design-vue';
-import { ref, onMounted, createVNode, reactive, h, watch } from 'vue';
+import { ref, onMounted, createVNode, reactive, h, watch, computed } from 'vue';
 import { ExclamationCircleOutlined } from '@ant-design/icons-vue';
 import ApiAdd from './components/ApiAdd.vue';
 import ApiEdit from './components/ApiEdit.vue';
@@ -115,6 +115,25 @@ import AppSelectVue from '@/components/AppSelect.vue';
 import { EyeOutlined } from '@ant-design/icons-vue';
 import TestCaseAdd from '@/views/test/testCase/components/TestCaseAdd.vue';
 import router from '@/router';
+import { useStore } from 'vuex';
+
+const store = useStore();
+
+const showAddBtn = computed(() => {
+    return store.state.currentUser.superAdmin || store.state.buttonPermList.indexOf('add-api-btn') > -1  || store.state.buttonPermList.indexOf('all-api-btn') > -1 
+});
+const showDelBtn = computed(() => {
+    return store.state.currentUser.superAdmin || store.state.buttonPermList.indexOf('del-api-btn') > -1  || store.state.buttonPermList.indexOf('all-api-btn') > -1 
+});
+const showEditBtn = computed(() => {
+    return store.state.currentUser.superAdmin || store.state.buttonPermList.indexOf('edit-api-btn') > -1  || store.state.buttonPermList.indexOf('all-api-btn') > -1 
+});
+const showImportBtn = computed(() => {
+    return store.state.currentUser.superAdmin || store.state.buttonPermList.indexOf('import-api-btn') > -1  || store.state.buttonPermList.indexOf('all-api-btn') > -1 
+});
+const showAddCaseBtn = computed(() => {
+    return store.state.currentUser.superAdmin || store.state.buttonPermList.indexOf('add-testCase-btn') > -1  || store.state.buttonPermList.indexOf('all-testCase-btn') > -1 
+});
 
 const dataSource = ref([]);
 const columns = reactive([

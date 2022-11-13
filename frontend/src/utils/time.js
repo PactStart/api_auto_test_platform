@@ -100,7 +100,7 @@ function getTimeStamp_MS() {
   var timestamp = new Date().getTime();
   return timestamp;
 }
-function getdate(TimeStamp) {
+function getdate(date) {
   var now = new Date(date),
     y = now.getFullYear(),
     m = now.getMonth() + 1,
