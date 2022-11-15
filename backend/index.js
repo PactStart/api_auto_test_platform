@@ -219,8 +219,9 @@ app.use((err, req, res, next) => {
   });
 });
 
-app.listen(3000, () => {
-  console.log("server start on http://127.0.0.1:3000");
+let port = process.env.PORT || 3000;
+app.listen(port, () => {
+  console.log("server start on http://127.0.0.1:"+port);
   const promise = connect();
   promise.then(() => {
     cacheApiPerm();

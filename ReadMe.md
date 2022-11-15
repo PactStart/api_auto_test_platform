@@ -20,4 +20,25 @@
 
 3、安装部署
 ```
+    运行服务端：
+
+        1) 构建镜像
+            cd backend
+            docker build -t="pactstart/api_auto_test_server:1.0.0"  .
+        2) 或者从dockerhub上拉取镜像（作者已经构建好上传到dockerhub）
+            docker pull pactstart/api_auto_test_server:1.0.0
+
+        3）运行镜像
+            docker run -it -d -p 3000:3000 --name api_auto_test_server api_auto_test_server:1.0.0
+
+            镜像支持多个动态配置参数，可通过-e参数动态配置：
+            MYSQL_HOST：mysql数据库主机地址，默认值127.0.0.1
+            MYSQL_USER：mysql数据库的连接用户，默认值root
+            MYSQL_PASSWORD：mysql数据库的连接密码，默认值123456
+            MYSQL_DATABASE：连接的数据库，默认值api_auto_test
+            REDIS_URL: redis连接字符串，默认值redis://127.0.0.1:6379
+            REDIS_PASSWORD： rdis密码，默认值123456
+
+            如果你的redis和mysql是通过docker在本地启动的，且容器名字为redis和mysql（如果不一样，根据你的名字修改对应的参数），则可以通过下面的命令启动镜像，以确保服务端可以正常连接到redis和mysql
+            docker run -it -d --link mysql:mysql_alias --link redis:redis_alias -e MYSQL_HOST=mysql_alias -e REDIS_URL="redis://redis_alias:6379" -p 3000:3000 --name api_auto_test_server api_auto_test_server:1.0.0
 ```

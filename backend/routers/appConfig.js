@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const appConfigController = require('../controllers/appConfigController');
+const appConfigController = require('../controllers/AppConfigController');
 
 const expressJoi = require('@escook/express-joi');
 const AppConfigCheck = require('../utils/AppConfigCheck');

@@ -1,8 +1,8 @@
 const { createClient } = require("redis");
 
 const client = createClient({
-  url: "redis://127.0.0.1:6379",
-  password: "123456",
+  url: process.env.REDIS_URL || "redis://127.0.0.1:6379",
+  password: process.env.REDIS_PASSWORD || "123456",
 });
 client.on("connect", function () {
   console.debug("Redis client connected");
