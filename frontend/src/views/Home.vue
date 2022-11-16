@@ -97,7 +97,7 @@ getUserInfo().then(res => {
 const availRoutes = computed(() => {
     return store.state.currentUser.superAdmin ? menuRoutes[0].children : getAvailRoutes(menuRoutes[0].children,store.state.pagePermList);
 })
-console.log(availRoutes.value);
+// console.log(availRoutes.value);
 
 const handleLogout = () => {
     logout({}).then(res => {

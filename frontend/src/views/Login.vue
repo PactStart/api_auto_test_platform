@@ -33,9 +33,9 @@ import { message } from 'ant-design-vue';
 export default defineComponent({
     setup() {
         const loginForm = reactive({
-            username: 'admin',
-            password: '123456',
-            remember: true,
+            username: '',
+            password: '',
+            remember: false,
         });
 
         const onFinish = values => {

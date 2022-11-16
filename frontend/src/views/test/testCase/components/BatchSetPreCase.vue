@@ -19,7 +19,7 @@
     </div>
 </template>
 <script>
-import { ref,reactive, defineComponent } from 'vue';
+import { reactive, defineComponent } from 'vue';
 import AppSelect from '@/components/AppSelect.vue';
 import JsonEditorVue from 'json-editor-vue3';
 

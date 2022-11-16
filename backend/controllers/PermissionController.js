@@ -364,3 +364,43 @@ const insertPagePerm = async (page, parentId, now, currentUser) => {
     });
   }) 
 };
+
+exports.importButtonPermission = (req, res) => {
+  let { btns } = req.body;
+  const now = Date.now();
+  const currentUser = parseToken(req);
+  let promiseArr = [];
+  for (const btn of btns) {
+    const promise = insertButtonPerm(btn, 0, now, currentUser);
+    promiseArr.push(promise);
+  }
+  Promise.all(promiseArr).then(() => {
+    res.send({
+      code:0,
+      msg:'success'
+    })
+  });
+};
+
+const insertButtonPerm = async (btn, parentId, now, currentUser) => {
+  return new Promise(resolve => {
+    let insertSql = `insert sys_permission(parent_id,type,anon,name,description,internal,create_at,create_by,update_at) values 
+        (${parentId},'Button',1,'${btn.name}','${btn.description}',0,${now},'${currentUser.nickname}',${now}) 
+        on duplicate key update description=values(description),update_at=values(update_at),update_by='${currentUser.nickname}'`;
+    db.query(insertSql, (err, results) => {
+      if (err) {
+        throw err;
+      }
+      let promiseArr = [];
+      if (btn.children && btn.children.length) {
+        for (const item of btn.children) {
+          const promise = insertButtonPerm(item, results.insertId, now, currentUser);
+          promiseArr.push(promise);
+        }
+      }
+      Promise.all(promiseArr).then(function () {
+        resolve();
+      });
+    });
+  }) 
+};

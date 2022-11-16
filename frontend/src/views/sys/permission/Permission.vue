@@ -115,10 +115,10 @@
         <PermissionEdit :permission="permission" :onSubmit="handleUpdatePermission" />
     </a-drawer>
     <a-modal v-model:visible="showImportModal" title="导入权限" @ok="handleImport" okText="导入" cancelText="取消">
-        <a-tabs>
+        <a-tabs v-model:activeKey="activeTab">
             <a-tab-pane key="1" tab="导入API权限" force-render>
                 <a-form :model="importApiForm" :label-col="{ span: 4 }" :wrapper-col="{ span: 20 }" autocomplete="off" style="height: 150px;padding-top: 30px">
-                    <a-form-item label="URL" name="url" :rules="[{ required: true, message: 'Please input url!' }]" st>
+                    <a-form-item label="URL" name="url" :rules="[{ required: true, message: 'Please input url!' }]">
                         <a-input v-model:value="importApiForm.url" placeholder="请输入swagger api文档地址" />
                     </a-form-item>
                 </a-form>
@@ -317,10 +317,6 @@ const onClose = (type) => {
 }
 const onImportClick = () =>{
     showImportModal.value = true;
-}
-const changeTab = (activeKey) => {
-    console.log('tab changed',activeKey);
-    activeTab.value = activeKey;
 }
 const handleImport = () => {
     if(activeTab.value == '1' && importApiForm.url) {

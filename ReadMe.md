@@ -40,5 +40,16 @@
             REDIS_PASSWORD： rdis密码，默认值123456
 
             如果你的redis和mysql是通过docker在本地启动的，且容器名字为redis和mysql（如果不一样，根据你的名字修改对应的参数），则可以通过下面的命令启动镜像，以确保服务端可以正常连接到redis和mysql
-            docker run -it -d --link mysql:mysql_alias --link redis:redis_alias -e MYSQL_HOST=mysql_alias -e REDIS_URL="redis://redis_alias:6379" -p 3000:3000 --name api_auto_test_server api_auto_test_server:1.0.0
+            docker run -it -d --link mysql:mysql_alias --link redis:redis_alias -e MYSQL_HOST=mysql_alias -e REDIS_URL="redis://redis_alias:6379" -p 3000:3000 --name api_auto_test_server pactstart/api_auto_test_server:1.0.0
+
+    部署管理界面(上传构建产物到阿里云OSS)：
+
+        1）修改oss.config.js中的配置
+
+        2）修改utils/request.js中的production的接口域名路径
+
+        3）修改vue.config.js中的配置
+        
+        4）运行npm run build
+    
 ```

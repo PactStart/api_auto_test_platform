@@ -6,7 +6,7 @@ import { message } from "ant-design-vue";
  * 创建axios实例
  */
 const ENV = process.env.NODE_ENV;
-const host = ENV === "development" ? "http://127.0.0.1:3000" : "";
+const host = ENV === "development" ? "http://127.0.0.1:3000" : "http://127.0.0.1:3000";
 const service = axios.create({
   baseURL: host,
   timeout: "3000",

@@ -94,7 +94,7 @@ const getBodyExample = (api) => {
         let bodyExample2 = genJsonFromSchema(schema);
         bodyExample = { ...bodyExample2, ...bodyExample1 }
     } else if (api.request_method == "get") {
-        queryParamArr = JSON.parse(api.query);
+        let queryParamArr = JSON.parse(api.query);
         if (queryParamArr.length) {
             for (const item of queryParamArr) {
                 if (item.type == "string") {

@@ -12,7 +12,7 @@
     </div>
 </template>
 <script>
-import { ref,reactive, defineComponent } from 'vue';
+import { reactive, defineComponent } from 'vue';
 import AppSelect from '@/components/AppSelect.vue';
 
 export default defineComponent({

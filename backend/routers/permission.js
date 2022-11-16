@@ -251,7 +251,7 @@ router.get('/query',expressJoi(permissionCheck.permissionQueryCheck),permissionC
  *        in: header
  *        required: true
  *    requestBody:
- *      description: 权限信息
+ *      description: 页面权限信息
  *      content:
  *        application/json:
  *          schema:
@@ -271,5 +271,41 @@ router.get('/query',expressJoi(permissionCheck.permissionQueryCheck),permissionC
  * 
  */
  router.post('/importPagePerms',permissionController.importPagePermission);
+
+ /**
+ * @openapi
+ * /api/v1/permission/importButtonPerms:
+ *  post:
+ *    tags:
+ *      - 权限模块
+ *    summary: 批量导入页面权限点
+ *    description: 批量导入页面权限点
+ *    parameters:
+ *      - name: Authorization
+ *        type: string
+ *        description: jwt
+ *        in: header
+ *        required: true
+ *    requestBody:
+ *      description: 按钮权限信息
+ *      content:
+ *        application/json:
+ *          schema:
+ *            type: object
+ *            properties: 
+ *              pages:
+ *                type: array
+ *                required: true
+ *                description: 按钮数组
+ *    produces: 
+ *      - application/json 
+ *    consumes: 
+ *      - application/json 
+ *    responses:
+ *      200:
+ *        description: OK
+ * 
+ */
+  router.post('/importButtonPerms',permissionController.importButtonPermission);
 
 module.exports = router;
