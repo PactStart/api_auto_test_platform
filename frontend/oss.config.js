@@ -1,6 +1,6 @@
 module.exports = {
     region: 'oss-cn-shenzhen',
-    accessKeyId: '',
-    accessKeySecret: '',
-    bucket: ''
+    accessKeyId: 'LTAI5tRjvKuZdSUqoGTNoeqJ',
+    accessKeySecret: 'EeO3BKROxZvE4jnXiUxqch6CCRdfD8',
+    bucket: 'aat-admin'
 }

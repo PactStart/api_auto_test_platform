@@ -16,9 +16,14 @@
 
     4）运行界面（按照./frontend/ReadMe.md执行）
 
+    5）访问http://localhost:8080，初始账号密码admin/123456，admin为超级管理员账号（sys_user表的super_admin字段为1）
+
 ```
 
-3、安装部署
+3 效果预览
+        ![后台界面](./doc/screenshot.png)
+
+4、安装部署
 ```
     运行服务端：
 
