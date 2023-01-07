@@ -257,6 +257,6 @@ CREATE TABLE `sys_user_role` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='角色表';
 
 
-INSERT INTO `sys_user` VALUES (1, 'admin', '$2a$10$5o4WeYzr7UYZQII2pYUPhO9WBtdD7F8zMvN4BAzHsBuJIj4fBg09i', '', 'admin', '', '', '', NULL, '', 0, 1667902454625, '雷迪', 1667902454625, '', 0);
+INSERT INTO `sys_user` VALUES (1, 'admin', '$2a$10$5o4WeYzr7UYZQII2pYUPhO9WBtdD7F8zMvN4BAzHsBuJIj4fBg09i', '', 'admin', '', '', '::ffff:127.0.0.1', 1673069236075, '', 1, 1667902454625, '雷迪', 1667902454625, '', 0);
 
 SET FOREIGN_KEY_CHECKS = 1;
